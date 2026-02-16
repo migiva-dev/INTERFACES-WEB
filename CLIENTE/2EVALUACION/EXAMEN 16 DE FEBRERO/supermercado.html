@@ -283,9 +283,16 @@
       //    - Si está vacía, muestra "La cola está vacía"
       //    - Salir (return)
 
+        if (cola.estaVacia){
+            alert("La cola esta vacía");
+            return;
+        }
+
       // TODO:
       // 2) Sacar al primer cliente de la cola 
       //    - Guardalo en clienteAtendido
+       const clienteAtendido = cola.dequeue();
+      
 
       // TODO:
       // 3) Hacer una petición fetch() a "supermercado.php"
@@ -296,8 +303,21 @@
       //      cantidad: cantidad del cliente
       //    }
 
+        const respPrecio = await fetch("supermercado.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                accion: "calcular_precio",
+                item: clienteAtendido.item,
+                cantidad: clienteAtendido.cantidad,
+            }),
+        });
+
       // TODO:
       // 4) Convertir la respuesta a JSON y obtener el precio
+
+        const dataPrecio = await respPrecio.json();
+        const precio = Number(dataPrecio.precio);
 
       // TODO:
       // 5) Comprobar si el cliente tiene dinero suficiente:
@@ -305,10 +325,22 @@
       //        - Muestra mensaje de "NO atendido"
       //        - Llama a render()
       //        - Salir (return)
+        if (clienteAtendido.dinero < precio) {
+            alert(
+                `NO atendido: ${clienteAtendido.nombre} no tiene dinero suficiente. ` +
+                `Tiene ${clienteAtendido.dinero}€ y necesita ${precio}€`
+            );
 
+    render();
+    return;
+  }
       // TODO:
       // 6) Mostrar mensaje de "Atendido" si puede pagar
 
+        alert(
+            `Atendido: ${clienteAtendido.nombre} compra ${clienteAtendido.cantidad} ` +
+            `${clienteAtendido.item} por ${precio}€`
+        );
       // TODO:
       // 7) Enviar otra petición fetch() con:
       //    {
@@ -316,6 +348,14 @@
       //      importe: precio
       //    }
 
+      await fetch("supermercado.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                accion: "sumar_ingresos",
+                importe: precio,
+    }),
+  });
       renderIngresos()
       render()
     });
