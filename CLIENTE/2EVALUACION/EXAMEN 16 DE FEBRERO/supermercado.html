@@ -183,7 +183,6 @@
     }
     
 
-
     resumen() {
       const euros = this.#dinero.toFixed(2);
       return `${this.#nombre} — ${euros}€ — Compra: ${this.#cantidad} x ${this.#producto}`;
@@ -205,6 +204,11 @@
       // TODO:
       // Crea una instancia de la clase Cola
       // y guardala en una variable llamada "cola"
+
+      const cola = new Cola();
+
+
+
 
     // ===== DOM =====
     const form = document.getElementById("formCliente");
@@ -257,6 +261,17 @@
       // Crea un nuevo objeto Cliente con los datos anteriores
       // Encola el cliente en la cola
       // Limpia los inputs del formulario
+
+        const nombre = inpNombre.value.trim();
+        const dinero = parseFloat(inpDinero.value);
+        const producto = selProducto.value;
+        const cantidad = parseInt(selCantidad.value);
+
+        const nuevoCliente = new Cliente(nombre, dinero, producto, cantidad);
+
+        cola.encolar(nuevoCliente);
+
+        form.reset();
 
       render();
     });
