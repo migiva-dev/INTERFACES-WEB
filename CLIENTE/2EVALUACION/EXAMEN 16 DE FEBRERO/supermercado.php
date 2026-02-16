@@ -66,7 +66,10 @@ if ($accion === "calcular_precio") {
 }
 
     if ($accion === "sumar_ingresos") {
+        
+    // TODO:
     // 1) Guarda el importe enviado desde el array $data en $importe.
+
     $importe = $data["importe"] ?? 0;
 
     if (!is_numeric($importe)) {
@@ -75,7 +78,10 @@ if ($accion === "calcular_precio") {
     }
     $importe = (float)$importe;
 
-    // 2) Comprueba si existe la cookie "ingresos"
+    // // TODO:
+    // 2) Comprueba si existe la cookie "ingresos":
+    //    - Si existe, guardala en una variable $actual.
+    //    - Si no existe, asigna 0 a $actual.
     if (isset($_COOKIE["ingresos"]) && is_numeric($_COOKIE["ingresos"])) {
         $actual = (float)$_COOKIE["ingresos"];
     } else {
@@ -83,9 +89,9 @@ if ($accion === "calcular_precio") {
     }
 
     // TODO:
-  // 3) Calcula el nuevo total de ingresos:
-  //    - $nuevo = $actual + $importe
-  
+    // 3) Calcula el nuevo total de ingresos:
+    //    - $nuevo = $actual + $importe
+
     $nuevo = round($actual + $importe, 2);
 
     // TODO:
