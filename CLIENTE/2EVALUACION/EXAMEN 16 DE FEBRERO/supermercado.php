@@ -12,7 +12,6 @@ $raw = file_get_contents("php://input");
 // 2) Convierte el JSON recibido a un array asociativo llamado $data.
 $data = json_decode($raw, true);
 
-// Si el JSON no es válido o viene vacío
 if (!is_array($data)) {
   echo json_encode(["error" => "JSON inválido"], JSON_UNESCAPED_UNICODE);
   exit;
@@ -32,10 +31,14 @@ $precios = [
 ];
 
 if ($accion === "calcular_precio") {
+    // TODO:
   // 1) Obtén el producto a partir del array $data y guardalo en una variable $item.
+
   $item = $data["item"] ?? null;
 
+   // TODO:
   // 2) Obtén la cantidad a partir del array $data y guardala en una variable $cantidad.
+
   $cantidad = $data["cantidad"] ?? null;
 
   if (!$item || !isset($precios[$item])) {
@@ -50,11 +53,18 @@ if ($accion === "calcular_precio") {
   }
   $cantidad = (int)$cantidad;
 
-  // 3) Calcula el precio total
+  // TODO:
+  // 3) Calcula el precio total:
+  //    - Obtén el precio unitario del producto desde el array $precios usando $item como clave.
+  //    - Multiplica precio_unitario * cantidad.
+  //    - Guarda el resultado en $precio.
+
   $precio_unitario = (float)$precios[$item];
   $precio = round($precio_unitario * $cantidad, 2);
 
-  // 4) Devuelve una respuesta JSON
+  // TODO:
+  // 4) Devuelve una respuesta JSON usando echo json_encode(...) con los siguientes campos:
+  
   echo json_encode([
     "item" => $item,
     "cantidad" => $cantidad,
@@ -66,7 +76,7 @@ if ($accion === "calcular_precio") {
 }
 
     if ($accion === "sumar_ingresos") {
-        
+
     // TODO:
     // 1) Guarda el importe enviado desde el array $data en $importe.
 
