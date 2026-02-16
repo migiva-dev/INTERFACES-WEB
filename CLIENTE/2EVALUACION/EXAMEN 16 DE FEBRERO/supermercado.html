@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cola de Clientes - Supermercado</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; line-height: 1.4; margin: 20px; }
+    form { display: grid; gap: 10px; max-width: 520px; padding: 12px; border: 1px solid #ddd; border-radius: 10px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label { display: grid; gap: 6px; font-weight: 600; }
+    input, select, button { padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+    button { cursor: pointer; font-weight: 700; }
+    .panel { margin-top: 14px; padding: 12px; border: 1px solid #ddd; border-radius: 10px; }
+    .muted { color: #666; }
+    ul { margin: 10px 0 0; padding-left: 18px; }
+    li { margin: 6px 0; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+
+  <h2>Supermercado</h2>
+  
+  <form id="formCliente" autocomplete="off">
+    <div class="row">
+      <label>
+        Nombre
+        <input id="inpNombre" type="text" placeholder="Ej: Ana" required />
+      </label>
+
+      <label>
+        Dinero (€)
+        <input id="inpDinero" type="number" min="0" step="0.01" placeholder="Ej: 25.50" required />
+      </label>
+    </div>
+
+    <div class="row">
+      <label>
+        Producto
+        <select id="selProducto" required>
+          <option value="Pan">Pan</option>
+          <option value="Leche">Leche</option>
+          <option value="Huevos">Huevos</option>
+          <option value="Arroz">Arroz</option>
+          <option value="Café">Café</option>
+        </select>
+      </label>
+
+      <label>
+        Cantidad
+        <select id="selCantidad" required>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row">
+      <button type="submit">Añadir a la cola</button>
+      <button type="button" id="btnAtender">Atender</button>
+    </div>
+  </form>
+
+  <div class="panel">
+    <p><strong>Ingresos (cookie):</strong> <span id="ingresos">0.00</span> €</p>
+    <p><strong>Salida (último atendido):</strong> <span id="salida">(nada aún)</span></p>
+    <p><strong>Cola:</strong> <span id="cola">(vacía)</span></p>
+    <p><strong>Clientes (lista):</strong></p>
+    <ul id="listaClientes"></ul>
+  </div>
+
+  <script>
+    // ===== Clase Cola =====
+    class Cola {
+      #items;
+
+      constructor() {
+        this.#items = [];
+      }
+
+      enqueue(elemento) {
+        this.#items.push(elemento);
+      }
+
+      dequeue() {
+        if (this.isEmpty()) return null;
+        return this.#items.shift();
+      }
+
+      isEmpty() {
+        return this.#items.length === 0;
+      }
+
+      size() {
+        return this.#items.length;
+      }
+
+      toArray() {
+        return this.#items.slice();
+      }
+
+      mostrar() {
+        if (this.isEmpty()) return "(vacía)";
+        let resultado = "";
+        for (let i = 0; i < this.#items.length; i++) {
+          resultado += this.#items[i].getNombre();
+          if (i < this.#items.length - 1) resultado += " → ";
+        }
+        return resultado;
+      }
+    }
+
+  // ===== Clase Cliente =====
+  class Cliente {
+
+    // TODO: Define los atributos privados:
+    // - nombre
+    // - dinero
+    // - producto
+    // - cantidad
+
+    #nombre;
+    #dinero;
+    #producto;
+    #cantidad;
+
+    // TODO: Crea el constructor que reciba:
+    // (nombre, dinero, producto, cantidad)
+    // y asigne los valores a los atributos privados
+    // utilizando los setters
+    constructor(nombre, dinero, producto, cantidad){
+      this.nombre = nombre;
+      this.dinero = dinero;
+      this.producto = producto;
+      this.cantidad = cantidad;
+    }
+
+    // TODO: Implementa los getters:
+    // getNombre()
+    // getDinero()
+    // getProducto()
+    // getCantidad()
+
+    getNombre(){
+      return this.#nombre;
+    }
+    
+    getDinero(){
+      return this.#dinero;
+    }
+
+    getProducto(){
+      return this.#producto;
+    }
+
+    getCantidad(){
+      return this.#cantidad;
+    }
+
+    // TODO: Implementa los setters:
+    // setNombre(nombre)
+    // setDinero(dinero)
+    // setProducto(producto)
+    // setCantidad(cantidad)
+
+    setNombre(){
+      this.#nombre = nombre;
+    }
+
+    setDinero(){
+      this.#dinero = dinero;
+    }
+
+    setProducto(){
+      this.#producto = producto;
+    }
+
+    setCantidad(){
+      this.#cantidad = cantidad;
+    }
+    
+
+
+    resumen() {
+      const euros = this.#dinero.toFixed(2);
+      return `${this.#nombre} — ${euros}€ — Compra: ${this.#cantidad} x ${this.#producto}`;
+    }
+  }
+
+    // ===== Cookies =====
+    function getCookie(nombre) {
+      const nombreEQ = nombre + "=";
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        let c = cookies[i].trim();
+        if (c.indexOf(nombreEQ) === 0) return decodeURIComponent(c.substring(nombreEQ.length));
+      }
+      return null;
+    }
+
+    // ===== Instancia de la cola =====
+      // TODO:
+      // Crea una instancia de la clase Cola
+      // y guardala en una variable llamada "cola"
+
+    // ===== DOM =====
+    const form = document.getElementById("formCliente");
+    const inpNombre = document.getElementById("inpNombre");
+    const inpDinero = document.getElementById("inpDinero");
+    const selProducto = document.getElementById("selProducto");
+    const selCantidad = document.getElementById("selCantidad");
+
+    const salida = document.getElementById("salida");
+    const colaSpan = document.getElementById("cola");
+    const listaClientes = document.getElementById("listaClientes");
+    const btnAtender = document.getElementById("btnAtender");
+
+    const ingresosSpan = document.getElementById("ingresos");
+
+    function renderIngresos() {
+      const v = getCookie("ingresos");
+      const num = v === null ? 0 : Number(v);
+      ingresosSpan.textContent = (Number.isFinite(num) ? num : 0).toFixed(2);
+    }
+
+    // ===== Renderizado cola/lista =====
+    function render() {
+      colaSpan.textContent = `${cola.mostrar()} (tamaño: ${cola.size()})`;
+
+      const arr = cola.toArray();
+      listaClientes.innerHTML = "";
+
+      if (arr.length === 0) {
+        const li = document.createElement("li");
+        li.className = "muted";
+        li.textContent = "(no hay clientes en cola)";
+        listaClientes.appendChild(li);
+        return;
+      }
+
+      for (let i = 0; i < arr.length; i++) {
+        const cliente = arr[i];
+        const li = document.createElement("li");
+        li.textContent = `${i + 1}. ${cliente.resumen()}`;
+        listaClientes.appendChild(li);
+      }
+    }
+
+    // ===== Añadir cliente =====
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      // TODO: Recoge los valores de: inpNombre, inpDinero, selProducto y selCantidad
+      // Crea un nuevo objeto Cliente con los datos anteriores
+      // Encola el cliente en la cola
+      // Limpia los inputs del formulario
+
+      render();
+    });
+
+    // ===== Atender (peticiones a PHP) =====
+    btnAtender.addEventListener("click", async () => {
+      // TODO:
+      // 1) Comprobar si la cola está vacía
+      //    - Si está vacía, muestra "La cola está vacía"
+      //    - Salir (return)
+
+      // TODO:
+      // 2) Sacar al primer cliente de la cola 
+      //    - Guardalo en clienteAtendido
+
+      // TODO:
+      // 3) Hacer una petición fetch() a "supermercado.php"
+      //    enviando:
+      //    {
+      //      accion: "calcular_precio",
+      //      item: item del cliente,
+      //      cantidad: cantidad del cliente
+      //    }
+
+      // TODO:
+      // 4) Convertir la respuesta a JSON y obtener el precio
+
+      // TODO:
+      // 5) Comprobar si el cliente tiene dinero suficiente:
+      //    - Si dineroCliente < precio:
+      //        - Muestra mensaje de "NO atendido"
+      //        - Llama a render()
+      //        - Salir (return)
+
+      // TODO:
+      // 6) Mostrar mensaje de "Atendido" si puede pagar
+
+      // TODO:
+      // 7) Enviar otra petición fetch() con:
+      //    {
+      //      accion: "sumar_ingresos",
+      //      importe: precio
+      //    }
+
+      renderIngresos()
+      render()
+    });
+
+    // ===== Inicial =====
+    renderIngresos();
+    render();
+  </script>
+
+</body>
+</html>
