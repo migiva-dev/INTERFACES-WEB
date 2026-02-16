@@ -14,213 +14,355 @@
     .muted { color: #666; }
     ul { margin: 10px 0 0; padding-left: 18px; }
     li { margin: 6px 0; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
   </style>
 </head>
 <body>
 
-<h2>Supermercado</h2>
+  <h2>Supermercado</h2>
+  
+  <form id="formCliente" autocomplete="off">
+    <div class="row">
+      <label>
+        Nombre
+        <input id="inpNombre" type="text" placeholder="Ej: Ana" required />
+      </label>
 
-<form id="formCliente" autocomplete="off">
-  <div class="row">
-    <label>
-      Nombre
-      <input id="inpNombre" type="text" required />
-    </label>
+      <label>
+        Dinero (€)
+        <input id="inpDinero" type="number" min="0" step="0.01" placeholder="Ej: 25.50" required />
+      </label>
+    </div>
 
-    <label>
-      Dinero (€)
-      <input id="inpDinero" type="number" min="0" step="0.01" required />
-    </label>
+    <div class="row">
+      <label>
+        Producto
+        <select id="selProducto" required>
+          <option value="Pan">Pan</option>
+          <option value="Leche">Leche</option>
+          <option value="Huevos">Huevos</option>
+          <option value="Arroz">Arroz</option>
+          <option value="Café">Café</option>
+        </select>
+      </label>
+
+      <label>
+        Cantidad
+        <select id="selCantidad" required>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row">
+      <button type="submit">Añadir a la cola</button>
+      <button type="button" id="btnAtender">Atender</button>
+    </div>
+  </form>
+
+  <div class="panel">
+    <p><strong>Ingresos (cookie):</strong> <span id="ingresos">0.00</span> €</p>
+    <p><strong>Salida (último atendido):</strong> <span id="salida">(nada aún)</span></p>
+    <p><strong>Cola:</strong> <span id="cola">(vacía)</span></p>
+    <p><strong>Clientes (lista):</strong></p>
+    <ul id="listaClientes"></ul>
   </div>
 
-  <div class="row">
-    <label>
-      Producto
-      <select id="selProducto" required>
-        <option value="Pan">Pan</option>
-        <option value="Leche">Leche</option>
-        <option value="Huevos">Huevos</option>
-        <option value="Arroz">Arroz</option>
-        <option value="Café">Café</option>
-      </select>
-    </label>
+  <script>
+    // ===== Clase Cola =====
+    class Cola {
+      #items;
 
-    <label>
-      Cantidad
-      <select id="selCantidad" required>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="5">5</option>
-        <option value="10">10</option>
-      </select>
-    </label>
-  </div>
+      constructor() {
+        this.#items = [];
+      }
 
-  <div class="row">
-    <button type="submit">Añadir a la cola</button>
-    <button type="button" id="btnAtender">Atender</button>
-  </div>
-</form>
+      enqueue(elemento) {
+        this.#items.push(elemento);
+      }
 
-<div class="panel">
-  <p><strong>Ingresos (cookie):</strong> <span id="ingresos">0.00</span> €</p>
-  <p><strong>Salida:</strong> <span id="salida">(nada aún)</span></p>
-  <p><strong>Cola:</strong> <span id="cola">(vacía)</span></p>
-  <p><strong>Clientes (lista):</strong></p>
-  <ul id="listaClientes"></ul>
-</div>
+      dequeue() {
+        if (this.isEmpty()) return null;
+        return this.#items.shift();
+      }
 
-<script>
+      isEmpty() {
+        return this.#items.length === 0;
+      }
 
-class Cola {
-  #items = [];
+      size() {
+        return this.#items.length;
+      }
 
-  enqueue(e) { this.#items.push(e); }
-  dequeue() { return this.isEmpty() ? null : this.#items.shift(); }
-  isEmpty() { return this.#items.length === 0; }
-  size() { return this.#items.length; }
-  toArray() { return this.#items.slice(); }
+      toArray() {
+        return this.#items.slice();
+      }
 
-  mostrar() {
-    if (this.isEmpty()) return "(vacía)";
-    return this.#items.map(c => c.getNombre()).join(" → ");
-  }
-}
+      mostrar() {
+        if (this.isEmpty()) return "(vacía)";
+        let resultado = "";
+        for (let i = 0; i < this.#items.length; i++) {
+          resultado += this.#items[i].getNombre();
+          if (i < this.#items.length - 1) resultado += " → ";
+        }
+        return resultado;
+      }
+    }
 
-class Cliente {
-  #nombre; #dinero; #producto; #cantidad;
+  // ===== Clase Cliente =====
+  class Cliente {
 
-  constructor(nombre, dinero, producto, cantidad) {
-    this.setNombre(nombre);
-    this.setDinero(dinero);
-    this.setProducto(producto);
-    this.setCantidad(cantidad);
-  }
+    // TODO: Define los atributos privados:
+    // - nombre
+    // - dinero
+    // - producto
+    // - cantidad
 
-  getNombre(){ return this.#nombre; }
-  getDinero(){ return this.#dinero; }
-  getProducto(){ return this.#producto; }
-  getCantidad(){ return this.#cantidad; }
+    #nombre;
+    #dinero;
+    #producto;
+    #cantidad;
 
-  setNombre(nombre){ this.#nombre = nombre; }
-  setDinero(dinero){ this.#dinero = dinero; }
-  setProducto(producto){ this.#producto = producto; }
-  setCantidad(cantidad){ this.#cantidad = cantidad; }
+    // TODO: Crea el constructor que reciba:
+    // (nombre, dinero, producto, cantidad)
+    // y asigne los valores a los atributos privados
+    // utilizando los setters
+    constructor(nombre, dinero, producto, cantidad){
+      this.setNombre(nombre);
+      this.setDinero(dinero);
+      this.setProducto(producto);
+      this.setCantidad(cantidad);
+    }
 
-  resumen(){
-    return `${this.#nombre} — ${Number(this.#dinero).toFixed(2)}€ — ${this.#cantidad} x ${this.#producto}`;
-  }
-}
+    // TODO: Implementa los getters:
+    // getNombre()
+    // getDinero()
+    // getProducto()
+    // getCantidad()
 
-function getCookie(nombre) {
-  const cookies = document.cookie.split(";");
-  for (let c of cookies) {
-    c = c.trim();
-    if (c.startsWith(nombre + "=")) {
-      return decodeURIComponent(c.substring(nombre.length + 1));
+    getNombre(){
+      return this.#nombre;
+    }
+    
+    getDinero(){
+      return this.#dinero;
+    }
+
+    getProducto(){
+      return this.#producto;
+    }
+
+    getCantidad(){
+      return this.#cantidad;
+    }
+
+    // TODO: Implementa los setters:
+    // setNombre(nombre)
+    // setDinero(dinero)
+    // setProducto(producto)
+    // setCantidad(cantidad)
+
+    setNombre(nombre){
+      this.#nombre = nombre;
+    }
+
+    setDinero(dinero){
+      this.#dinero = dinero;
+    }
+
+    setProducto(producto){
+      this.#producto = producto;
+    }
+
+    setCantidad(cantidad){
+      this.#cantidad = cantidad;
+    }
+    
+    resumen() {
+      const euros = Number(this.#dinero).toFixed(2);
+      return `${this.#nombre} — ${euros}€ — Compra: ${this.#cantidad} x ${this.#producto}`;
     }
   }
-  return null;
-}
 
-const cola = new Cola();
+    // ===== Cookies =====
+    function getCookie(nombre) {
+      const nombreEQ = nombre + "=";
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        let c = cookies[i].trim();
+        if (c.indexOf(nombreEQ) === 0) return decodeURIComponent(c.substring(nombreEQ.length));
+      }
+      return null;
+    }
 
-const form = document.getElementById("formCliente");
-const salida = document.getElementById("salida");
-const colaSpan = document.getElementById("cola");
-const listaClientes = document.getElementById("listaClientes");
-const ingresosSpan = document.getElementById("ingresos");
+    // ===== Instancia de la cola =====
+      // TODO:
+      // Crea una instancia de la clase Cola
+      // y guardala en una variable llamada "cola"
+      const cola = new Cola();
 
-function renderIngresos(){
-  const v = getCookie("ingresos");
-  ingresosSpan.textContent = v ? Number(v).toFixed(2) : "0.00";
-}
+    // ===== DOM =====
+    const form = document.getElementById("formCliente");
+    const inpNombre = document.getElementById("inpNombre");
+    const inpDinero = document.getElementById("inpDinero");
+    const selProducto = document.getElementById("selProducto");
+    const selCantidad = document.getElementById("selCantidad");
 
-function render(){
-  colaSpan.textContent = `${cola.mostrar()} (tamaño: ${cola.size()})`;
-  listaClientes.innerHTML = "";
+    const salida = document.getElementById("salida");
+    const colaSpan = document.getElementById("cola");
+    const listaClientes = document.getElementById("listaClientes");
+    const btnAtender = document.getElementById("btnAtender");
 
-  cola.toArray().forEach((c,i)=>{
-    const li = document.createElement("li");
-    li.textContent = `${i+1}. ${c.resumen()}`;
-    listaClientes.appendChild(li);
-  });
-}
+    const ingresosSpan = document.getElementById("ingresos");
 
-form.addEventListener("submit",(e)=>{
-  e.preventDefault();
+    function renderIngresos() {
+      const v = getCookie("ingresos");
+      const num = v === null ? 0 : Number(v);
+      ingresosSpan.textContent = (Number.isFinite(num) ? num : 0).toFixed(2);
+    }
 
-  const nuevo = new Cliente(
-    inpNombre.value.trim(),
-    parseFloat(inpDinero.value),
-    selProducto.value,
-    parseInt(selCantidad.value)
-  );
+    // ===== Renderizado cola/lista =====
+    function render() {
+      colaSpan.textContent = `${cola.mostrar()} (tamaño: ${cola.size()})`;
 
-  cola.enqueue(nuevo);
-  salida.textContent = `Añadido: ${nuevo.getNombre()}`;
-  form.reset();
-  render();
-});
+      const arr = cola.toArray();
+      listaClientes.innerHTML = "";
 
-btnAtender.addEventListener("click", async ()=>{
+      if (arr.length === 0) {
+        const li = document.createElement("li");
+        li.className = "muted";
+        li.textContent = "(no hay clientes en cola)";
+        listaClientes.appendChild(li);
+        return;
+      }
 
-  if (cola.isEmpty()){
-    salida.textContent = "La cola está vacía";
-    return;
-  }
+      for (let i = 0; i < arr.length; i++) {
+        const cliente = arr[i];
+        const li = document.createElement("li");
+        li.textContent = `${i + 1}. ${cliente.resumen()}`;
+        listaClientes.appendChild(li);
+      }
+    }
 
-  const cliente = cola.dequeue();
+    // ===== Añadir cliente =====
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-  const resp = await fetch("supermercado.php",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      accion:"calcular_precio",
-      item: cliente.getProducto(),
-      cantidad: cliente.getCantidad()
-    })
-  });
+      // TODO: Recoge los valores de: inpNombre, inpDinero, selProducto y selCantidad
+      const nombre = inpNombre.value.trim();
+      const dinero = parseFloat(inpDinero.value);
+      const producto = selProducto.value;
+      const cantidad = parseInt(selCantidad.value, 10);
 
-  const data = await resp.json();
+      // Crea un nuevo objeto Cliente con los datos anteriores
+      const nuevoCliente = new Cliente(nombre, dinero, producto, cantidad);
 
-  if (data.error){
-    salida.textContent = data.error;
+      // Encola el cliente en la cola
+      cola.enqueue(nuevoCliente);
+
+      // Limpia los inputs del formulario
+      form.reset();
+
+      salida.textContent = `Añadido: ${nuevoCliente.getNombre()}`;
+
+      render();
+    });
+
+    // ===== Atender (peticiones a PHP) =====
+    btnAtender.addEventListener("click", async () => {
+      // TODO:
+      // 1) Comprobar si la cola está vacía
+      //    - Si está vacía, muestra "La cola está vacía"
+      //    - Salir (return)
+      if (cola.isEmpty()) {
+        salida.textContent = "La cola está vacía";
+        return;
+      }
+
+      // TODO:
+      // 2) Sacar al primer cliente de la cola 
+      //    - Guardalo en clienteAtendido
+      const clienteAtendido = cola.dequeue();
+
+      // TODO:
+      // 3) Hacer una petición fetch() a "supermercado.php"
+      //    enviando:
+      //    {
+      //      accion: "calcular_precio",
+      //      item: item del cliente,
+      //      cantidad: cantidad del cliente
+      //    }
+      const respPrecio = await fetch("supermercado.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accion: "calcular_precio",
+          item: clienteAtendido.getProducto(),
+          cantidad: clienteAtendido.getCantidad()
+        })
+      });
+
+      // TODO:
+      // 4) Convertir la respuesta a JSON y obtener el precio
+      const dataPrecio = await respPrecio.json();
+
+      // Si el servidor devuelve error, lo mostramos y salimos
+      if (dataPrecio.error) {
+        salida.textContent = dataPrecio.error;
+        render();
+        return;
+      }
+
+      const precio = Number(dataPrecio.precio);
+
+      // TODO:
+      // 5) Comprobar si el cliente tiene dinero suficiente:
+      //    - Si dineroCliente < precio:
+      //        - Muestra mensaje de "NO atendido"
+      //        - Llama a render()
+      //        - Salir (return)
+      const dineroCliente = Number(clienteAtendido.getDinero());
+
+      if (dineroCliente < precio) {
+        salida.textContent =
+          `NO atendido: ${clienteAtendido.getNombre()} no tiene dinero suficiente. ` +
+          `Tiene ${dineroCliente.toFixed(2)}€ y necesita ${precio.toFixed(2)}€`;
+        render();
+        return;
+      }
+
+      // TODO:
+      // 6) Mostrar mensaje de "Atendido" si puede pagar
+      salida.textContent =
+        `Atendido: ${clienteAtendido.getNombre()} paga ${precio.toFixed(2)}€`;
+
+      // TODO:
+      // 7) Enviar otra petición fetch() con:
+      //    {
+      //      accion: "sumar_ingresos",
+      //      importe: precio
+      //    }
+      await fetch("supermercado.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accion: "sumar_ingresos",
+          importe: precio
+        })
+      });
+
+      renderIngresos()
+      render()
+    });
+
+    // ===== Inicial =====
+    renderIngresos();
     render();
-    return;
-  }
-
-  const precio = Number(data.precio);
-  const dinero = cliente.getDinero();
-
-  if (dinero < precio){
-    salida.textContent =
-      `NO atendido: ${cliente.getNombre()} no tiene dinero suficiente`;
-    render();
-    return;
-  }
-
-  await fetch("supermercado.php",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      accion:"sumar_ingresos",
-      importe: precio
-    })
-  });
-
-  salida.textContent =
-    `Atendido: ${cliente.getNombre()} paga ${precio.toFixed(2)}€`;
-
-  renderIngresos();
-  render();
-});
-
-renderIngresos();
-render();
-
-</script>
+  </script>
 
 </body>
 </html>
