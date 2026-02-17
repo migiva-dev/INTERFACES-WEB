@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel con contraseñas</title>
+    <style>
+        input {
+            padding: 6px;
+            font-size: 16px;
+            width: 300px;
+        }
+
+        #info {
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-line;
+        }
+
+        .ok { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h1>Panel con contraseñas</h1>
+
+<p>
+Shift + Enter → Guardar contraseña
+
+<br>
+<br>
+
+Ctrl + Z → reset cola
+</p>
+
+<input type="text" id="textInput" placeholder="Escribe algo...">
+
+<div id="info">Estado: Inactivo</div>
+
+<script>
+
+/* ==================================================
+   VARIABLES
+================================================== */
+const input = document.getElementById("textInput");
+const info = document.getElementById("info");
+
+let grabando = false;   
+const passwordCorrecta = "telenox$Ç";
+
+/* ==================================================
+   COLA 
+================================================== */
+class Cola {
+    constructor() {
+        this.elementos = [];
+    }
+
+    encolar(tecla) {
+        if (this.elementos.length >= 9) {
+            this.elementos.shift();
+        }
+        this.elementos.push(tecla);
+    }
+
+    reset() {
+        this.elementos = [];
+    }
+
+    obtenerTexto() {
+        return this.elementos.join("");
+    }
+}
+
+const cola = new Cola();
+
+/* ==================================================
+   FUNCIÓN PARA GRABAR TECLAS
+   (Necesaria para removeEventListener)
+================================================== */
+function grabarTecla(event) {
+
+    if (event.key.length === 1) {
+        cola.encolar(event.key);
+    }
+
+    info.textContent =
+        "Grabando...\nCola: " + cola.obtenerTexto();
+}
+
+/* ==================================================
+   EVENTO PRINCIPAL
+================================================== */
+input.addEventListener("keydown", function(event) {
+
+    // CTRL + Z → reset
+    if (event.ctrlKey && event.key === "z") {
+        event.preventDefault();
+        cola.reset();
+        info.textContent = "Cola reseteada";
+        return;
+    }
+
+    // SHIFT + ENTER 
+    if (event.shiftKey && event.key === "Enter") {
+
+        event.preventDefault();
+
+        grabando = !grabando;
+
+        if (grabando) {
+
+            cola.reset();
+            input.value = "";
+
+            input.addEventListener("keydown", grabarTecla);
+
+            info.textContent = "Estado: Grabando contraseña...";
+
+        } else {
+
+            input.removeEventListener("keydown", grabarTecla);
+
+            const intento = cola.obtenerTexto();
+
+            if (intento === passwordCorrecta) {
+                info.textContent = " Contraseña correcta";
+                info.className = "ok";
+            } else {
+                info.textContent = " Contraseña incorrecta";
+                info.className = "error";
+            }
+        }
+    }
+});
+
+</script>
+
+</body>
+</html>
