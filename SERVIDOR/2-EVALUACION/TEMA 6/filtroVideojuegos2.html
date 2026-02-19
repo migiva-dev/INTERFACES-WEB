@@ -21,8 +21,6 @@
     <label for="tabla">Tabla:</label>
     <select id="tabla">
       <option value="videojuego">videojuego</option>
-      <!-- Si en el PHP has permitido "videojuegos" también, puedes añadirla -->
-      <!-- <option value="videojuegos">videojuegos</option> -->
     </select>
   </div>
 
@@ -40,6 +38,7 @@
 
 <script>
 document.getElementById("btnBuscar").addEventListener("click", async () => {
+
   const tabla = document.getElementById("tabla").value;
   const id = document.getElementById("id").value;
 
@@ -50,14 +49,15 @@ document.getElementById("btnBuscar").addEventListener("click", async () => {
   estado.innerText = "Consultando servidor...";
   resultado.innerText = "";
 
-  // Validaciones básicas
   const idNum = parseInt(id, 10);
+
   if (!tabla) {
     estado.className = "error";
     estado.innerText = "Error";
     resultado.innerText = "Selecciona una tabla.";
     return;
   }
+
   if (!Number.isInteger(idNum) || idNum <= 0) {
     estado.className = "error";
     estado.innerText = "Error";
@@ -66,7 +66,8 @@ document.getElementById("btnBuscar").addEventListener("click", async () => {
   }
 
   try {
-    const resp = await fetch("videojuegos2_api.php", {
+
+    const resp = await fetch("./videojuegos_api2.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -88,29 +89,25 @@ document.getElementById("btnBuscar").addEventListener("click", async () => {
       return;
     }
 
-    // Si no hay resultado
-    if (data.encontrado === false || !data.registro) {
+    if (!data.encontrado) {
       estado.innerText = "Resultados: 0 registro(s)";
       resultado.innerText = "No existe ningún registro con ese ID en esa tabla.";
       return;
     }
 
-    // Mostrar resultados (manteniendo el estilo del ejemplo)
     estado.innerText = "Resultados: 1 registro(s)";
 
     let texto = "";
 
-    // Si es un videojuego y tiene esos campos, lo mostramos igual que tu ejemplo
-    if (data.registro.id_videojuego !== undefined && data.registro.titulo !== undefined) {
+    if (data.registro.id_videojuego !== undefined) {
       texto += "#" + data.registro.id_videojuego +
                " | " + (data.registro.titulo ?? "") +
                " | " + (data.registro.fecha_lanzamiento ?? "") +
                " | €" + (data.registro.precio_base ?? "") +
                "\n";
     } else {
-      // Si es otra tabla (o estructura distinta), lo mostramos campo por campo
-      for (const k in data.registro) {
-        texto += k + ": " + data.registro[k] + "\n";
+      for (const campo in data.registro) {
+        texto += campo + ": " + data.registro[campo] + "\n";
       }
     }
 
@@ -121,6 +118,7 @@ document.getElementById("btnBuscar").addEventListener("click", async () => {
     estado.innerText = "Error de red o JSON inválido";
     resultado.innerText = String(err);
   }
+
 });
 </script>
 
