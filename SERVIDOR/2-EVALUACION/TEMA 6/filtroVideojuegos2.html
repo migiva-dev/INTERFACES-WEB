@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Filtro de videojuegos</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; }
+    .fila { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    label { min-width: 170px; }
+    input, select { padding: 6px; }
+    button { padding: 8px 12px; cursor: pointer; }
+    pre { background: #f6f6f6; padding: 12px; border-radius: 6px; overflow: auto; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+
+  <h2>Buscar videojuegos por Tabla e ID</h2>
+
+  <div class="fila">
+    <label for="tabla">Tabla:</label>
+    <select id="tabla">
+      <option value="videojuego">videojuego</option>
+      <!-- Si en el PHP has permitido "videojuegos" también, puedes añadirla -->
+      <!-- <option value="videojuegos">videojuegos</option> -->
+    </select>
+  </div>
+
+  <div class="fila">
+    <label for="id">ID del registro:</label>
+    <input id="id" type="number" min="1" step="1" value="1" />
+  </div>
+
+  <div class="fila">
+    <button id="btnBuscar">Buscar</button>
+  </div>
+
+  <p id="estado"></p>
+  <pre id="resultado">Pulsa “Buscar” para ver resultados…</pre>
+
+<script>
+document.getElementById("btnBuscar").addEventListener("click", async () => {
+  const tabla = document.getElementById("tabla").value;
+  const id = document.getElementById("id").value;
+
+  const estado = document.getElementById("estado");
+  const resultado = document.getElementById("resultado");
+
+  estado.className = "";
+  estado.innerText = "Consultando servidor...";
+  resultado.innerText = "";
+
+  // Validaciones básicas
+  const idNum = parseInt(id, 10);
+  if (!tabla) {
+    estado.className = "error";
+    estado.innerText = "Error";
+    resultado.innerText = "Selecciona una tabla.";
+    return;
+  }
+  if (!Number.isInteger(idNum) || idNum <= 0) {
+    estado.className = "error";
+    estado.innerText = "Error";
+    resultado.innerText = "Introduce un ID válido (entero > 0).";
+    return;
+  }
+
+  try {
+    const resp = await fetch("videojuegos2_api.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        accion: "buscar_por_tabla_id",
+        tabla: tabla,
+        id: idNum
+      })
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      estado.className = "error";
+      estado.innerText = "Error del servidor";
+      resultado.innerText = JSON.stringify(data, null, 2);
+      return;
+    }
+
+    // Si no hay resultado
+    if (data.encontrado === false || !data.registro) {
+      estado.innerText = "Resultados: 0 registro(s)";
+      resultado.innerText = "No existe ningún registro con ese ID en esa tabla.";
+      return;
+    }
+
+    // Mostrar resultados (manteniendo el estilo del ejemplo)
+    estado.innerText = "Resultados: 1 registro(s)";
+
+    let texto = "";
+
+    // Si es un videojuego y tiene esos campos, lo mostramos igual que tu ejemplo
+    if (data.registro.id_videojuego !== undefined && data.registro.titulo !== undefined) {
+      texto += "#" + data.registro.id_videojuego +
+               " | " + (data.registro.titulo ?? "") +
+               " | " + (data.registro.fecha_lanzamiento ?? "") +
+               " | €" + (data.registro.precio_base ?? "") +
+               "\n";
+    } else {
+      // Si es otra tabla (o estructura distinta), lo mostramos campo por campo
+      for (const k in data.registro) {
+        texto += k + ": " + data.registro[k] + "\n";
+      }
+    }
+
+    resultado.innerText = texto;
+
+  } catch (err) {
+    estado.className = "error";
+    estado.innerText = "Error de red o JSON inválido";
+    resultado.innerText = String(err);
+  }
+});
+</script>
+
+</body>
+</html>
