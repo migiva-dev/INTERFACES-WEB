@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Eventos del Navegador</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+
+    #log {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      height: 200px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+
+    .mensaje {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Prueba de Eventos del Navegador</h1>
+
+  <button id="activarCambios">Simular cambios sin guardar</button>
+
+  <div id="log"></div>
+
+  <script>
+    const log = document.getElementById("log");
+    const boton = document.getElementById("activarCambios");
+
+    let hayCambios = false;
+    let resizeCount = 0;
+
+    function mostrarMensaje(texto) {
+      const div = document.createElement("div");
+      div.classList.add("mensaje");
+      div.textContent = texto;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight; // auto scroll
+    }
+
+    // Evento load
+    window.addEventListener("load", () => {
+      mostrarMensaje("Página cargada completamente (load)");
+    });
+
+    // Evento resize
+    window.addEventListener("resize", () => {
+      resizeCount++;
+      mostrarMensaje(
+        `Resize #${resizeCount} - Tamaño actual: ${window.innerWidth}px x ${window.innerHeight}px`
+      );
+    });
+
+    // Activar simulación de cambios
+    boton.addEventListener("click", () => {
+      hayCambios = true;
+      mostrarMensaje("Cambios sin guardar activados.");
+    });
+
+    // Evento beforeunload
+    window.addEventListener("beforeunload", (event) => {
+      if (hayCambios) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    });
+  </script>
+
+</body>
+</html>

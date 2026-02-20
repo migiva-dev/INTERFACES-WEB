@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Eventos del Navegador</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+
+    #log {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      height: 200px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+
+    .mensaje { margin-bottom: 8px; font-size: 14px; }
+
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Prueba de Eventos del Navegador</h1>
+
+  <button id="activarCambios">Simular cambios sin guardar</button>
+  <button id="abrirPopup">Abrir popup</button>
+
+  <div id="log"></div>
+
+  <script>
+    const log = document.getElementById("log");
+    const boton = document.getElementById("activarCambios");
+    const btnPopup = document.getElementById("abrirPopup");
+
+    let hayCambios = false;
+    let resizeCount = 0;
+
+    function mostrarMensaje(texto) {
+      const div = document.createElement("div");
+      div.classList.add("mensaje");
+      div.textContent = texto;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    window.addEventListener("load", () => {
+      mostrarMensaje("Página cargada completamente (load)");
+    });
+
+    window.addEventListener("resize", () => {
+      resizeCount++;
+      mostrarMensaje(`Resize #${resizeCount} - Tamaño actual: ${window.innerWidth}px x ${window.innerHeight}px`);
+    });
+
+    boton.addEventListener("click", () => {
+      hayCambios = true;
+      mostrarMensaje("Cambios sin guardar activados.");
+    });
+
+    window.addEventListener("beforeunload", (event) => {
+      if (hayCambios) {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    });
+
+    // ==============================
+    //            POPUP
+    // ==============================
+
+    window.popupCargado = function () {
+      mostrarMensaje("El popup se ha cargado.");
+    };
+
+    function vigilarCierrePopup(popupRef) {
+      const intervalo = setInterval(() => {
+        if (!popupRef || popupRef.closed) {
+          clearInterval(intervalo);
+          mostrarMensaje("El popup se ha cerrado.");
+        }
+      }, 300);
+    }
+
+    btnPopup.addEventListener("click", () => {
+
+      const popup = window.open("", "miPopup", "width=900,height=600");
+
+      if (!popup) {
+        mostrarMensaje("Popup bloqueado por el navegador.");
+        return;
+      }
+
+      // Estilos básicos popup
+      popup.document.title = "Wikipedia Popup";
+      popup.document.body.style.margin = "0";
+      popup.document.body.style.overflow = "hidden";
+
+      // Crear iframe
+      const iframe = popup.document.createElement("iframe");
+      iframe.src = "https://es.wikipedia.org/";
+      iframe.style.border = "none";
+      iframe.style.width = "100%";
+
+      // Función para ajustar tamaño
+      function ajustarIframe() {
+        iframe.style.height = popup.innerHeight + "px";
+      }
+
+      // Eventos dentro del popup
+      popup.addEventListener("load", () => {
+        ajustarIframe();
+
+        if (popup.opener && popup.opener.popupCargado) {
+          popup.opener.popupCargado();
+        }
+      });
+
+      popup.addEventListener("resize", ajustarIframe);
+
+      popup.document.body.appendChild(iframe);
+
+      mostrarMensaje("Popup abierto con Wikipedia...");
+      vigilarCierrePopup(popup);
+    });
+
+  </script>
+
+</body>
+</html>
