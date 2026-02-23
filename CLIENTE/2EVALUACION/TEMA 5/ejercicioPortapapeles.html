@@ -50,7 +50,7 @@
 
   <textarea id="areaTexto" placeholder="Escribe aquí..."></textarea>
   <br>
-  <button id="btnCopiarFragmento">Copiar fragmento al portapapeles</button>
+  <button id="btnCopiarFragmento">Copiar </button>
 
   <div id="log"></div>
 
@@ -59,7 +59,7 @@
     const log = document.getElementById("log");
     const btnCopiarFragmento = document.getElementById("btnCopiarFragmento");
 
-    const PALABRA_PROHIBIDA = "prohibida"; // <-- cámbiala si quieres
+    const PALABRA_PROHIBIDA = "teleno"; 
     const CONTENIDO_PERSONALIZADO = "Contenido personalizado";
 
     function mostrarMensaje(texto) {
@@ -70,14 +70,14 @@
       log.scrollTop = log.scrollHeight;
     }
 
-    // Evento copy (copiado)
+    // Evento copiar
     areaTexto.addEventListener("copy", (event) => {
-      event.preventDefault(); // importantísimo para sustituir el portapapeles
+      event.preventDefault(); 
       event.clipboardData.setData("text/plain", CONTENIDO_PERSONALIZADO);
       mostrarMensaje("Copy: Se copió contenido personalizado al portapapeles.");
     });
 
-    // Evento cut (cortado)
+    // Evento cortado
     areaTexto.addEventListener("cut", (event) => {
       event.preventDefault(); // importantísimo para sustituir el portapapeles
       event.clipboardData.setData("text/plain", CONTENIDO_PERSONALIZADO);
@@ -106,7 +106,7 @@
       }
     });
 
-    // Evento paste (pegado)
+    // Evento pegado
     areaTexto.addEventListener("paste", (event) => {
       const textoPegado = event.clipboardData.getData("text/plain");
 
