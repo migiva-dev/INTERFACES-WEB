@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Eventos de Portapapeles</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+
+    textarea {
+      width: 300px;
+      height: 100px;
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    button{
+      margin-top: 12px;
+      padding: 10px 14px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    #log {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      height: 200px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+
+    .mensaje {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Prueba de Eventos de Portapapeles</h1>
+  <p>Escribe algo en el área de texto y prueba copiar, cortar o pegar.</p>
+
+  <textarea id="areaTexto" placeholder="Escribe aquí..."></textarea>
+  <br>
+  <button id="btnCopiarFragmento">Copiar fragmento al portapapeles</button>
+
+  <div id="log"></div>
+
+  <script>
+    const areaTexto = document.getElementById("areaTexto");
+    const log = document.getElementById("log");
+    const btnCopiarFragmento = document.getElementById("btnCopiarFragmento");
+
+    const PALABRA_PROHIBIDA = "prohibida"; // <-- cámbiala si quieres
+    const CONTENIDO_PERSONALIZADO = "Contenido personalizado";
+
+    function mostrarMensaje(texto) {
+      const div = document.createElement("div");
+      div.classList.add("mensaje");
+      div.textContent = texto;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Evento copy (copiado)
+    areaTexto.addEventListener("copy", (event) => {
+      event.preventDefault(); // importantísimo para sustituir el portapapeles
+      event.clipboardData.setData("text/plain", CONTENIDO_PERSONALIZADO);
+      mostrarMensaje("Copy: Se copió contenido personalizado al portapapeles.");
+    });
+
+    // Evento cut (cortado)
+    areaTexto.addEventListener("cut", (event) => {
+      event.preventDefault(); // importantísimo para sustituir el portapapeles
+      event.clipboardData.setData("text/plain", CONTENIDO_PERSONALIZADO);
+      mostrarMensaje("Cut: Se cortó (pero se guardó contenido personalizado).");
+
+      // Simulamos el "corte" eliminando lo seleccionado (ya que preventDefault lo evita)
+      const start = areaTexto.selectionStart;
+      const end = areaTexto.selectionEnd;
+      if (start !== end) {
+        const antes = areaTexto.value.slice(0, start);
+        const despues = areaTexto.value.slice(end);
+        areaTexto.value = antes + despues;
+        areaTexto.setSelectionRange(start, start);
+      }
+    });
+
+    // Botón para copiar un fragmento
+    btnCopiarFragmento.addEventListener("click", async () => {
+      const fragmento = "Este texto lo copia el botón.";
+      try {
+        await navigator.clipboard.writeText(fragmento);
+        mostrarMensaje("Botón: Copiado al portapapeles -> " + fragmento);
+      } catch (e) {
+        // Por si el navegador bloquea navigator.clipboard (https / permisos)
+        mostrarMensaje("Botón: No se pudo copiar (permiso/https). Prueba en https o con permisos.");
+      }
+    });
+
+    // Evento paste (pegado)
+    areaTexto.addEventListener("paste", (event) => {
+      const textoPegado = event.clipboardData.getData("text/plain");
+
+      // Comprobar estado del portapapeles antes de pegar
+      if (textoPegado.toLowerCase().includes(PALABRA_PROHIBIDA.toLowerCase())) {
+        event.preventDefault();
+
+        // Pegar "*" en su lugar (en la posición del cursor o reemplazando selección)
+        const start = areaTexto.selectionStart;
+        const end = areaTexto.selectionEnd;
+        const antes = areaTexto.value.slice(0, start);
+        const despues = areaTexto.value.slice(end);
+        areaTexto.value = antes + "*" + despues;
+
+        // Colocar cursor justo después del "*"
+        areaTexto.setSelectionRange(start + 1, start + 1);
+
+        mostrarMensaje(`Paste: Detectada palabra prohibida ("${PALABRA_PROHIBIDA}") -> se pegó "*"`);
+      } else {
+        mostrarMensaje("Paste: Texto pegado: " + textoPegado);
+        // aquí NO hacemos preventDefault para que pegue normal
+      }
+    });
+  </script>
+
+</body>
+</html>
