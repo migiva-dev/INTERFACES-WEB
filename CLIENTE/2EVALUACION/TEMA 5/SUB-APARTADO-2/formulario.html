@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>1.3 Utilización de formularios desde código</title>
+
+<style>
+  body { font-family: Arial; padding: 30px; }
+  label { display:block; margin-top:10px; }
+  #info { margin-top:20px; padding:10px; background:#f0f0f0; }
+  .email { background-color: #51565e; }
+</style>
+
+</head>
+
+<body>
+
+<h2>Formulario de Registro</h2>
+
+<form name="registro" id="registro">
+
+  <label>
+    Nombre:
+    <input type="text" name="nombre" id="nombre">
+  </label>
+
+  <label>
+    Usuario:
+    <input type="text" name="usuario" id="usuario">
+  </label>
+
+  <label>
+    Email:
+    <input type="email" name="email" id="email" class="email">
+  </label>
+
+  <label>
+    Tipo de cuenta:
+    <select name="tipoCuenta" id="tipoCuenta">
+      <option value="personal">Personal</option>
+      <option value="empresa">Empresa</option>
+    </select>
+  </label>
+
+  <div id="campoEmpresa" style="display:none;">
+    <label>
+      CIF Empresa:
+      <input type="text" name="cif">
+    </label>
+  </div>
+
+  <br>
+  <button type="button" id="btnMostrar">Mostrar datos</button>
+
+</form>
+
+<div id="info"></div>
+
+</body>
+
+<script>
+window.onload = function() {
+
+  // Acceso por índice (forms y elements)
+  const formulario = document.forms[0]; 
+  const primerElemento = formulario.elements[0];
+
+  // Acceso por name
+  const nombreInput = document.registro.nombre;
+
+  // Acceso por id
+  const usuarioInput = document.getElementById("usuario");
+
+  // Acceso por querySelector
+  const emailPorId = document.querySelector("#email"); // id del componente
+  const emailPorClase = document.querySelector(".email"); // clase css del componente
+
+  // 🔹 Autogenerar usuario al escribir nombre
+  nombreInput.addEventListener("input", function() {
+    usuarioInput.value = this.value
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "_");
+  });
+
+  // Mostrar tipo de elemento seleccionado y controlar campo empresa
+  const tipoCuenta = document.getElementById("tipoCuenta");
+  const campoEmpresa = document.getElementById("campoEmpresa");
+
+  tipoCuenta.addEventListener("change", function() {
+    document.getElementById("info").innerHTML =
+      "Tipo seleccionado: " + this.value +
+      "<br>Tipo de elemento: " + this.type;
+
+    if (this.value === "empresa") {
+      campoEmpresa.style.display = "block";
+    } else {
+      campoEmpresa.style.display = "none";
+    }
+  });
+
+  // 🔹 Mostrar información del formulario (incluye email)
+  document.getElementById("btnMostrar").addEventListener("click", function() {
+
+    let info = `
+      <strong>Información del formulario:</strong><br>
+      Nombre: ${nombreInput.value}<br>
+      Usuario: ${usuarioInput.value}<br>
+      Email (por id): ${emailPorId.value}<br>
+      Email (por clase): ${emailPorClase.value}<br>
+      Tipo cuenta: ${tipoCuenta.value}<br>
+      Este campo pertenece al formulario: ${nombreInput.form.name}
+    `;
+
+    document.getElementById("info").innerHTML = info;
+  });
+
+};
+</script>
