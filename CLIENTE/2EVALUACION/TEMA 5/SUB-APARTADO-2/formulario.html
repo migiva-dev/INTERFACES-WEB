@@ -64,6 +64,7 @@ window.onload = function() {
   // Acceso por índice (forms y elements)
   const formulario = document.forms[0]; 
   const primerElemento = formulario.elements[0];
+  
 
   // Acceso por name
   const nombreInput = document.registro.nombre;
@@ -110,6 +111,7 @@ window.onload = function() {
       Email (por clase): ${emailPorClase.value}<br>
       Tipo cuenta: ${tipoCuenta.value}<br>
       Este campo pertenece al formulario: ${nombreInput.form.name}
+
     `;
 
     document.getElementById("info").innerHTML = info;

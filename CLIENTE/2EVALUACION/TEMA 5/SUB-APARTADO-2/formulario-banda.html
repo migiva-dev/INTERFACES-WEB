@@ -1,244 +1,483 @@
 <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <title>1.3 Utilización de formularios desde código</title>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Creación de banda</title>
 
-        <style>
-        body { font-family: Arial; padding: 30px; }
-        label { display:block; margin-top:10px; }
-        #info { margin-top:20px; padding:10px; background:#f0f0f0; }
-        .email { background-color: #51565e; }
-        </style>
+<style>
+  body { font-family: Arial; padding: 30px; }
+  label { display:block; margin-top:10px; }
+  #info { margin-top:20px; padding:10px; background:#f0f0f0; }
+  .email { background-color: #51565e; }
+</style>
 
-    </head>
+</head>
 
-    <body>
-        <div class="card" id="card1">
-            <fieldset>
-            <legend>Miembro 1</legend>
+<body>
 
-            <form id="f1" name="miembro1">
-                <label>
-                Nombre:
-                <input type="text" name="nombre" />
-                </label>
+<h2>Creación de banda</h2>
 
-                <label>
-                Apellido:
-                <input type="text" name="apellido" />
-                </label>
+<!-- ==================== FORM 1 (forms y elements) ==================== -->
+<h2>Miembro 1</h2>
+<form name="m1" id="m1">
+  <label>Nombre:
+    <input type="text" name="nombre">
+  </label>
 
-                <label>
-                Edad:
-                <input type="number" name="edad" min="1" />
-                </label>
+  <label>Apellido:
+    <input type="text" name="apellido">
+  </label>
 
-                <label>
-                Posición:
-                <select name="posicion">
-                    <option value="">-- Elige --</option>
-                    <option value="vocalista">Vocalista</option>
-                    <option value="musico">Músico</option>
-                </select>
-                </label>
+  <label>Edad:
+    <input type="number" name="edad" min="1">
+  </label>
 
-                <div class="instrumento">
-                <label>
-                    Instrumento:
-                    <select name="instrumento">
-                    <option value="">-- Elige --</option>
-                    <option value="guitarra">Guitarra</option>
-                    <option value="bateria">Batería</option>
-                    <option value="bajo">Bajo</option>
-                    </select>
-                </label>
-                </div>
+  <label>Posición:
+    <select name="posicion">
+      <option value="">-- Elige --</option>
+      <option value="vocalista">Vocalista</option>
+      <option value="musico">Músico</option>
+    </select>
+  </label>
 
-                <div class="actions">
-                <button type="button" class="btnNext" data-next="2" disabled>Pasar al formulario 2</button>
-                </div>
-            </form>
-            </fieldset>
-        </div>
-        <br>
-        <br>
+  <div class="inst" style="display:none;">
+    <label>Instrumento:
+      <select name="instrumento">
+        <option value="">-- Elige --</option>
+        <option value="guitarra">Guitarra</option>
+        <option value="bateria">Batería</option>
+        <option value="bajo">Bajo</option>
+      </select>
+    </label>
+  </div>
 
-      
-        <div class="card disabled" id="card2">
-            <fieldset>
-            <legend>Miembro 2</legend>
+  <br>
+  <button type="button" id="btnNext1" disabled>Pasar al formulario 2</button>
+</form>
 
-            <form id="f2" name="miembro2">
-                <label>
-                Nombre:
-                <input type="text" name="nombre" />
-                </label>
+<!-- ==================== FORM 2 (name) ==================== -->
+<div id="wrap2" style="display:none;">
+  <h2>Miembro 2 (name)</h2>
+  <form name="m2" id="m2">
+    <label>Nombre:
+      <input type="text" name="nombre">
+    </label>
 
-                <label>
-                Apellido:
-                <input type="text" name="apellido" />
-                </label>
+    <label>Apellido:
+      <input type="text" name="apellido">
+    </label>
 
-                <label>
-                Edad:
-                <input type="number" name="edad" min="1" />
-                </label>
+    <label>Edad:
+      <input type="number" name="edad" min="1">
+    </label>
 
-                <label>
-                Posición:
-                <select name="posicion">
-                    <option value="">-- Elige --</option>
-                    <option value="vocalista">Vocalista</option>
-                    <option value="musico">Músico</option>
-                </select>
-                </label>
+    <label>Posición:
+      <select name="posicion">
+        <option value="">-- Elige --</option>
+        <option value="vocalista">Vocalista</option>
+        <option value="musico">Músico</option>
+      </select>
+    </label>
 
-                <div class="instrumento">
-                <label>
-                    Instrumento:
-                    <select name="instrumento">
-                    <option value="">-- Elige --</option>
-                    <option value="guitarra">Guitarra</option>
-                    <option value="bateria">Batería</option>
-                    <option value="bajo">Bajo</option>
-                    </select>
-                </label>
-                </div>
+    <div class="inst" style="display:none;">
+      <label>Instrumento:
+        <select name="instrumento">
+          <option value="">-- Elige --</option>
+          <option value="guitarra">Guitarra</option>
+          <option value="bateria">Batería</option>
+          <option value="bajo">Bajo</option>
+        </select>
+      </label>
+    </div>
 
-                <div class="actions">
-                <button type="button" class="btnNext" data-next="3" disabled>Pasar al formulario 3</button>
-                </div>
-            </form>
-            </fieldset>
-        </div>
+    <br>
+    <button type="button" id="btnNext2" disabled>Pasar al formulario 3</button>
+  </form>
+</div>
 
+<!-- ==================== FORM 3 (id) ==================== -->
+<div id="wrap3" style="display:none;">
+  <h2>Miembro 3</h2>
+  <form name="m3" id="m3">
+    <label>Nombre:
+      <input type="text" name="nombre" id="m3_nombre">
+    </label>
 
-        <br>
-        <br>
-        <br>
-            <div class="card disabled" id="card3">
-                <fieldset>
-                <legend>Miembro 3</legend>
+    <label>Apellido:
+      <input type="text" name="apellido" id="m3_apellido">
+    </label>
 
-                <form id="f3" name="miembro3">
-                    <label>
-                    Nombre:
-                    <input type="text" id="m3_nombre" name="nombre" />
-                    </label>
+    <label>Edad:
+      <input type="number" name="edad" id="m3_edad" min="1">
+    </label>
 
-                    <label>
-                    Apellido:
-                    <input type="text" id="m3_apellido" name="apellido" />
-                    </label>
+    <label>Posición:
+      <select name="posicion" id="m3_posicion">
+        <option value="">-- Elige --</option>
+        <option value="vocalista">Vocalista</option>
+        <option value="musico">Músico</option>
+      </select>
+    </label>
 
-                    <label>
-                    Edad:
-                    <input type="number" id="m3_edad" name="edad" min="1" />
-                    </label>
+    <div class="inst" id="m3_inst_wrap" style="display:none;">
+      <label>Instrumento:
+        <select name="instrumento" id="m3_instrumento">
+          <option value="">-- Elige --</option>
+          <option value="guitarra">Guitarra</option>
+          <option value="bateria">Batería</option>
+          <option value="bajo">Bajo</option>
+        </select>
+      </label>
+    </div>
 
-                    <label>
-                    Posición:
-                    <select id="m3_posicion" name="posicion">
-                        <option value="">-- Elige --</option>
-                        <option value="vocalista">Vocalista</option>
-                        <option value="musico">Músico</option>
-                    </select>
-                    </label>
+    <br>
+    <button type="button" id="btnNext3" disabled>Pasar al formulario 4</button>
+  </form>
+</div>
 
-                    <div class="instrumento" id="m3_instrumento_wrap">
-                    <label>
-                        Instrumento:
-                        <select id="m3_instrumento" name="instrumento">
-                        <option value="">-- Elige --</option>
-                        <option value="guitarra">Guitarra</option>
-                        <option value="bateria">Batería</option>
-                        <option value="bajo">Bajo</option>
-                        </select>
-                    </label>
-                    </div>
+<!-- ==================== FORM 4 (querySelector) ==================== -->
+<div id="wrap4" style="display:none;">
+  <h2>Miembro 4 </h2>
+  <form name="m4" id="m4">
+    <label>Nombre:
+      <input type="text" name="nombre" class="m4_nombre">
+    </label>
 
-                    <div class="actions">
-                    <button type="button" class="btnNext" data-next="4" disabled>Pasar al formulario 4</button>
-                    </div>
-                </form>
-                </fieldset>
-            </div>
+    <label>Apellido:
+      <input type="text" name="apellido" class="m4_apellido">
+    </label>
 
-            <br>
-            <br>
-            <br>
-            
-            <div class="card disabled" id="card4">
-                    <fieldset>
-                    <legend>Miembro 4 querySelector</legend>
+    <label>Edad:
+      <input type="number" name="edad" class="m4_edad" min="1">
+    </label>
 
-                    <form id="f4" name="miembro4">
-                        <label>
-                        Nombre:
-                        <input type="text" name="nombre" class="m4-nombre" />
-                        </label>
+    <label>Posición:
+      <select name="posicion" class="m4_posicion">
+        <option value="">-- Elige --</option>
+        <option value="vocalista">Vocalista</option>
+        <option value="musico">Músico</option>
+      </select>
+    </label>
 
-                        <label>
-                        Apellido:
-                        <input type="text" name="apellido" class="m4-apellido" />
-                        </label>
+    <div class="inst m4_inst_wrap" style="display:none;">
+      <label>Instrumento:
+        <select name="instrumento" class="m4_instrumento">
+          <option value="">-- Elige --</option>
+          <option value="guitarra">Guitarra</option>
+          <option value="bateria">Batería</option>
+          <option value="bajo">Bajo</option>
+        </select>
+      </label>
+    </div>
 
-                        <label>
-                        Edad:
-                        <input type="number" name="edad" class="m4-edad" min="1" />
-                        </label>
+    <br>
+    <button type="button" id="btnMostrar" disabled>Mostrar datos</button>
+  </form>
+</div>
 
-                        <label>
-                        Posición:
-                        <select name="posicion" class="m4-posicion">
-                            <option value="">-- Elige --</option>
-                            <option value="vocalista">Vocalista</option>
-                            <option value="musico">Músico</option>
-                        </select>
-                        </label>
+<div id="info"></div>
 
-                        <div class="instrumento m4-instrumento-wrap">
-                        <label>
-                            Instrumento:
-                            <select name="instrumento" class="m4-instrumento">
-                            <option value="">-- Elige --</option>
-                            <option value="guitarra">Guitarra</option>
-                            <option value="bateria">Batería</option>
-                            <option value="bajo">Bajo</option>
-                            </select>
-                        </label>
-                        </div>
+<h3>Estructura de los formularios</h3>
+<div id="estructura"></div>
 
-                        <div class="actions">
-                        <button type="button" id="btnFinal" disabled>Finalizar y mostrar todo</button>
-                        </div>
-                    </form>
-                    </fieldset>
-                </div>
+<script>
+window.onload = function() {
 
-                <div class="card">
-                    <h3>Salida</h3>
-                    <div id="info">(Aquí verás los datos y el nombre de la banda)</div>
-                </div>
+  // ==========================
+  // 1) Mostrar estructura de los formularios
+  // ==========================
+  function mostrarEstructura() {
+    let html = "";
+    for (let i = 0; i < document.forms.length; i++) {
+      const f = document.forms[i];
+      html += `<strong>Nombre del formulario:</strong> ${f.name}<br>`;
+      html += `<strong>Número de elementos:</strong> ${f.elements.length}<br>`;
+      html += `<strong>Elementos (nombre y tipo):</strong><br><ul>`;
+      for (let j = 0; j < f.elements.length; j++) {
+        const el = f.elements[j];
+        html += `<li>${el.name || "(sin name)"} - ${el.type || el.tagName}</li>`;
+      }
+      html += `</ul><hr>`;
+    }
+    document.getElementById("estructura").innerHTML = html;
+  }
+  mostrarEstructura();
 
-                <div class="card">
-                    <h3>Estructura de los formularios</h3>
-                    <div class="muted">
-                    (Nombre de cada formulario, nº elementos, nombre y tipo de cada elemento)
-                    </div>
-                    <div id="estructura"></div>
-                </div>
+  // ==========================
+  // Helpers
+  // ==========================
+  function two(s) { return (s || "").trim().substring(0,2).toUpperCase(); }
 
-            </div>
+  function toggleInstrumento(formEl, show) {
+    const wrap = formEl.querySelector(".inst");
+    if (!wrap) return;
+    wrap.style.display = show ? "block" : "none";
+    const sel = wrap.querySelector('select[name="instrumento"]');
+    if (sel && !show) sel.value = "";
+  }
 
+  // "Hasta que no modifiques todos los campos..."
+  // Guardamos qué campos se han "tocado" (modificado) en cada formulario
+  const tocados = {
+    1: new Set(),
+    2: new Set(),
+    3: new Set(),
+    4: new Set()
+  };
 
+  function requisitos(posicion) {
+    // Si es vocalista, instrumento no cuenta (no aplica).
+    const base = ["nombre", "apellido", "edad", "posicion"];
+    if (posicion === "musico") base.push("instrumento");
+    return base;
+  }
 
+  function puedePasar(n, posicion) {
+    const req = requisitos(posicion);
+    return req.every(campo => tocados[n].has(campo));
+  }
 
+  // ==========================
+  // 2) Obtener datos con accesos distintos (como pide el enunciado)
+  // ==========================
+  // Form 1: forms y elements
+  function get1() {
+    const f = document.forms[0]; // m1
+    return {
+      nombre: f.elements[0].value,
+      apellido: f.elements[1].value,
+      edad: f.elements[2].value,
+      posicion: f.elements[3].value,
+      instrumento: f.elements["instrumento"].value
+    };
+  }
 
-    </body>
+  // Form 2: name
+  function get2() {
+    return {
+      nombre: document.m2.nombre.value,
+      apellido: document.m2.apellido.value,
+      edad: document.m2.edad.value,
+      posicion: document.m2.posicion.value,
+      instrumento: document.m2.instrumento.value
+    };
+  }
 
-    
+  // Form 3: id
+  function get3() {
+    return {
+      nombre: document.getElementById("m3_nombre").value,
+      apellido: document.getElementById("m3_apellido").value,
+      edad: document.getElementById("m3_edad").value,
+      posicion: document.getElementById("m3_posicion").value,
+      instrumento: document.getElementById("m3_instrumento").value
+    };
+  }
 
+  // Form 4: querySelector
+  function get4() {
+    return {
+      nombre: document.querySelector(".m4_nombre").value,
+      apellido: document.querySelector(".m4_apellido").value,
+      edad: document.querySelector(".m4_edad").value,
+      posicion: document.querySelector(".m4_posicion").value,
+      instrumento: document.querySelector(".m4_instrumento").value
+    };
+  }
+
+  function actualizarNombreBanda() {
+    const a1 = get1().apellido;
+    const a2 = get2().apellido;
+    const a3 = get3().apellido;
+    const a4 = get4().apellido;
+    const band = two(a1) + two(a2) + two(a3) + two(a4);
+    document.getElementById("bandName").textContent = band.trim() ? band : "(pendiente)";
+  }
+
+  // ==========================
+  // 3) Control por formulario (mostrar siguiente solo si completo)
+  // ==========================
+
+  // -------- Form 1 (forms/elements)
+  const f1 = document.forms[0];
+  const f1_nombre = f1.elements[0];
+  const f1_apellido = f1.elements[1];
+  const f1_edad = f1.elements[2];
+  const f1_posicion = f1.elements[3];
+  const f1_instrumento = f1.elements["instrumento"];
+  const btnNext1 = document.getElementById("btnNext1");
+
+  function check1() {
+    btnNext1.disabled = !puedePasar(1, f1_posicion.value);
+    actualizarNombreBanda();
+  }
+
+  [f1_nombre, f1_apellido, f1_edad].forEach(el => {
+    el.addEventListener("input", function() {
+      tocados[1].add(this.name);
+      check1();
+    });
+  });
+
+  f1_posicion.addEventListener("change", function() {
+    tocados[1].add("posicion");
+    toggleInstrumento(f1, this.value === "musico");
+    check1();
+  });
+
+  f1_instrumento.addEventListener("change", function() {
+    tocados[1].add("instrumento");
+    check1();
+  });
+
+  btnNext1.addEventListener("click", function() {
+    document.getElementById("wrap2").style.display = "block";
+    actualizarNombreBanda();
+  });
+
+  // -------- Form 2 (name)
+  const btnNext2 = document.getElementById("btnNext2");
+
+  function check2() {
+    btnNext2.disabled = !puedePasar(2, document.m2.posicion.value);
+    actualizarNombreBanda();
+  }
+
+  [document.m2.nombre, document.m2.apellido, document.m2.edad].forEach(el => {
+    el.addEventListener("input", function() {
+      tocados[2].add(this.name);
+      check2();
+    });
+  });
+
+  document.m2.posicion.addEventListener("change", function() {
+    tocados[2].add("posicion");
+    toggleInstrumento(document.m2, this.value === "musico");
+    check2();
+  });
+
+  document.m2.instrumento.addEventListener("change", function() {
+    tocados[2].add("instrumento");
+    check2();
+  });
+
+  btnNext2.addEventListener("click", function() {
+    document.getElementById("wrap3").style.display = "block";
+    actualizarNombreBanda();
+  });
+
+  // -------- Form 3 (id)
+  const btnNext3 = document.getElementById("btnNext3");
+  const m3_nombre = document.getElementById("m3_nombre");
+  const m3_apellido = document.getElementById("m3_apellido");
+  const m3_edad = document.getElementById("m3_edad");
+  const m3_posicion = document.getElementById("m3_posicion");
+  const m3_instrumento = document.getElementById("m3_instrumento");
+  const form3 = document.getElementById("m3");
+
+  function check3() {
+    btnNext3.disabled = !puedePasar(3, m3_posicion.value);
+    actualizarNombreBanda();
+  }
+
+  [m3_nombre, m3_apellido, m3_edad].forEach(el => {
+    el.addEventListener("input", function() {
+      tocados[3].add(this.name);
+      check3();
+    });
+  });
+
+  m3_posicion.addEventListener("change", function() {
+    tocados[3].add("posicion");
+    toggleInstrumento(form3, this.value === "musico");
+    check3();
+  });
+
+  m3_instrumento.addEventListener("change", function() {
+    tocados[3].add("instrumento");
+    check3();
+  });
+
+  btnNext3.addEventListener("click", function() {
+    document.getElementById("wrap4").style.display = "block";
+    actualizarNombreBanda();
+  });
+
+  // -------- Form 4 (querySelector)
+  const btnMostrar = document.getElementById("btnMostrar");
+  const q4_nombre = document.querySelector(".m4_nombre");
+  const q4_apellido = document.querySelector(".m4_apellido");
+  const q4_edad = document.querySelector(".m4_edad");
+  const q4_posicion = document.querySelector(".m4_posicion");
+  const q4_inst_wrap = document.querySelector(".m4_inst_wrap");
+  const q4_instrumento = document.querySelector(".m4_instrumento");
+
+  function check4() {
+    btnMostrar.disabled = !puedePasar(4, q4_posicion.value);
+    actualizarNombreBanda();
+  }
+
+  [q4_nombre, q4_apellido, q4_edad].forEach(el => {
+    el.addEventListener("input", function() {
+      tocados[4].add(this.name);
+      check4();
+    });
+  });
+
+  q4_posicion.addEventListener("change", function() {
+    tocados[4].add("posicion");
+    q4_inst_wrap.style.display = (this.value === "musico") ? "block" : "none";
+    if (this.value !== "musico") q4_instrumento.value = "";
+    check4();
+  });
+
+  q4_instrumento.addEventListener("change", function() {
+    tocados[4].add("instrumento");
+    check4();
+  });
+
+  // ==========================
+  // 4) Mostrar datos finales
+  // ==========================
+  btnMostrar.addEventListener("click", function() {
+    actualizarNombreBanda();
+
+    const v1 = get1();
+    const v2 = get2();
+    const v3 = get3();
+    const v4 = get4();
+
+    const band = two(v1.apellido) + two(v2.apellido) + two(v3.apellido) + two(v4.apellido);
+
+    document.getElementById("info").innerHTML = `
+      <strong>Nombre de la banda:</strong> ${band}<br><br>
+
+      <strong>Miembro 1:</strong><br>
+      ${v1.nombre} ${v1.apellido} - ${v1.edad} - ${v1.posicion}
+      ${v1.posicion === "musico" ? " (" + (v1.instrumento || "sin instrumento") + ")" : ""}<br><br>
+
+      <strong>Miembro 2:</strong><br>
+      ${v2.nombre} ${v2.apellido} - ${v2.edad} - ${v2.posicion}
+      ${v2.posicion === "musico" ? " (" + (v2.instrumento || "sin instrumento") + ")" : ""}<br><br>
+
+      <strong>Miembro 3:</strong><br>
+      ${v3.nombre} ${v3.apellido} - ${v3.edad} - ${v3.posicion}
+      ${v3.posicion === "musico" ? " (" + (v3.instrumento || "sin instrumento") + ")" : ""}<br><br>
+
+      <strong>Miembro 4:</strong><br>
+      ${v4.nombre} ${v4.apellido} - ${v4.edad} - ${v4.posicion}
+      ${v4.posicion === "musico" ? " (" + (v4.instrumento || "sin instrumento") + ")" : ""}<br>
+    `;
+  });
+
+  // Inicial: ocultar instrumentos
+  toggleInstrumento(f1, false);
+  toggleInstrumento(document.m2, false);
+  toggleInstrumento(form3, false);
+  q4_inst_wrap.style.display = "none";
+  actualizarNombreBanda();
+};
+</script>
+
+</body>
 </html>
-
