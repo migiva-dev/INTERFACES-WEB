@@ -14,49 +14,223 @@
     </head>
 
     <body>
-
-        <h2>Formulario de una banda</h2>
-        
         <div class="card" id="card1">
-    <fieldset>
-      <legend>Miembro 1</legend>
+            <fieldset>
+            <legend>Miembro 1</legend>
 
-      <form id="f1" name="miembro1">
-        <label>
-          Nombre:
-          <input type="text" name="nombre" />
-        </label>
+            <form id="f1" name="miembro1">
+                <label>
+                Nombre:
+                <input type="text" name="nombre" />
+                </label>
 
-        <label>
-          Apellido:
-          <input type="text" name="apellido" />
-        </label>
+                <label>
+                Apellido:
+                <input type="text" name="apellido" />
+                </label>
 
-        <label>
-          Edad:
-          <input type="number" name="edad" min="1" />
-        </label>
+                <label>
+                Edad:
+                <input type="number" name="edad" min="1" />
+                </label>
 
-        <label>
-          Posición:
-          <select name="posicion">
-            <option value="">-- Elige --</option>
-            <option value="vocalista">Vocalista</option>
-            <option value="musico">Músico</option>
-          </select>
-        </label>
+                <label>
+                Posición:
+                <select name="posicion">
+                    <option value="">-- Elige --</option>
+                    <option value="vocalista">Vocalista</option>
+                    <option value="musico">Músico</option>
+                </select>
+                </label>
 
-        <label>
-            Instrumeto: 
-            <select name="instrumeto">
-                <option value="">-- Elige --</option>
-                 <option value="guitarrra">Guitarra</option>
-                 <option value="bateria">Batería</option>
-                 <option value="Bajo">Bajo</option>
-            </select>
-        </label>
+                <div class="instrumento">
+                <label>
+                    Instrumento:
+                    <select name="instrumento">
+                    <option value="">-- Elige --</option>
+                    <option value="guitarra">Guitarra</option>
+                    <option value="bateria">Batería</option>
+                    <option value="bajo">Bajo</option>
+                    </select>
+                </label>
+                </div>
+
+                <div class="actions">
+                <button type="button" class="btnNext" data-next="2" disabled>Pasar al formulario 2</button>
+                </div>
+            </form>
+            </fieldset>
+        </div>
+        <br>
+        <br>
+
+      
+        <div class="card disabled" id="card2">
+            <fieldset>
+            <legend>Miembro 2</legend>
+
+            <form id="f2" name="miembro2">
+                <label>
+                Nombre:
+                <input type="text" name="nombre" />
+                </label>
+
+                <label>
+                Apellido:
+                <input type="text" name="apellido" />
+                </label>
+
+                <label>
+                Edad:
+                <input type="number" name="edad" min="1" />
+                </label>
+
+                <label>
+                Posición:
+                <select name="posicion">
+                    <option value="">-- Elige --</option>
+                    <option value="vocalista">Vocalista</option>
+                    <option value="musico">Músico</option>
+                </select>
+                </label>
+
+                <div class="instrumento">
+                <label>
+                    Instrumento:
+                    <select name="instrumento">
+                    <option value="">-- Elige --</option>
+                    <option value="guitarra">Guitarra</option>
+                    <option value="bateria">Batería</option>
+                    <option value="bajo">Bajo</option>
+                    </select>
+                </label>
+                </div>
+
+                <div class="actions">
+                <button type="button" class="btnNext" data-next="3" disabled>Pasar al formulario 3</button>
+                </div>
+            </form>
+            </fieldset>
+        </div>
 
 
+        <br>
+        <br>
+        <br>
+            <div class="card disabled" id="card3">
+                <fieldset>
+                <legend>Miembro 3</legend>
+
+                <form id="f3" name="miembro3">
+                    <label>
+                    Nombre:
+                    <input type="text" id="m3_nombre" name="nombre" />
+                    </label>
+
+                    <label>
+                    Apellido:
+                    <input type="text" id="m3_apellido" name="apellido" />
+                    </label>
+
+                    <label>
+                    Edad:
+                    <input type="number" id="m3_edad" name="edad" min="1" />
+                    </label>
+
+                    <label>
+                    Posición:
+                    <select id="m3_posicion" name="posicion">
+                        <option value="">-- Elige --</option>
+                        <option value="vocalista">Vocalista</option>
+                        <option value="musico">Músico</option>
+                    </select>
+                    </label>
+
+                    <div class="instrumento" id="m3_instrumento_wrap">
+                    <label>
+                        Instrumento:
+                        <select id="m3_instrumento" name="instrumento">
+                        <option value="">-- Elige --</option>
+                        <option value="guitarra">Guitarra</option>
+                        <option value="bateria">Batería</option>
+                        <option value="bajo">Bajo</option>
+                        </select>
+                    </label>
+                    </div>
+
+                    <div class="actions">
+                    <button type="button" class="btnNext" data-next="4" disabled>Pasar al formulario 4</button>
+                    </div>
+                </form>
+                </fieldset>
+            </div>
+
+            <br>
+            <br>
+            <br>
+            
+            <div class="card disabled" id="card4">
+                    <fieldset>
+                    <legend>Miembro 4 querySelector</legend>
+
+                    <form id="f4" name="miembro4">
+                        <label>
+                        Nombre:
+                        <input type="text" name="nombre" class="m4-nombre" />
+                        </label>
+
+                        <label>
+                        Apellido:
+                        <input type="text" name="apellido" class="m4-apellido" />
+                        </label>
+
+                        <label>
+                        Edad:
+                        <input type="number" name="edad" class="m4-edad" min="1" />
+                        </label>
+
+                        <label>
+                        Posición:
+                        <select name="posicion" class="m4-posicion">
+                            <option value="">-- Elige --</option>
+                            <option value="vocalista">Vocalista</option>
+                            <option value="musico">Músico</option>
+                        </select>
+                        </label>
+
+                        <div class="instrumento m4-instrumento-wrap">
+                        <label>
+                            Instrumento:
+                            <select name="instrumento" class="m4-instrumento">
+                            <option value="">-- Elige --</option>
+                            <option value="guitarra">Guitarra</option>
+                            <option value="bateria">Batería</option>
+                            <option value="bajo">Bajo</option>
+                            </select>
+                        </label>
+                        </div>
+
+                        <div class="actions">
+                        <button type="button" id="btnFinal" disabled>Finalizar y mostrar todo</button>
+                        </div>
+                    </form>
+                    </fieldset>
+                </div>
+
+                <div class="card">
+                    <h3>Salida</h3>
+                    <div id="info">(Aquí verás los datos y el nombre de la banda)</div>
+                </div>
+
+                <div class="card">
+                    <h3>Estructura de los formularios</h3>
+                    <div class="muted">
+                    (Nombre de cada formulario, nº elementos, nombre y tipo de cada elemento)
+                    </div>
+                    <div id="estructura"></div>
+                </div>
+
+            </div>
 
 
 
