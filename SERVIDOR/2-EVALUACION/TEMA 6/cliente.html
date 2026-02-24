@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<h2>CRUD sencillo - Tabla videojuego</h2>
+<h2>CRUD - Tabla videojuego</h2>
 
 <p id="mensaje"></p>
 
@@ -53,6 +53,8 @@
     <label>ID Estudio:</label><br>
     <input type="number" name="id_estudio" id="id_estudio"><br><br>
 
+    <label>Descripcion</label><br>
+    <textarea name="descripcion" id="descripcion" rows="4" cols="50"></textarea><br><br>
 
     <button type="submit" name="accion" value="add" id="btnAdd">Añadir</button>
     <button type="submit" name="accion" value="update" id="btnUpdate">Actualizar</button>
@@ -62,7 +64,7 @@
 
 <hr>
 
-<h3>READ (Mostrar)</h3>
+<h3> Mostrar </h3>
 <button id="btnReadAll" type="button">Mostrar toda la tabla</button>
 <button id="btnReadId" type="button">Mostrar fila por ID (usa el campo ID)</button>
 <button id="btnReadTitle" type="button">Mostrar fila por Título (usa el campo Título)</button>

@@ -15,7 +15,16 @@ function responder($code, $data) {
 
 function getById(PDO $pdo, int $id) {
   $stmt = $pdo->prepare("
-    SELECT id_videojuego, titulo, precio_base
+    SELECT
+      id_videojuego,
+      titulo,
+      precio_base,
+      fecha_lanzamiento,
+      pegi,
+      motor,
+      es_multijugador,
+      id_estudio,
+      descripcion
     FROM videojuego
     WHERE id_videojuego = :id
   ");
@@ -37,22 +46,40 @@ try {
 
   $accion = $_POST["accion"] ?? "";
 
-  // CREATE
+  // =========================
+  // CREATE (add)
+  // =========================
   if ($accion === "add") {
     $titulo = trim($_POST["titulo"] ?? "");
     $precio = $_POST["precio"] ?? null;
 
+    $fecha  = $_POST["fecha_lanzamiento"] ?? null; // YYYY-MM-DD
+    $pegi   = $_POST["pegi"] ?? null;
+    $motor  = trim($_POST["motor"] ?? "");
+    $multi  = isset($_POST["es_multijugador"]) ? (int)$_POST["es_multijugador"] : 0;
+    $estudio = $_POST["id_estudio"] ?? null;
+    $desc   = trim($_POST["descripcion"] ?? "");
+
+    // Validación mínima (ajusta si tu profe lo exige)
     if ($titulo === "" || $precio === null) {
-      responder(400, ["ok" => false, "error" => "Faltan campos: titulo, precio"]);
+      responder(400, ["ok" => false, "error" => "Faltan campos obligatorios: titulo, precio"]);
     }
 
     $stmt = $pdo->prepare("
-      INSERT INTO videojuego (titulo, precio_base)
-      VALUES (:titulo, :precio)
+      INSERT INTO videojuego
+        (titulo, precio_base, fecha_lanzamiento, pegi, motor, es_multijugador, id_estudio, descripcion)
+      VALUES
+        (:titulo, :precio, :fecha, :pegi, :motor, :multi, :estudio, :desc)
     ");
     $stmt->execute([
-      ":titulo" => $titulo,
-      ":precio" => $precio
+      ":titulo"  => $titulo,
+      ":precio"  => $precio,
+      ":fecha"   => ($fecha === "" ? null : $fecha),
+      ":pegi"    => ($pegi === "" ? null : $pegi),
+      ":motor"   => ($motor === "" ? null : $motor),
+      ":multi"   => $multi,
+      ":estudio" => ($estudio === "" ? null : $estudio),
+      ":desc"    => ($desc === "" ? null : $desc),
     ]);
 
     $id = (int)$pdo->lastInsertId();
@@ -61,14 +88,23 @@ try {
     responder(200, ["ok" => true, "accion" => "add", "fila" => $fila]);
   }
 
-  // UPDATE
+  // =========================
+  // UPDATE (update)
+  // =========================
   if ($accion === "update") {
     $id     = (int)($_POST["id"] ?? 0);
     $titulo = trim($_POST["titulo"] ?? "");
     $precio = $_POST["precio"] ?? null;
 
-    if ($id <= 0 || $titulo === "" || $precio === null) {
-      responder(400, ["ok" => false, "error" => "Faltan campos: id, titulo, precio"]);
+    $fecha  = $_POST["fecha_lanzamiento"] ?? null;
+    $pegi   = $_POST["pegi"] ?? null;
+    $motor  = trim($_POST["motor"] ?? "");
+    $multi  = isset($_POST["es_multijugador"]) ? (int)$_POST["es_multijugador"] : 0;
+    $estudio = $_POST["id_estudio"] ?? null;
+    $desc   = trim($_POST["descripcion"] ?? "");
+
+    if ($id <= 0) {
+      responder(400, ["ok" => false, "error" => "Falta campo obligatorio: id"]);
     }
 
     $existe = getById($pdo, $id);
@@ -76,23 +112,43 @@ try {
       responder(404, ["ok" => false, "error" => "No existe ese id"]);
     }
 
+    // Si quieres obligatorios en update, deja esta validación:
+    if ($titulo === "" || $precio === null) {
+      responder(400, ["ok" => false, "error" => "Faltan campos obligatorios: titulo, precio"]);
+    }
+
     $stmt = $pdo->prepare("
       UPDATE videojuego
-      SET titulo = :titulo,
-          precio_base = :precio
+      SET
+        titulo = :titulo,
+        precio_base = :precio,
+        fecha_lanzamiento = :fecha,
+        pegi = :pegi,
+        motor = :motor,
+        es_multijugador = :multi,
+        id_estudio = :estudio,
+        descripcion = :desc
       WHERE id_videojuego = :id
     ");
     $stmt->execute([
-      ":id"     => $id,
-      ":titulo" => $titulo,
-      ":precio" => $precio
+      ":id"      => $id,
+      ":titulo"  => $titulo,
+      ":precio"  => $precio,
+      ":fecha"   => ($fecha === "" ? null : $fecha),
+      ":pegi"    => ($pegi === "" ? null : $pegi),
+      ":motor"   => ($motor === "" ? null : $motor),
+      ":multi"   => $multi,
+      ":estudio" => ($estudio === "" ? null : $estudio),
+      ":desc"    => ($desc === "" ? null : $desc),
     ]);
 
     $fila = getById($pdo, $id);
     responder(200, ["ok" => true, "accion" => "update", "fila" => $fila]);
   }
 
-  // DELETE
+  // =========================
+  // DELETE (delete)
+  // =========================
   if ($accion === "delete") {
     $id = (int)($_POST["id"] ?? 0);
     if ($id <= 0) {
@@ -110,10 +166,21 @@ try {
     responder(200, ["ok" => true, "accion" => "delete", "fila" => $fila]);
   }
 
-  // READ ALL
+  // =========================
+  // READ ALL (read_all)
+  // =========================
   if ($accion === "read_all") {
     $stmt = $pdo->query("
-      SELECT id_videojuego, titulo, precio_base
+      SELECT
+        id_videojuego,
+        titulo,
+        precio_base,
+        fecha_lanzamiento,
+        pegi,
+        motor,
+        es_multijugador,
+        id_estudio,
+        descripcion
       FROM videojuego
       ORDER BY id_videojuego ASC
     ");
@@ -122,7 +189,9 @@ try {
     responder(200, ["ok" => true, "accion" => "read_all", "total" => count($filas), "filas" => $filas]);
   }
 
-  // READ BY ID
+  // =========================
+  // READ BY ID (read_id)
+  // =========================
   if ($accion === "read_id") {
     $id = (int)($_POST["id"] ?? 0);
     if ($id <= 0) responder(400, ["ok" => false, "error" => "Falta campo: id"]);
@@ -133,13 +202,16 @@ try {
     responder(200, ["ok" => true, "accion" => "read_id", "fila" => $fila]);
   }
 
-  // READ BY TITLE (exacto)
+  // =========================
+  // READ BY TITLE (read_title) (exacto)
+  // =========================
   if ($accion === "read_title") {
     $titulo = trim($_POST["titulo"] ?? "");
     if ($titulo === "") responder(400, ["ok" => false, "error" => "Falta campo: titulo"]);
 
     $stmt = $pdo->prepare("
-      SELECT id_videojuego, titulo, precio_base
+      SELECT
+      id_videojuego, titulo, fecha_lanzamiento, pegi, precio_base, motor, es_multijugador, id_estudio, descripcion
       FROM videojuego
       WHERE titulo = :t
       LIMIT 1
