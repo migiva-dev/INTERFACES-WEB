@@ -2,14 +2,15 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>CRUD simple en PHP</title>
+<title>CRUD - Tabla videojuego</title>
 <style>
-  body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; }
+  body { font-family: Arial, sans-serif; max-width: 1100px; margin: 20px auto; }
   .error { color: #b00020; }
   .ok { color: #0a7a2f; }
   table { width:100%; border-collapse: collapse; margin-top: 10px; }
   th, td { border: 1px solid #e3e3e3; padding: 8px; text-align: left; vertical-align: top; }
   th { background: #fafafa; }
+  textarea { width: 520px; }
 </style>
 </head>
 <body>
@@ -26,13 +27,11 @@
     <label>Título:</label><br>
     <input type="text" name="titulo" id="titulo"><br><br>
 
-    
     <label>Fecha de Lanzamiento</label><br>
     <input type="date" name="fecha_lanzamiento" id="fecha_lanzamiento"><br><br>
 
-    <label>Pegi</label><br>
-    
-    <input type="number" name="pegi" id="pegi" min="0" max="21" placeholder="Ej: 3, 7, 12, 16, 18"><br><br>
+    <label>PEGI</label><br>
+    <input type="number" name="pegi" id="pegi" min="0" max="21"><br><br>
 
     <label>Precio:</label><br>
     <input type="number" step="0.01" name="precio" id="precio"><br><br>
@@ -48,11 +47,17 @@
     </select><br><br>
 
     <label>Multijugador</label><br>
-    
     <input type="checkbox" id="multijugador"><br><br>
 
-    <label>ID Estudio:</label><br>
-    <input type="number" name="id_estudio" id="id_estudio"><br><br>
+    <label>Estudio (asociado):</label><br>
+    <select name="id_estudio" id="id_estudio">
+      <option value="">-- Sin estudio (NULL) --</option>
+    </select><br><br>
+
+    <label>Género (asociado):</label><br>
+    <select name="id_genero" id="id_genero">
+      <option value="">-- Sin género (NULL) --</option>
+    </select><br><br>
 
     <label>Descripción</label><br>
     <textarea name="descripcion" id="descripcion" rows="4" cols="50"></textarea><br><br>
@@ -65,10 +70,32 @@
 
 <hr>
 
-<h3> Mostrar </h3>
+<h3>Mostrar</h3>
 <button id="btnReadAll" type="button">Mostrar toda la tabla</button>
 <button id="btnReadId" type="button">Mostrar fila por ID (usa el campo ID)</button>
 <button id="btnReadTitle" type="button">Mostrar fila por Título (usa el campo Título)</button>
+
+<hr>
+
+<h3>Ampliación: Detalle juego + estudio + género (1 consulta)</h3>
+<button id="btnDetalleId" type="button">Detalle por ID</button>
+<button id="btnDetalleTitulo" type="button">Detalle por Título</button>
+<p id="detalleTxt"></p>
+
+<hr>
+
+<h3>Ampliación: Cambiar estudio y género asociados (por ID)</h3>
+<label>Nuevo estudio:</label><br>
+<select id="selEstudio">
+  <option value="">--Selecciona estudio--</option>
+</select><br><br>
+
+<label>Nuevo género:</label><br>
+<select id="selGenero">
+  <option value="">--Selecciona género--</option>
+</select><br><br>
+
+<button id="btnUpdRel" type="button">Actualizar estudio y género</button>
 
 <table id="tabla" style="display:none">
   <thead>
@@ -81,6 +108,7 @@
       <th>Motor</th>
       <th>Multi</th>
       <th>ID Estudio</th>
+      <th>ID Género</th>
       <th>Descripción</th>
     </tr>
   </thead>
@@ -92,6 +120,7 @@
 
   const form = document.getElementById("formCrud");
   const mensaje = document.getElementById("mensaje");
+  const detalleTxt = document.getElementById("detalleTxt");
 
   const tabla = document.getElementById("tabla");
   const tbody = document.getElementById("tbody");
@@ -124,6 +153,7 @@
         <td>${esc(f.motor)}</td>
         <td>${esc(f.es_multijugador)}</td>
         <td>${esc(f.id_estudio)}</td>
+        <td>${esc(f.id_genero)}</td>
         <td>${esc(f.descripcion)}</td>
       `;
       tbody.appendChild(tr);
@@ -143,18 +173,14 @@
     const fd = new FormData(form);
     fd.set("accion", accion);
 
-    // Convertir checkbox a 0/1 con el nombre que espera el servidor
+    // checkbox -> 0/1 con el nombre correcto
     const multi = document.getElementById("multijugador").checked ? "1" : "0";
     fd.set("es_multijugador", multi);
-
-    // Aseguramos fecha_lanzamiento 
-    const fecha = document.getElementById("fecha_lanzamiento").value;
-    fd.set("fecha_lanzamiento", fecha);
 
     return fd;
   }
 
-  // ===== add/update/delete =====
+  // ===== CRUD: add/update/delete =====
   ["btnAdd","btnUpdate","btnDelete"].forEach(idBtn => {
     document.getElementById(idBtn).addEventListener("click", async (e) => {
       e.preventDefault();
@@ -163,6 +189,7 @@
       const fd = buildFormData(accion);
 
       setMensaje("Procesando...", true);
+      detalleTxt.textContent = "";
       pintarTabla([]);
 
       try {
@@ -172,7 +199,6 @@
         if (accion === "update") setMensaje("Videojuego actualizado.", true);
         if (accion === "delete") setMensaje("Videojuego eliminado.", true);
 
-        // Mostrar SOLO la fila devuelta
         if (data.fila) pintarTabla([data.fila]);
       } catch (err) {
         setMensaje(String(err), false);
@@ -181,12 +207,13 @@
     });
   });
 
-  // ===== read_all =====
+  // ===== READ ALL =====
   document.getElementById("btnReadAll").addEventListener("click", async () => {
     const fd = new FormData();
     fd.set("accion", "read_all");
 
     setMensaje("Leyendo tabla...", true);
+    detalleTxt.textContent = "";
     pintarTabla([]);
 
     try {
@@ -199,7 +226,7 @@
     }
   });
 
-  // ===== read_id =====
+  // ===== READ BY ID =====
   document.getElementById("btnReadId").addEventListener("click", async () => {
     const id = document.getElementById("id").value;
 
@@ -208,6 +235,7 @@
     fd.set("id", id);
 
     setMensaje("Buscando por ID...", true);
+    detalleTxt.textContent = "";
     pintarTabla([]);
 
     try {
@@ -220,7 +248,7 @@
     }
   });
 
-  // ===== read_title =====
+  // ===== READ BY TITLE =====
   document.getElementById("btnReadTitle").addEventListener("click", async () => {
     const titulo = document.getElementById("titulo").value;
 
@@ -229,6 +257,7 @@
     fd.set("titulo", titulo);
 
     setMensaje("Buscando por título...", true);
+    detalleTxt.textContent = "";
     pintarTabla([]);
 
     try {
@@ -240,6 +269,120 @@
       pintarTabla([]);
     }
   });
+
+  // ===== DETALLE por ID =====
+  document.getElementById("btnDetalleId").addEventListener("click", async () => {
+    const id = document.getElementById("id").value;
+
+    const fd = new FormData();
+    fd.set("accion", "read_detalle");
+    fd.set("id", id);
+
+    try {
+      const data = await postForm(fd);
+      const d = data.detalle;
+      detalleTxt.textContent = `Juego: ${d.titulo} | Estudio: ${d.estudio ?? "—"} | Género: ${d.genero ?? "—"}`;
+      setMensaje("Detalle cargado.", true);
+    } catch (err) {
+      detalleTxt.textContent = "";
+      setMensaje(String(err), false);
+    }
+  });
+
+  // ===== DETALLE por Título =====
+  document.getElementById("btnDetalleTitulo").addEventListener("click", async () => {
+    const titulo = document.getElementById("titulo").value;
+
+    const fd = new FormData();
+    fd.set("accion", "read_detalle");
+    fd.set("titulo", titulo);
+
+    try {
+      const data = await postForm(fd);
+      const d = data.detalle;
+      detalleTxt.textContent = `Juego: ${d.titulo} | Estudio: ${d.estudio ?? "—"} | Género: ${d.genero ?? "—"}`;
+      setMensaje("Detalle cargado.", true);
+    } catch (err) {
+      detalleTxt.textContent = "";
+      setMensaje(String(err), false);
+    }
+  });
+
+  // ===== UPDATE estudio + género =====
+  document.getElementById("btnUpdRel").addEventListener("click", async () => {
+    const id = document.getElementById("id").value;
+    const id_estudio = document.getElementById("selEstudio").value;
+    const id_genero  = document.getElementById("selGenero").value;
+
+    const fd = new FormData();
+    fd.set("accion", "update_estudio_genero");
+    fd.set("id", id);
+    fd.set("id_estudio", id_estudio);
+    fd.set("id_genero", id_genero);
+
+    try {
+      const data = await postForm(fd);
+      setMensaje("Estudio y género actualizados.", true);
+      detalleTxt.textContent = "";
+      if (data.fila) pintarTabla([data.fila]);
+    } catch (err) {
+      setMensaje(String(err), false);
+    }
+  });
+
+  // ===== Cargar combos =====
+  async function cargarEstudiosEnSelects(){
+    const fd = new FormData();
+    fd.set("accion", "read_estudios");
+    try {
+      const data = await postForm(fd);
+
+      const selForm = document.getElementById("id_estudio");
+      const selUpd  = document.getElementById("selEstudio");
+
+      data.estudios.forEach(e => {
+        const opt1 = document.createElement("option");
+        opt1.value = e.id_estudio;
+        opt1.textContent = `${e.id_estudio} - ${e.nombre}`;
+        selForm.appendChild(opt1);
+
+        const opt2 = document.createElement("option");
+        opt2.value = e.id_estudio;
+        opt2.textContent = `${e.id_estudio} - ${e.nombre}`;
+        selUpd.appendChild(opt2);
+      });
+    } catch (err) {
+      console.log("No se pudieron cargar estudios:", err);
+    }
+  }
+
+  async function cargarGenerosEnSelects(){
+    const fd = new FormData();
+    fd.set("accion", "read_generos");
+    try {
+      const data = await postForm(fd);
+
+      const selForm = document.getElementById("id_genero");
+      const selUpd  = document.getElementById("selGenero");
+
+      data.generos.forEach(g => {
+        const opt1 = document.createElement("option");
+        opt1.value = g.id_genero;
+        opt1.textContent = `${g.id_genero} - ${g.nombre}`;
+        selForm.appendChild(opt1);
+
+        const opt2 = document.createElement("option");
+        opt2.value = g.id_genero;
+        opt2.textContent = `${g.id_genero} - ${g.nombre}`;
+        selUpd.appendChild(opt2);
+      });
+    } catch (err) {
+      console.log("No se pudieron cargar generos:", err);
+    }
+  }
+
+  cargarEstudiosEnSelects();
+  cargarGenerosEnSelects();
 </script>
 
 </body>
