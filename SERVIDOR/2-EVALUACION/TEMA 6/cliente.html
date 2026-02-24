@@ -20,14 +20,39 @@
 
 <form method="POST" id="formCrud">
 
-    <label>ID (para actualizar/eliminar):</label><br>
+    <label>ID:</label><br>
     <input type="number" name="id" id="id"><br><br>
 
     <label>Título:</label><br>
     <input type="text" name="titulo" id="titulo"><br><br>
 
+    <label>Fecha de Lanzamiento</label><br>
+    <input type="date" name="fecha" id="fecha"><br><br>
+
+    <label>Pegi</label><br>
+    <input type="number" step="0.01" name="pegi" id="pegi"><br><br>
+
     <label>Precio:</label><br>
     <input type="number" step="0.01" name="precio" id="precio"><br><br>
+
+    
+    <label>Motor:</label><br>
+      <select name="motor" id="motor">
+        <option value="">--Selecciona un motor--</option>
+        <option value="Unreal Engine">Unreal Engine</option>
+        <option value="Unity">Unity</option>
+        <option value="Godot">Godot</option>
+        <option value="CryEngine">CryEngine</option>
+        <option value="Frostbite">Frostbite</option>
+
+      </select><br><br>
+
+    <label>Multijugador</label><br>
+    <input type="checkbox" name="multijugador" id="multijugador"><br><br>
+
+    <label>ID Estudio:</label><br>
+    <input type="number" name="id_estudio" id="id_estudio"><br><br>
+
 
     <button type="submit" name="accion" value="add" id="btnAdd">Añadir</button>
     <button type="submit" name="accion" value="update" id="btnUpdate">Actualizar</button>
