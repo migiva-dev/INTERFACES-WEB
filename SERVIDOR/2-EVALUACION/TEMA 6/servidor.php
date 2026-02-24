@@ -47,7 +47,7 @@ try {
   $accion = $_POST["accion"] ?? "";
 
   // =========================
-  // CREATE (add)
+  // CREATE 
   // =========================
   if ($accion === "add") {
     $titulo = trim($_POST["titulo"] ?? "");
@@ -89,7 +89,7 @@ try {
   }
 
   // =========================
-  // UPDATE (update)
+  // UPDATE 
   // =========================
   if ($accion === "update") {
     $id     = (int)($_POST["id"] ?? 0);
@@ -147,7 +147,7 @@ try {
   }
 
   // =========================
-  // DELETE (delete)
+  // DELETE 
   // =========================
   if ($accion === "delete") {
     $id = (int)($_POST["id"] ?? 0);
@@ -167,7 +167,7 @@ try {
   }
 
   // =========================
-  // READ ALL (read_all)
+  // READ ALL 
   // =========================
   if ($accion === "read_all") {
     $stmt = $pdo->query("
@@ -202,9 +202,7 @@ try {
     responder(200, ["ok" => true, "accion" => "read_id", "fila" => $fila]);
   }
 
-  // =========================
-  // READ BY TITLE (read_title) (exacto)
-  // =========================
+
   if ($accion === "read_title") {
     $titulo = trim($_POST["titulo"] ?? "");
     if ($titulo === "") responder(400, ["ok" => false, "error" => "Falta campo: titulo"]);
