@@ -190,7 +190,7 @@ try {
   }
 
   // =========================
-  // READ BY ID (read_id)
+  // READ BY ID
   // =========================
   if ($accion === "read_id") {
     $id = (int)($_POST["id"] ?? 0);

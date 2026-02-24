@@ -8,7 +8,7 @@
   .error { color: #b00020; }
   .ok { color: #0a7a2f; }
   table { width:100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { border: 1px solid #e3e3e3; padding: 8px; text-align: left; }
+  th, td { border: 1px solid #e3e3e3; padding: 8px; text-align: left; vertical-align: top; }
   th { background: #fafafa; }
 </style>
 </head>
@@ -26,34 +26,35 @@
     <label>Título:</label><br>
     <input type="text" name="titulo" id="titulo"><br><br>
 
+    
     <label>Fecha de Lanzamiento</label><br>
-    <input type="date" name="fecha" id="fecha"><br><br>
+    <input type="date" name="fecha_lanzamiento" id="fecha_lanzamiento"><br><br>
 
     <label>Pegi</label><br>
-    <input type="number" step="0.01" name="pegi" id="pegi"><br><br>
+    
+    <input type="number" name="pegi" id="pegi" min="0" max="21" placeholder="Ej: 3, 7, 12, 16, 18"><br><br>
 
     <label>Precio:</label><br>
     <input type="number" step="0.01" name="precio" id="precio"><br><br>
 
-    
     <label>Motor:</label><br>
-      <select name="motor" id="motor">
-        <option value="">--Selecciona un motor--</option>
-        <option value="Unreal Engine">Unreal Engine</option>
-        <option value="Unity">Unity</option>
-        <option value="Godot">Godot</option>
-        <option value="CryEngine">CryEngine</option>
-        <option value="Frostbite">Frostbite</option>
-
-      </select><br><br>
+    <select name="motor" id="motor">
+      <option value="">--Selecciona un motor--</option>
+      <option value="Unreal Engine">Unreal Engine</option>
+      <option value="Unity">Unity</option>
+      <option value="Godot">Godot</option>
+      <option value="CryEngine">CryEngine</option>
+      <option value="Frostbite">Frostbite</option>
+    </select><br><br>
 
     <label>Multijugador</label><br>
-    <input type="checkbox" name="multijugador" id="multijugador"><br><br>
+    
+    <input type="checkbox" id="multijugador"><br><br>
 
     <label>ID Estudio:</label><br>
     <input type="number" name="id_estudio" id="id_estudio"><br><br>
 
-    <label>Descripcion</label><br>
+    <label>Descripción</label><br>
     <textarea name="descripcion" id="descripcion" rows="4" cols="50"></textarea><br><br>
 
     <button type="submit" name="accion" value="add" id="btnAdd">Añadir</button>
@@ -74,7 +75,13 @@
     <tr>
       <th>ID</th>
       <th>Título</th>
+      <th>Fecha</th>
+      <th>PEGI</th>
       <th>Precio</th>
+      <th>Motor</th>
+      <th>Multi</th>
+      <th>ID Estudio</th>
+      <th>Descripción</th>
     </tr>
   </thead>
   <tbody id="tbody"></tbody>
@@ -94,6 +101,10 @@
     mensaje.textContent = txt;
   }
 
+  function esc(v){
+    return (v === null || v === undefined) ? "" : String(v);
+  }
+
   function pintarTabla(filas){
     tbody.innerHTML = "";
 
@@ -105,9 +116,15 @@
     filas.forEach(f => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${f.id_videojuego}</td>
-        <td>${f.titulo}</td>
-        <td>${f.precio_base}</td>
+        <td>${esc(f.id_videojuego)}</td>
+        <td>${esc(f.titulo)}</td>
+        <td>${esc(f.fecha_lanzamiento)}</td>
+        <td>${esc(f.pegi)}</td>
+        <td>${esc(f.precio_base)}</td>
+        <td>${esc(f.motor)}</td>
+        <td>${esc(f.es_multijugador)}</td>
+        <td>${esc(f.id_estudio)}</td>
+        <td>${esc(f.descripcion)}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -118,9 +135,23 @@
   async function postForm(formData){
     const resp = await fetch(URL, { method: "POST", body: formData });
     const data = await resp.json().catch(() => ({}));
-
     if (!resp.ok) throw new Error(data?.error || "Error del servidor");
     return data;
+  }
+
+  function buildFormData(accion){
+    const fd = new FormData(form);
+    fd.set("accion", accion);
+
+    // Convertir checkbox a 0/1 con el nombre que espera el servidor
+    const multi = document.getElementById("multijugador").checked ? "1" : "0";
+    fd.set("es_multijugador", multi);
+
+    // Aseguramos fecha_lanzamiento 
+    const fecha = document.getElementById("fecha_lanzamiento").value;
+    fd.set("fecha_lanzamiento", fecha);
+
+    return fd;
   }
 
   // ===== add/update/delete =====
@@ -129,8 +160,7 @@
       e.preventDefault();
 
       const accion = e.target.value; // add/update/delete
-      const fd = new FormData(form);
-      fd.set("accion", accion);
+      const fd = buildFormData(accion);
 
       setMensaje("Procesando...", true);
       pintarTabla([]);
