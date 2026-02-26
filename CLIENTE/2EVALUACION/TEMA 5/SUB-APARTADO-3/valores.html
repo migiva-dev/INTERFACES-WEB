@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Obtener valores del formulario</title>
+
+<style>
+  body { font-family: Arial; padding: 30px; }
+  label { display:block; margin-top:10px; }
+  #resultado {
+    margin-top:20px;
+    padding:15px;
+    background:#f2f2f2;
+    border:1px solid #ccc;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>Encuesta completa</h2>
+
+<form id="formEncuesta">
+
+  <!-- TEXT -->
+  <label>
+    Nombre:
+    <input type="text" id="nombre">
+  </label>
+
+  <!-- TEXTAREA -->
+  <label>
+    Comentarios:
+    <textarea id="comentarios"></textarea>
+  </label>
+
+  <!-- RADIO -->
+  <label>Género:</label>
+  <input type="radio" name="genero" value="Hombre"> Hombre
+  <input type="radio" name="genero" value="Mujer"> Mujer
+  <input type="radio" name="genero" value="Otro"> Otro
+
+  <!-- CHECKBOX -->
+  <label>Intereses:</label>
+  <input type="checkbox" name="intereses" value="Deporte"> Deporte
+  <input type="checkbox" name="intereses" value="Tecnología"> Tecnología
+  <input type="checkbox" name="intereses" value="Música"> Música
+
+  <!-- SELECT -->
+  <label>
+    Provincia:
+    <select id="provincia">
+      <option value="">-- Selecciona --</option>
+      <option value="Castellón">Castellón</option>
+      <option value="Valencia">Valencia</option>
+      <option value="Alicante">Alicante</option>
+    </select>
+  </label>
+
+  <!-- SELECT MULTIPLE -->
+  <label>
+    Lenguajes que conoces:
+    <select id="lenguajes" multiple>
+      <option value="Java">Java</option>
+      <option value="JavaScript">JavaScript</option>
+      <option value="Python">Python</option>
+      <option value="PHP">PHP</option>
+    </select>
+  </label>
+
+  <!-- NUMBER -->
+  <label>
+    Edad:
+    <input type="number" id="edad">
+  </label>
+
+  <!-- DATE -->
+  <label>
+    Fecha de nacimiento:
+    <input type="date" id="fecha">
+  </label>
+
+  <!-- RANGE -->
+  <label>
+    Nivel de satisfacción:
+    <input type="range" id="satisfaccion" min="0" max="10">
+  </label>
+
+  <!-- COLOR -->
+  <label>
+    Color favorito:
+    <input type="color" id="color">
+  </label>
+
+  <br><br>
+  <button type="button" id="btnMostrar">Mostrar valores</button>
+
+</form>
+
+<div id="resultado"></div>
+
+<script>
+document.getElementById("btnMostrar").addEventListener("click", function() {
+
+  // TEXT y TEXTAREA
+  const nombre = document.getElementById("nombre").value;
+  const comentarios = document.getElementById("comentarios").value;
+
+  // RADIO
+  const radios = document.getElementsByName("genero");
+  let generoSeleccionado = "";
+  radios.forEach(radio => {
+    if (radio.checked) {
+      generoSeleccionado = radio.value;
+    }
+  });
+
+  // CHECKBOX
+  const checkboxes = document.getElementsByName("intereses");
+  let interesesSeleccionados = [];
+  checkboxes.forEach(check => {
+    if (check.checked) {
+      interesesSeleccionados.push(check.value);
+    }
+  });
+
+  // SELECT
+  const provinciaSelect = document.getElementById("provincia");
+  const provincia = provinciaSelect.options[provinciaSelect.selectedIndex].value;
+
+  // SELECT MULTIPLE
+    const lenguajesSelect = document.getElementById("lenguajes");
+    let lenguajesSeleccionados = [];
+
+    for (const opcion of lenguajesSelect.options) {
+    if (opcion.selected) {
+        lenguajesSeleccionados.push(opcion.value);
+    }
+    }
+
+  // NUMBER
+  const edad = document.getElementById("edad").value;
+
+  // DATE
+  const fecha = document.getElementById("fecha").value;
+
+  // RANGE
+  const satisfaccion = document.getElementById("satisfaccion").value;
+
+  // COLOR
+  const color = document.getElementById("color").value;
+
+  // Mostrar resultados
+  document.getElementById("resultado").innerHTML = `
+    <strong>Valores recogidos:</strong><br>
+    Nombre: ${nombre}<br>
+    Comentarios: ${comentarios}<br>
+    Género: ${generoSeleccionado}<br>
+    Intereses: ${interesesSeleccionados.join(", ")}<br>
+    Provincia: ${provincia}<br>
+    Lenguajes: ${lenguajesSeleccionados.join(", ")}<br>
+    Edad: ${edad}<br>
+    Fecha nacimiento: ${fecha}<br>
+    Satisfacción: ${satisfaccion}<br>
+    Color favorito: ${color}
+  `;
+});
+</script>
+
+</body>
+</html>
