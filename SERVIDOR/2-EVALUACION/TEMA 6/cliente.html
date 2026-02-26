@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>CRUD - Tabla videojuego</title>
+<title>CRUD Videojuegos</title>
 <style>
   body { font-family: Arial, sans-serif; max-width: 1100px; margin: 20px auto; }
   .error { color: #b00020; }
@@ -16,56 +16,40 @@
 <body>
 
 <h2>CRUD - Tabla videojuego</h2>
-
 <p id="mensaje"></p>
 
-<form method="POST" id="formCrud">
+<form id="formCrud">
 
-    <label>ID:</label><br>
-    <input type="number" name="id" id="id"><br><br>
+  <label>ID:</label><br>
+  <input type="number" name="id" id="id"><br><br>
 
-    <label>Título:</label><br>
-    <input type="text" name="titulo" id="titulo"><br><br>
+  <label>Título:</label><br>
+  <input type="text" name="titulo" id="titulo"><br><br>
 
-    <label>Fecha de Lanzamiento</label><br>
-    <input type="date" name="fecha_lanzamiento" id="fecha_lanzamiento"><br><br>
+  <label>Fecha Lanzamiento:</label><br>
+  <input type="date" name="fecha_lanzamiento" id="fecha_lanzamiento"><br><br>
 
-    <label>PEGI</label><br>
-    <input type="number" name="pegi" id="pegi" min="0" max="21"><br><br>
+  <label>PEGI:</label><br>
+  <input type="number" name="pegi" id="pegi" min="0" max="21"><br><br>
 
-    <label>Precio:</label><br>
-    <input type="number" step="0.01" name="precio" id="precio"><br><br>
+  <label>Precio:</label><br>
+  <input type="number" step="0.01" name="precio" id="precio"><br><br>
 
-    <label>Motor:</label><br>
-    <select name="motor" id="motor">
-      <option value="">--Selecciona un motor--</option>
-      <option value="Unreal Engine">Unreal Engine</option>
-      <option value="Unity">Unity</option>
-      <option value="Godot">Godot</option>
-      <option value="CryEngine">CryEngine</option>
-      <option value="Frostbite">Frostbite</option>
-    </select><br><br>
+  <label>Motor:</label><br>
+  <input type="text" name="motor" id="motor"><br><br>
 
-    <label>Multijugador</label><br>
-    <input type="checkbox" id="multijugador"><br><br>
+  <label>Multijugador:</label><br>
+  <select id="multijugador">
+    <option value="0">No</option>
+    <option value="1">Sí</option>
+  </select><br><br>
 
-    <label>Estudio (asociado):</label><br>
-    <select name="id_estudio" id="id_estudio">
-      <option value="">-- Sin estudio (NULL) --</option>
-    </select><br><br>
+  <label>Descripción:</label><br>
+  <textarea name="descripcion" id="descripcion" rows="4"></textarea><br><br>
 
-    <label>Género (asociado):</label><br>
-    <select name="id_genero" id="id_genero">
-      <option value="">-- Sin género (NULL) --</option>
-    </select><br><br>
-
-    <label>Descripción</label><br>
-    <textarea name="descripcion" id="descripcion" rows="4" cols="50"></textarea><br><br>
-
-    <button type="submit" name="accion" value="add" id="btnAdd">Añadir</button>
-    <button type="submit" name="accion" value="update" id="btnUpdate">Actualizar</button>
-    <button type="submit" name="accion" value="delete" id="btnDelete">Eliminar</button>
-
+  <button id="btnAdd" type="button">Añadir</button>
+  <button id="btnUpdate" type="button">Actualizar</button>
+  <button id="btnDelete" type="button">Eliminar</button>
 </form>
 
 <hr>
@@ -74,28 +58,6 @@
 <button id="btnReadAll" type="button">Mostrar toda la tabla</button>
 <button id="btnReadId" type="button">Mostrar fila por ID (usa el campo ID)</button>
 <button id="btnReadTitle" type="button">Mostrar fila por Título (usa el campo Título)</button>
-
-<hr>
-
-<h3>Ampliación: Detalle juego + estudio + género (1 consulta)</h3>
-<button id="btnDetalleId" type="button">Detalle por ID</button>
-<button id="btnDetalleTitulo" type="button">Detalle por Título</button>
-<p id="detalleTxt"></p>
-
-<hr>
-
-<h3>Ampliación: Cambiar estudio y género asociados (por ID)</h3>
-<label>Nuevo estudio:</label><br>
-<select id="selEstudio">
-  <option value="">--Selecciona estudio--</option>
-</select><br><br>
-
-<label>Nuevo género:</label><br>
-<select id="selGenero">
-  <option value="">--Selecciona género--</option>
-</select><br><br>
-
-<button id="btnUpdRel" type="button">Actualizar estudio y género</button>
 
 <table id="tabla" style="display:none">
   <thead>
@@ -106,9 +68,7 @@
       <th>PEGI</th>
       <th>Precio</th>
       <th>Motor</th>
-      <th>Multi</th>
-      <th>ID Estudio</th>
-      <th>ID Género</th>
+      <th>Multijugador</th>
       <th>Descripción</th>
     </tr>
   </thead>
@@ -116,273 +76,141 @@
 </table>
 
 <script>
-  const URL = "servidor.php";
+const URL = "servidor.php";
 
-  const form = document.getElementById("formCrud");
-  const mensaje = document.getElementById("mensaje");
-  const detalleTxt = document.getElementById("detalleTxt");
+const form = document.getElementById("formCrud");
+const mensaje = document.getElementById("mensaje");
+const tabla = document.getElementById("tabla");
+const tbody = document.getElementById("tbody");
 
-  const tabla = document.getElementById("tabla");
-  const tbody = document.getElementById("tbody");
+function setMensaje(txt, ok=true){
+  mensaje.className = ok ? "ok" : "error";
+  mensaje.textContent = txt;
+}
 
-  function setMensaje(txt, ok=true){
-    mensaje.className = ok ? "ok" : "error";
-    mensaje.textContent = txt;
-  }
+function esc(v){ return (v === null || v === undefined) ? "" : String(v); }
 
-  function esc(v){
-    return (v === null || v === undefined) ? "" : String(v);
-  }
+function multiTxt(v){
+  return String(v) === "1" ? "Sí" : "No";
+}
 
-  function pintarTabla(filas){
-    tbody.innerHTML = "";
+function pintarTabla(filas){
+  tbody.innerHTML = "";
+  if (!Array.isArray(filas) || filas.length === 0) { tabla.style.display = "none"; return; }
 
-    if (!Array.isArray(filas) || filas.length === 0){
-      tabla.style.display = "none";
-      return;
-    }
-
-    filas.forEach(f => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${esc(f.id_videojuego)}</td>
-        <td>${esc(f.titulo)}</td>
-        <td>${esc(f.fecha_lanzamiento)}</td>
-        <td>${esc(f.pegi)}</td>
-        <td>${esc(f.precio_base)}</td>
-        <td>${esc(f.motor)}</td>
-        <td>${esc(f.es_multijugador)}</td>
-        <td>${esc(f.id_estudio)}</td>
-        <td>${esc(f.id_genero)}</td>
-        <td>${esc(f.descripcion)}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    tabla.style.display = "";
-  }
-
-  async function postForm(formData){
-    const resp = await fetch(URL, { method: "POST", body: formData });
-    const data = await resp.json().catch(() => ({}));
-    if (!resp.ok) throw new Error(data?.error || "Error del servidor");
-    return data;
-  }
-
-  function buildFormData(accion){
-    const fd = new FormData(form);
-    fd.set("accion", accion);
-
-    // checkbox -> 0/1 con el nombre correcto
-    const multi = document.getElementById("multijugador").checked ? "1" : "0";
-    fd.set("es_multijugador", multi);
-
-    return fd;
-  }
-
-  // ===== CRUD: add/update/delete =====
-  ["btnAdd","btnUpdate","btnDelete"].forEach(idBtn => {
-    document.getElementById(idBtn).addEventListener("click", async (e) => {
-      e.preventDefault();
-
-      const accion = e.target.value; // add/update/delete
-      const fd = buildFormData(accion);
-
-      setMensaje("Procesando...", true);
-      detalleTxt.textContent = "";
-      pintarTabla([]);
-
-      try {
-        const data = await postForm(fd);
-
-        if (accion === "add") setMensaje("Videojuego añadido correctamente.", true);
-        if (accion === "update") setMensaje("Videojuego actualizado.", true);
-        if (accion === "delete") setMensaje("Videojuego eliminado.", true);
-
-        if (data.fila) pintarTabla([data.fila]);
-      } catch (err) {
-        setMensaje(String(err), false);
-        pintarTabla([]);
-      }
-    });
+  filas.forEach(f => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${esc(f.id_videojuego)}</td>
+      <td>${esc(f.titulo)}</td>
+      <td>${esc(f.fecha_lanzamiento)}</td>
+      <td>${esc(f.pegi)}</td>
+      <td>${esc(f.precio_base)}</td>
+      <td>${esc(f.motor)}</td>
+      <td>${multiTxt(f.es_multijugador)}</td>
+      <td>${esc(f.descripcion)}</td>
+    `;
+    tbody.appendChild(tr);
   });
 
-  // ===== READ ALL =====
-  document.getElementById("btnReadAll").addEventListener("click", async () => {
-    const fd = new FormData();
-    fd.set("accion", "read_all");
+  tabla.style.display = "";
+}
 
-    setMensaje("Leyendo tabla...", true);
-    detalleTxt.textContent = "";
-    pintarTabla([]);
+async function postFD(fd){
+  const resp = await fetch(URL, { method:"POST", body: fd });
+  const data = await resp.json().catch(()=> ({}));
+  if (!resp.ok) throw new Error(data?.error || "Error servidor");
+  return data;
+}
 
-    try {
-      const data = await postForm(fd);
-      pintarTabla(data.filas);
-      setMensaje(`Mostrando ${data.total} videojuego(s).`, true);
-    } catch (err) {
-      setMensaje(String(err), false);
-      pintarTabla([]);
-    }
-  });
+function buildFD(accion){
+  const fd = new FormData(form);
+  fd.set("accion", accion);
 
-  // ===== READ BY ID =====
-  document.getElementById("btnReadId").addEventListener("click", async () => {
-    const id = document.getElementById("id").value;
+  // multijugador: enviamos 0/1 aunque el usuario vea Sí/No
+  fd.set("es_multijugador", document.getElementById("multijugador").value);
 
-    const fd = new FormData();
-    fd.set("accion", "read_id");
-    fd.set("id", id);
+  return fd;
+}
 
+// ADD
+document.getElementById("btnAdd").addEventListener("click", async () => {
+  try {
+    setMensaje("Añadiendo...", true);
+    const data = await postFD(buildFD("add"));
+    setMensaje("Añadido OK (mostrando fila añadida)", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// UPDATE
+document.getElementById("btnUpdate").addEventListener("click", async () => {
+  try {
+    setMensaje("Actualizando...", true);
+    const data = await postFD(buildFD("update"));
+    setMensaje("Actualizado OK (mostrando fila actualizada)", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// DELETE
+document.getElementById("btnDelete").addEventListener("click", async () => {
+  const id = document.getElementById("id").value;
+  if (!id) return setMensaje("Pon un ID para borrar", false);
+
+  const fd = new FormData();
+  fd.set("accion", "delete");
+  fd.set("id", id);
+
+  try {
+    setMensaje("Borrando...", true);
+    const data = await postFD(fd);
+    setMensaje("Borrado OK (mostrando fila borrada)", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// READ ALL
+document.getElementById("btnReadAll").addEventListener("click", async () => {
+  const fd = new FormData();
+  fd.set("accion", "read_all");
+  try {
+    setMensaje("Cargando tabla...", true);
+    const data = await postFD(fd);
+    setMensaje(`Mostrando ${data.total} videojuego(s)`, true);
+    pintarTabla(data.filas);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// READ ID
+document.getElementById("btnReadId").addEventListener("click", async () => {
+  const id = document.getElementById("id").value;
+  const fd = new FormData();
+  fd.set("accion", "read_id");
+  fd.set("id", id);
+
+  try {
     setMensaje("Buscando por ID...", true);
-    detalleTxt.textContent = "";
-    pintarTabla([]);
+    const data = await postFD(fd);
+    setMensaje("Fila encontrada por ID", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
 
-    try {
-      const data = await postForm(fd);
-      pintarTabla([data.fila]);
-      setMensaje("Fila encontrada por ID.", true);
-    } catch (err) {
-      setMensaje(String(err), false);
-      pintarTabla([]);
-    }
-  });
+// READ TITLE
+document.getElementById("btnReadTitle").addEventListener("click", async () => {
+  const titulo = document.getElementById("titulo").value;
+  const fd = new FormData();
+  fd.set("accion", "read_title");
+  fd.set("titulo", titulo);
 
-  // ===== READ BY TITLE =====
-  document.getElementById("btnReadTitle").addEventListener("click", async () => {
-    const titulo = document.getElementById("titulo").value;
-
-    const fd = new FormData();
-    fd.set("accion", "read_title");
-    fd.set("titulo", titulo);
-
+  try {
     setMensaje("Buscando por título...", true);
-    detalleTxt.textContent = "";
-    pintarTabla([]);
-
-    try {
-      const data = await postForm(fd);
-      pintarTabla([data.fila]);
-      setMensaje("Fila encontrada por título.", true);
-    } catch (err) {
-      setMensaje(String(err), false);
-      pintarTabla([]);
-    }
-  });
-
-  // ===== DETALLE por ID =====
-  document.getElementById("btnDetalleId").addEventListener("click", async () => {
-    const id = document.getElementById("id").value;
-
-    const fd = new FormData();
-    fd.set("accion", "read_detalle");
-    fd.set("id", id);
-
-    try {
-      const data = await postForm(fd);
-      const d = data.detalle;
-      detalleTxt.textContent = `Juego: ${d.titulo} | Estudio: ${d.estudio ?? "—"} | Género: ${d.genero ?? "—"}`;
-      setMensaje("Detalle cargado.", true);
-    } catch (err) {
-      detalleTxt.textContent = "";
-      setMensaje(String(err), false);
-    }
-  });
-
-  // ===== DETALLE por Título =====
-  document.getElementById("btnDetalleTitulo").addEventListener("click", async () => {
-    const titulo = document.getElementById("titulo").value;
-
-    const fd = new FormData();
-    fd.set("accion", "read_detalle");
-    fd.set("titulo", titulo);
-
-    try {
-      const data = await postForm(fd);
-      const d = data.detalle;
-      detalleTxt.textContent = `Juego: ${d.titulo} | Estudio: ${d.estudio ?? "—"} | Género: ${d.genero ?? "—"}`;
-      setMensaje("Detalle cargado.", true);
-    } catch (err) {
-      detalleTxt.textContent = "";
-      setMensaje(String(err), false);
-    }
-  });
-
-  // ===== UPDATE estudio + género =====
-  document.getElementById("btnUpdRel").addEventListener("click", async () => {
-    const id = document.getElementById("id").value;
-    const id_estudio = document.getElementById("selEstudio").value;
-    const id_genero  = document.getElementById("selGenero").value;
-
-    const fd = new FormData();
-    fd.set("accion", "update_estudio_genero");
-    fd.set("id", id);
-    fd.set("id_estudio", id_estudio);
-    fd.set("id_genero", id_genero);
-
-    try {
-      const data = await postForm(fd);
-      setMensaje("Estudio y género actualizados.", true);
-      detalleTxt.textContent = "";
-      if (data.fila) pintarTabla([data.fila]);
-    } catch (err) {
-      setMensaje(String(err), false);
-    }
-  });
-
-  // ===== Cargar combos =====
-  async function cargarEstudiosEnSelects(){
-    const fd = new FormData();
-    fd.set("accion", "read_estudios");
-    try {
-      const data = await postForm(fd);
-
-      const selForm = document.getElementById("id_estudio");
-      const selUpd  = document.getElementById("selEstudio");
-
-      data.estudios.forEach(e => {
-        const opt1 = document.createElement("option");
-        opt1.value = e.id_estudio;
-        opt1.textContent = `${e.id_estudio} - ${e.nombre}`;
-        selForm.appendChild(opt1);
-
-        const opt2 = document.createElement("option");
-        opt2.value = e.id_estudio;
-        opt2.textContent = `${e.id_estudio} - ${e.nombre}`;
-        selUpd.appendChild(opt2);
-      });
-    } catch (err) {
-      console.log("No se pudieron cargar estudios:", err);
-    }
-  }
-
-  async function cargarGenerosEnSelects(){
-    const fd = new FormData();
-    fd.set("accion", "read_generos");
-    try {
-      const data = await postForm(fd);
-
-      const selForm = document.getElementById("id_genero");
-      const selUpd  = document.getElementById("selGenero");
-
-      data.generos.forEach(g => {
-        const opt1 = document.createElement("option");
-        opt1.value = g.id_genero;
-        opt1.textContent = `${g.id_genero} - ${g.nombre}`;
-        selForm.appendChild(opt1);
-
-        const opt2 = document.createElement("option");
-        opt2.value = g.id_genero;
-        opt2.textContent = `${g.id_genero} - ${g.nombre}`;
-        selUpd.appendChild(opt2);
-      });
-    } catch (err) {
-      console.log("No se pudieron cargar generos:", err);
-    }
-  }
-
-  cargarEstudiosEnSelects();
-  cargarGenerosEnSelects();
+    const data = await postFD(fd);
+    setMensaje("Fila encontrada por título", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
 </script>
 
 </body>
