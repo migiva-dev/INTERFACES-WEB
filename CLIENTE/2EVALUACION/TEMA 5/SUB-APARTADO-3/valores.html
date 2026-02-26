@@ -2,169 +2,175 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Obtener valores del formulario</title>
-
+<title>Formulario Desarrollador</title>
 <style>
-  body { font-family: Arial; padding: 30px; }
+  body { font-family: Arial; padding:20px; }
   label { display:block; margin-top:10px; }
-  #resultado {
-    margin-top:20px;
-    padding:15px;
-    background:#f2f2f2;
-    border:1px solid #ccc;
-  }
 </style>
 </head>
 
 <body>
 
-<h2>Encuesta completa</h2>
+<h2>Formulario Desarrollador</h2>
 
-<form id="formEncuesta">
+<!-- ========================= -->
+<!-- FORMULARIO 1: PERSONALES -->
+<!-- ========================= -->
 
-  <!-- TEXT -->
+<form id="formPersonal">
+  <h3>Datos personales</h3>
+
   <label>
     Nombre:
-    <input type="text" id="nombre">
+    <input type="text" id="nombre" maxlength="50" required>
   </label>
 
-  <!-- TEXTAREA -->
   <label>
-    Comentarios:
-    <textarea id="comentarios"></textarea>
+    Apellidos:
+    <input type="text" id="apellidos" maxlength="100" required>
   </label>
 
-  <!-- RADIO -->
-  <label>Género:</label>
-  <input type="radio" name="genero" value="Hombre"> Hombre
-  <input type="radio" name="genero" value="Mujer"> Mujer
-  <input type="radio" name="genero" value="Otro"> Otro
-
-  <!-- CHECKBOX -->
-  <label>Intereses:</label>
-  <input type="checkbox" name="intereses" value="Deporte"> Deporte
-  <input type="checkbox" name="intereses" value="Tecnología"> Tecnología
-  <input type="checkbox" name="intereses" value="Música"> Música
-
-  <!-- SELECT -->
   <label>
-    Provincia:
-    <select id="provincia">
-      <option value="">-- Selecciona --</option>
-      <option value="Castellón">Castellón</option>
-      <option value="Valencia">Valencia</option>
-      <option value="Alicante">Alicante</option>
-    </select>
+    Email:
+    <input type="email" id="email" maxlength="150" required>
   </label>
 
-  <!-- SELECT MULTIPLE -->
   <label>
-    Lenguajes que conoces:
-    <select id="lenguajes" multiple>
-      <option value="Java">Java</option>
-      <option value="JavaScript">JavaScript</option>
-      <option value="Python">Python</option>
-      <option value="PHP">PHP</option>
-    </select>
+    Teléfono:
+    <input type="text" id="telefono" maxlength="15">
   </label>
 
-  <!-- NUMBER -->
   <label>
-    Edad:
-    <input type="number" id="edad">
+    DNI/NIE:
+    <input type="text" id="documento" maxlength="12">
   </label>
 
-  <!-- DATE -->
   <label>
-    Fecha de nacimiento:
-    <input type="date" id="fecha">
+    Dirección:
+    <input type="text" id="direccion" maxlength="150">
   </label>
 
-  <!-- RANGE -->
-  <label>
-    Nivel de satisfacción:
-    <input type="range" id="satisfaccion" min="0" max="10">
-  </label>
-
-  <!-- COLOR -->
-  <label>
-    Color favorito:
-    <input type="color" id="color">
-  </label>
-
-  <br><br>
-  <button type="button" id="btnMostrar">Mostrar valores</button>
-
+  <button type="button" id="btnPersonal">Guardar personales</button>
 </form>
+
+<hr>
+
+<!-- ======================== -->
+<!-- FORMULARIO 2: LABORALES -->
+<!-- ======================== -->
+
+<form id="formLaboral">
+  <h3>Datos laborales</h3>
+
+  <label>
+    Fecha alta:
+    <input type="date" id="fecha_alta" required>
+  </label>
+
+  <label>
+    <input type="checkbox" id="activo">
+    Activo
+  </label>
+
+  <div id="divEstudio" style="display:none;">
+    <label>
+      Estudio:
+      <select id="id_estudio">
+        <option value="">Sin estudio</option>
+        <option value="1">FP DAM</option>
+        <option value="2">FP DAW</option>
+        <option value="3">Grado Informática</option>
+      </select>
+    </label>
+  </div>
+
+  <button type="button" id="btnLaboral">Guardar laborales</button>
+</form>
+
+<hr>
+
+<button type="button" id="btnMostrar">Mostrar valores</button>
 
 <div id="resultado"></div>
 
 <script>
+
+// Mostrar/ocultar estudio según activo
+const chkActivo = document.getElementById("activo");
+const divEstudio = document.getElementById("divEstudio");
+
+chkActivo.addEventListener("change", function() {
+  divEstudio.style.display = this.checked ? "block" : "none";
+});
+
+// Limpieza de caracteres permitidos
+function limpiarTexto(texto) {
+  return texto.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ' -]/g, "").trim();
+}
+
+function limpiarTelefono(texto) {
+  return texto.replace(/[^0-9+() -]/g, "").trim();
+}
+
+function limpiarAlfanumerico(texto) {
+  return texto.replace(/[^A-Za-z0-9-]/g, "").trim();
+}
+
+function limpiarDireccion(texto) {
+  return texto.replace(/[<>]/g, "").trim();
+}
+
+// Recoger datos personales
+function getPersonal() {
+  return {
+    nombre: limpiarTexto(document.getElementById("nombre").value),
+    apellidos: limpiarTexto(document.getElementById("apellidos").value),
+    email: document.getElementById("email").value.trim(),
+    telefono: limpiarTelefono(document.getElementById("telefono").value),
+    documento: limpiarAlfanumerico(document.getElementById("documento").value),
+    direccion: limpiarDireccion(document.getElementById("direccion").value)
+  };
+}
+
+// Recoger datos laborales
+function getLaboral() {
+  const activo = chkActivo.checked;
+  let id_estudio = null;
+
+  if (activo) {
+    const valor = document.getElementById("id_estudio").value;
+    id_estudio = valor === "" ? null : parseInt(valor);
+  }
+
+  return {
+    fecha_alta: document.getElementById("fecha_alta").value,
+    activo: activo,
+    id_estudio: id_estudio
+  };
+}
+
+// Mostrar valores
 document.getElementById("btnMostrar").addEventListener("click", function() {
 
-  // TEXT y TEXTAREA
-  const nombre = document.getElementById("nombre").value;
-  const comentarios = document.getElementById("comentarios").value;
+  const personal = getPersonal();
+  const laboral = getLaboral();
 
-  // RADIO
-  const radios = document.getElementsByName("genero");
-  let generoSeleccionado = "";
-  radios.forEach(radio => {
-    if (radio.checked) {
-      generoSeleccionado = radio.value;
-    }
-  });
-
-  // CHECKBOX
-  const checkboxes = document.getElementsByName("intereses");
-  let interesesSeleccionados = [];
-  checkboxes.forEach(check => {
-    if (check.checked) {
-      interesesSeleccionados.push(check.value);
-    }
-  });
-
-  // SELECT
-  const provinciaSelect = document.getElementById("provincia");
-  const provincia = provinciaSelect.options[provinciaSelect.selectedIndex].value;
-
-  // SELECT MULTIPLE
-    const lenguajesSelect = document.getElementById("lenguajes");
-    let lenguajesSeleccionados = [];
-
-    for (const opcion of lenguajesSelect.options) {
-    if (opcion.selected) {
-        lenguajesSeleccionados.push(opcion.value);
-    }
-    }
-
-  // NUMBER
-  const edad = document.getElementById("edad").value;
-
-  // DATE
-  const fecha = document.getElementById("fecha").value;
-
-  // RANGE
-  const satisfaccion = document.getElementById("satisfaccion").value;
-
-  // COLOR
-  const color = document.getElementById("color").value;
-
-  // Mostrar resultados
   document.getElementById("resultado").innerHTML = `
-    <strong>Valores recogidos:</strong><br>
-    Nombre: ${nombre}<br>
-    Comentarios: ${comentarios}<br>
-    Género: ${generoSeleccionado}<br>
-    Intereses: ${interesesSeleccionados.join(", ")}<br>
-    Provincia: ${provincia}<br>
-    Lenguajes: ${lenguajesSeleccionados.join(", ")}<br>
-    Edad: ${edad}<br>
-    Fecha nacimiento: ${fecha}<br>
-    Satisfacción: ${satisfaccion}<br>
-    Color favorito: ${color}
+    <strong>PERSONALES</strong><br>
+    Nombre: ${personal.nombre}<br>
+    Apellidos: ${personal.apellidos}<br>
+    Email: ${personal.email}<br>
+    Teléfono: ${personal.telefono}<br>
+    Documento: ${personal.documento}<br>
+    Dirección: ${personal.direccion}<br><br>
+
+    <strong>LABORALES</strong><br>
+    Fecha alta: ${laboral.fecha_alta}<br>
+    Activo: ${laboral.activo ? "Sí" : "No"}<br>
+    Id estudio: ${laboral.id_estudio === null ? "NULL" : laboral.id_estudio}
   `;
 });
+
 </script>
 
 </body>
