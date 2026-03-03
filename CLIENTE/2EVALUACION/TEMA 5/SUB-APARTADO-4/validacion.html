@@ -2,9 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Desarrollador - Alta / Edición</title>
-
+  <title>Validación de formulario</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 24px; }
     label { display: block; margin-top: 12px; }
@@ -12,95 +10,319 @@
     .error { border: 2px solid red; background: #ffecec; }
     .msg-error { color: #b00020; margin: 6px 0 0; font-size: 13px; }
     #resumen { margin-top: 16px; padding: 12px; background: #f2f2f2; border: 1px solid #ccc; }
-    input, select, textarea { width: 100%; box-sizing: border-box; }
   </style>
 </head>
 
 <body>
-  <h2>Formulario de Desarrollador</h2>
+  <h2>Formulario de encuesta</h2>
 
-  <!-- =========================
-       FORM 1: DATOS PERSONALES
-       ========================= -->
-  <form id="formPersonal" novalidate>
+  <form id="formEncuesta">
     <fieldset>
-      <legend><strong>Información personal</strong></legend>
+      <legend>Datos</legend>
 
-      <label for="nombre">Nombre *</label>
-      <input id="nombre" name="nombre" type="text" maxlength="50" autocomplete="given-name" />
+      <label for="nombre">Nombre (obligatorio)</label>
+      <input type="text" id="nombre" name="nombre">
 
-      <label for="apellidos">Apellidos *</label>
-      <input id="apellidos" name="apellidos" type="text" maxlength="100" autocomplete="family-name" />
+      <label for="comentarios">Comentarios (mín. 10 caracteres)</label>
+      <textarea id="comentarios" name="comentarios" rows="4"></textarea>
 
-      <label for="dni">DNI/NIE</label>
-      <input id="dni" name="dni" type="text" maxlength="15" />
+      <label for="edad">Edad (>= 18)</label>
+      <input type="number" id="edad" name="edad">
 
-      <label for="email">Email *</label>
-      <input id="email" name="email" type="email" maxlength="120" autocomplete="email" />
-
-      <label for="telefono">Teléfono</label>
-      <input id="telefono" name="telefono" type="tel" maxlength="20" autocomplete="tel" />
-
-      <label for="fecha_nacimiento">Fecha de nacimiento</label>
-      <input id="fecha_nacimiento" name="fecha_nacimiento" type="date" />
-
-      <label for="direccion">Dirección</label>
-      <input id="direccion" name="direccion" type="text" maxlength="200" autocomplete="street-address" />
-
-      <label for="cp">Código postal</label>
-      <input id="cp" name="cp" type="text" maxlength="10" autocomplete="postal-code" />
-
-      <label for="ciudad">Ciudad</label>
-      <input id="ciudad" name="ciudad" type="text" maxlength="80" autocomplete="address-level2" />
-
-      <label for="provincia">Provincia</label>
-      <input id="provincia" name="provincia" type="text" maxlength="80" autocomplete="address-level1" />
-
-      <label for="pais">País</label>
-      <input id="pais" name="pais" type="text" maxlength="80" autocomplete="country-name" value="España" />
-
-      <label for="observaciones">Observaciones</label>
-      <textarea id="observaciones" name="observaciones" maxlength="500"></textarea>
-
-      <div style="margin-top: 12px;">
-        <button type="submit">Validar personal</button>
-        <button type="reset">Limpiar</button>
-      </div>
+      <label for="fecha">Fecha (obligatoria)</label>
+      <input type="date" id="fecha" name="fecha">
     </fieldset>
+
+    <fieldset>
+      <legend>Opciones</legend>
+
+      <div id="bloqueGenero">
+        <div>Género (obligatorio)</div>
+        <label><input type="radio" name="genero" value="Hombre"> Hombre</label>
+        <label><input type="radio" name="genero" value="Mujer"> Mujer</label>
+        <label><input type="radio" name="genero" value="Otro"> Otro</label>
+      </div>
+
+      <div id="bloqueIntereses" style="margin-top: 12px;">
+        <div>Intereses (elige al menos 1)</div>
+        <label><input type="checkbox" name="intereses" value="Deporte"> Deporte</label>
+        <label><input type="checkbox" name="intereses" value="Tecnología"> Tecnología</label>
+        <label><input type="checkbox" name="intereses" value="Música"> Música</label>
+        <label><input type="checkbox" name="intereses" value="Cine"> Cine</label>
+      </div>
+
+      <label for="provincia" style="margin-top: 12px;">Provincia (obligatoria)</label>
+      <select id="provincia" name="provincia">
+        <option value="">-- Selecciona --</option>
+        <option value="Castellón">Castellón</option>
+        <option value="Valencia">Valencia</option>
+        <option value="Alicante">Alicante</option>
+      </select>
+
+      <label for="lenguajes" style="margin-top: 12px;">Lenguajes (elige al menos 1)</label>
+      <select id="lenguajes" name="lenguajes" multiple size="4">
+        <option value="Java">Java</option>
+        <option value="JavaScript">JavaScript</option>
+        <option value="Python">Python</option>
+        <option value="PHP">PHP</option>
+      </select>
+
+      <label for="satisfaccion" style="margin-top: 12px;">Satisfacción (mínimo 3)</label>
+      <input type="range" id="satisfaccion" name="satisfaccion" min="0" max="10" value="5">
+      <div id="valorSatisfaccion">Valor: 5</div>
+
+      <label for="color" style="margin-top: 12px;">Color favorito (obligatorio)</label>
+      <input type="color" id="color" name="color" value="#000000">
+    </fieldset>
+
+    <button type="submit">Enviar</button>
+    <button type="reset">Limpiar</button>
   </form>
 
-  <!-- =========================
-    FORM 2: DATOS LABORALES
-  ========================= -->
-  <form id="formLaboral" novalidate>
-    <fieldset>
-      <legend><strong> Datos laborales</strong></legend>
+  <div id="resumen"></div>
 
-      <label for="fecha_alta">Fecha de alta *</label>
-      <input id="fecha_alta" name="fecha_alta" type="date" />
+  <script>
+    const form = document.getElementById("formEncuesta");
+    const resumen = document.getElementById("resumen");
 
-      <label style="display:block; margin-top:12px;">Activo</label>
-      <div>
-        <input id="activo" name="activo" type="checkbox" />
-        <label for="activo" style="display:inline; margin-top:0;">Sí</label>
-      </div>
+    const satisfaccion = document.getElementById("satisfaccion");
+    const valorSatisfaccion = document.getElementById("valorSatisfaccion");
 
-      <div id="wrapEstudio" class="hidden" style="margin-top: 12px;">
-        <label for="id_estudio">Estudio (solo si Activo)</label>
-        <select id="id_estudio" name="id_estudio"></select>
-        <div style="font-size: 13px; margin-top: 6px;">
-          “Sin estudio” enviará <code>null</code> a la base de datos.
-        </div>
-      </div>
+    // Mostrar valor del range en tiempo real
+    satisfaccion.addEventListener("input", function () {
+      valorSatisfaccion.textContent = "Valor: " + satisfaccion.value;
+      limpiarErrorDeCampo(satisfaccion);
+    });
 
-        <div style="margin-top: 12px;">
-          <button type="submit">Guardar (personal + laboral)</button>
-          <button type="reset">Limpiar</button>
-        </div>
-      </fieldset>
-    </form>
+    // --------- utilidades de errores ----------
+    function limpiarErrores() {
+      form.querySelectorAll(".error").forEach(function (el) {
+        el.classList.remove("error");
+      });
+      form.querySelectorAll(".msg-error").forEach(function (el) {
+        el.remove();
+      });
+      resumen.innerHTML = "";
+    }
 
-    <div id="resumen"></div>
+    function ponerError(elemento, mensaje) {
+      // Evitar duplicar mensajes si se valida varias veces
+      limpiarErrorDeCampo(elemento);
 
-  </body>
+      elemento.classList.add("error");
+      const p = document.createElement("p");
+      p.className = "msg-error";
+      p.textContent = mensaje;
+      elemento.insertAdjacentElement("afterend", p);
+    }
+
+    function ponerErrorBloque(bloque, mensaje) {
+      // Evitar duplicar mensajes
+      limpiarErrorDeBloque(bloque);
+
+      bloque.classList.add("error");
+      const p = document.createElement("p");
+      p.className = "msg-error";
+      p.textContent = mensaje;
+      bloque.appendChild(p);
+    }
+
+    function limpiarErrorDeCampo(elemento) {
+      elemento.classList.remove("error");
+      const siguiente = elemento.nextElementSibling;
+      if (siguiente && siguiente.classList.contains("msg-error")) {
+        siguiente.remove();
+      }
+    }
+
+    function limpiarErrorDeBloque(bloque) {
+      bloque.classList.remove("error");
+      bloque.querySelectorAll(".msg-error").forEach(function (m) {
+        m.remove();
+      });
+    }
+
+    // --------- limpiar error al corregir ----------
+    const nombre = document.getElementById("nombre");
+    const comentarios = document.getElementById("comentarios");
+    const edad = document.getElementById("edad");
+    const fecha = document.getElementById("fecha");
+    const provincia = document.getElementById("provincia");
+    const lenguajes = document.getElementById("lenguajes");
+    const color = document.getElementById("color");
+
+    const bloqueGenero = document.getElementById("bloqueGenero");
+    const bloqueIntereses = document.getElementById("bloqueIntereses");
+
+    nombre.addEventListener("input", function () { limpiarErrorDeCampo(nombre); });
+    comentarios.addEventListener("input", function () { limpiarErrorDeCampo(comentarios); });
+    edad.addEventListener("input", function () { limpiarErrorDeCampo(edad); });
+    fecha.addEventListener("change", function () { limpiarErrorDeCampo(fecha); });
+    provincia.addEventListener("change", function () { limpiarErrorDeCampo(provincia); });
+    lenguajes.addEventListener("change", function () { limpiarErrorDeCampo(lenguajes); });
+    color.addEventListener("change", function () { limpiarErrorDeCampo(color); });
+
+    // Radio - limpiar bloque al cambiar
+    Array.from(document.getElementsByName("genero")).forEach(function (r) {
+      r.addEventListener("change", function () {
+        limpiarErrorDeBloque(bloqueGenero);
+      });
+    });
+
+    // Checkbox - limpiar bloque al cambiar
+    Array.from(document.getElementsByName("intereses")).forEach(function (c) {
+      c.addEventListener("change", function () {
+        limpiarErrorDeBloque(bloqueIntereses);
+      });
+    });
+
+    // Reset: limpiar estilos y mensajes + foco al primer campo
+    form.addEventListener("reset", function () {
+      setTimeout(function () {
+        limpiarErrores();
+        valorSatisfaccion.textContent = "Valor: " + satisfaccion.value;
+        nombre.focus();
+      }, 0);
+    });
+
+    // Foco inicial al cargar
+    window.addEventListener("load", function () {
+      nombre.focus();
+    });
+
+    // --------- validación en submit + foco al primer error ----------
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      limpiarErrores();
+
+      let valido = true;
+      let primerError = null;
+
+      // TEXT
+      if (nombre.value.trim() === "") {
+        ponerError(nombre, "El nombre es obligatorio.");
+        if (!primerError) primerError = nombre;
+        valido = false;
+      }
+
+      // TEXTAREA
+      if (comentarios.value.trim().length < 10) {
+        ponerError(comentarios, "Escribe al menos 10 caracteres.");
+        if (!primerError) primerError = comentarios;
+        valido = false;
+      }
+
+      // NUMBER
+      const edadNum = Number(edad.value);
+      if (edad.value === "" || Number.isNaN(edadNum) || edadNum < 18) {
+        ponerError(edad, "La edad es obligatoria y debe ser mayor o igual que 18.");
+        if (!primerError) primerError = edad;
+        valido = false;
+      }
+
+      // DATE
+      if (fecha.value === "") {
+        ponerError(fecha, "La fecha es obligatoria.");
+        if (!primerError) primerError = fecha;
+        valido = false;
+      }
+
+      // RADIO (sin :checked)
+      const radiosGenero = Array.from(document.getElementsByName("genero"));
+      let generoMarcado = null;
+
+      radiosGenero.forEach(function (radio) {
+        if (generoMarcado === null && radio.checked) {
+          generoMarcado = radio;
+        }
+      });
+
+      if (generoMarcado === null) {
+        ponerErrorBloque(bloqueGenero, "Selecciona un género.");
+        if (!primerError && radiosGenero.length > 0) primerError = radiosGenero[0];
+        valido = false;
+      }
+
+      // CHECKBOX (sin :checked)
+      const checksIntereses = Array.from(document.getElementsByName("intereses"));
+      const interesesMarcados = [];
+
+      checksIntereses.forEach(function (check) {
+        if (check.checked) {
+          interesesMarcados.push(check);
+        }
+      });
+
+      if (interesesMarcados.length === 0) {
+        ponerErrorBloque(bloqueIntereses, "Selecciona al menos un interés.");
+        if (!primerError && checksIntereses.length > 0) primerError = checksIntereses[0];
+        valido = false;
+      }
+
+      // SELECT
+      if (provincia.value === "") {
+        ponerError(provincia, "Selecciona una provincia.");
+        if (!primerError) primerError = provincia;
+        valido = false;
+      }
+
+      // SELECT MULTIPLE (mínimo 1)
+      const seleccionadas = Array.from(lenguajes.selectedOptions);
+      if (seleccionadas.length === 0) {
+        ponerError(lenguajes, "Selecciona al menos un lenguaje.");
+        if (!primerError) primerError = lenguajes;
+        valido = false;
+      }
+
+      // RANGE
+      const sat = Number(satisfaccion.value);
+      if (sat < 3) {
+        ponerError(satisfaccion, "La satisfacción debe ser al menos 3.");
+        if (!primerError) primerError = satisfaccion;
+        valido = false;
+      }
+
+      // COLOR
+      if (!color.value) {
+        ponerError(color, "Selecciona un color.");
+        if (!primerError) primerError = color;
+        valido = false;
+      }
+
+      // Foco al primer campo con error
+      if (!valido && primerError) {
+        primerError.focus();
+      }
+
+      // Si todo OK, mostrar resumen (simulación de envío)
+      if (valido) {
+        // Construir listas sin map
+        let interesesTxt = "";
+        interesesMarcados.forEach(function (ch, idx) {
+          if (idx > 0) interesesTxt += ", ";
+          interesesTxt += ch.value;
+        });
+
+        let lenguajesTxt = "";
+        seleccionadas.forEach(function (op, idx) {
+          if (idx > 0) lenguajesTxt += ", ";
+          lenguajesTxt += op.value;
+        });
+
+        resumen.innerHTML = ""
+          + "<strong>Formulario válido (simulación de envío)</strong><br>"
+          + "Nombre: " + nombre.value + "<br>"
+          + "Comentarios: " + comentarios.value + "<br>"
+          + "Edad: " + edadNum + "<br>"
+          + "Fecha: " + fecha.value + "<br>"
+          + "Género: " + generoMarcado.value + "<br>"
+          + "Intereses: " + interesesTxt + "<br>"
+          + "Provincia: " + provincia.value + "<br>"
+          + "Lenguajes: " + lenguajesTxt + "<br>"
+          + "Satisfacción: " + sat + "<br>"
+          + "Color: " + color.value;
+      }
+    });
+  </script>
+</body>
 </html>
