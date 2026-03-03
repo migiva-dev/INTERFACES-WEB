@@ -10,35 +10,38 @@
     .error { border: 2px solid red; background: #ffecec; }
     .msg-error { color: #b00020; margin: 6px 0 0; font-size: 13px; }
     #resumen { margin-top: 16px; padding: 12px; background: #f2f2f2; border: 1px solid #ccc; }
+
+    /* opcional, no cambia el look, solo evita desbordes */
+    input, select, textarea { width: 100%; box-sizing: border-box; }
   </style>
 </head>
 
 <body>
-  <h2>Formulario de desarrollador </h2>
+  <h2>Formulario de desarrollador</h2>
 
   <!-- =========================
-       FORMULARIO: PERSONAL
+       FORM 1: PERSONAL
        ========================= -->
   <form id="formPersonal" novalidate>
     <fieldset>
       <legend>Información personal</legend>
 
-      <label for="nombre">Nombre (obligatorio)</label>
+      <label for="nombre">Nombre</label>
       <input type="text" id="nombre" name="nombre" maxlength="80">
 
-      <label for="apellido">Apellido (obligatorio)</label>
+      <label for="apellido">Apellido </label>
       <input type="text" id="apellido" name="apellido" maxlength="120">
 
-      <label for="email">Email (opcional)</label>
-      <input type="email" id="email" name="email" maxlength="150">
+      <label for="email">Email </label>
+      <input type="text" id="email" name="email" maxlength="150">
 
-      <label for="ciudad">Ciudad (opcional)</label>
+      <label for="ciudad">Ciudad </label>
       <input type="text" id="ciudad" name="ciudad" maxlength="80">
 
-      <label for="pais">País (opcional)</label>
+      <label for="pais">País </label>
       <input type="text" id="pais" name="pais" maxlength="80" value="España">
 
-      <label for="fecha_nacimiento">Fecha de nacimiento (opcional)</label>
+      <label for="fecha_nacimiento">Fecha de nacimiento </label>
       <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
 
       <button type="submit" style="margin-top:12px;">Validar personal</button>
@@ -47,13 +50,13 @@
   </form>
 
   <!-- =========================
-       FORMULARIO 2: LABORAL
+       FORM 2: LABORAL
        ========================= -->
   <form id="formLaboral" novalidate>
     <fieldset>
       <legend>Datos laborales</legend>
 
-      <label for="fecha_alta">Fecha de alta (obligatoria)</label>
+      <label for="fecha_alta">Fecha de alta</label>
       <input type="date" id="fecha_alta" name="fecha_alta">
 
       <div style="margin-top:12px;">
@@ -61,13 +64,9 @@
         <label for="activo" style="display:inline; margin-top:0;">Activo</label>
       </div>
 
-      <!-- id_estudio SOLO si Activo -->
       <div id="wrapEstudio" style="display:none; margin-top:12px;">
-        <label for="id_estudio">Estudio (solo si Activo)</label>
+        <label for="id_estudio">Estudio (obligatorio si Activo)</label>
         <select id="id_estudio" name="id_estudio"></select>
-        <div style="margin-top:6px; font-size:13px;">
-          “Sin estudio” enviará <code>null</code> a la base de datos.
-        </div>
       </div>
 
       <button type="submit" style="margin-top:12px;">Guardar (personal + laboral)</button>
@@ -82,7 +81,7 @@
     const formLaboral = document.getElementById("formLaboral");
     const resumen = document.getElementById("resumen");
 
-    // Campos
+    // Campos personal
     const nombre = document.getElementById("nombre");
     const apellido = document.getElementById("apellido");
     const email = document.getElementById("email");
@@ -90,12 +89,13 @@
     const pais = document.getElementById("pais");
     const fechaNacimiento = document.getElementById("fecha_nacimiento");
 
+    // Campos laboral
     const fechaAlta = document.getElementById("fecha_alta");
     const activo = document.getElementById("activo");
     const wrapEstudio = document.getElementById("wrapEstudio");
     const selectEstudio = document.getElementById("id_estudio");
 
-    // Estudios actuales (en producción vendrían de tu API)
+    // Estudios (simulados)
     const estudiosActuales = [
       { id: 1, nombre: "Larian Studios" },
       { id: 2, nombre: "FromSoftware" },
@@ -105,7 +105,7 @@
       { id: 6, nombre: "MercurySteam" }
     ];
 
-    // ---------- utilidades de errores ----------
+    // ======= utilidades errores (igual estilo ejemplo) =======
     function limpiarErrores(form) {
       form.querySelectorAll(".error").forEach(function (el) {
         el.classList.remove("error");
@@ -132,7 +132,23 @@
       }
     }
 
-    // ---------- sanitizado + maxlength ----------
+    function ponerErrorBloque(bloque, mensaje) {
+      limpiarErrorDeBloque(bloque);
+      bloque.classList.add("error");
+      const p = document.createElement("p");
+      p.className = "msg-error";
+      p.textContent = mensaje;
+      bloque.appendChild(p);
+    }
+
+    function limpiarErrorDeBloque(bloque) {
+      bloque.classList.remove("error");
+      bloque.querySelectorAll(".msg-error").forEach(function (m) {
+        m.remove();
+      });
+    }
+
+    // ======= sanitizado + maxlength =======
     function clampMaxLen(str, maxLen) {
       if (typeof str !== "string") return "";
       if (!maxLen || maxLen <= 0) return str;
@@ -140,13 +156,10 @@
     }
 
     function sanitizeNombreLike(s) {
-      // letras (incl acentos), espacios, apóstrofe y guion
       return s.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'\-]/g, "");
     }
-
     function sanitizeEmail(s) {
-      // sin espacios, en minúsculas
-      return s.replace(/\s+/g, "").toLowerCase();
+      return s.replace(/\s+/g, "");
     }
 
     function bindSanitizer(el, sanitizerFn) {
@@ -164,12 +177,12 @@
     bindSanitizer(pais, sanitizeNombreLike);
     bindSanitizer(email, sanitizeEmail);
 
-    // ---------- estudios: select con "Sin estudio" => null ----------
+    // ======= select estudios (Sin estudio => "") =======
     function fillEstudios() {
       selectEstudio.innerHTML = "";
 
       const optNull = document.createElement("option");
-      optNull.value = ""; // luego => null
+      optNull.value = "";               // => "Sin estudio"
       optNull.textContent = "Sin estudio";
       selectEstudio.appendChild(optNull);
 
@@ -182,49 +195,87 @@
     }
     fillEstudios();
 
-    // Mostrar/ocultar id_estudio según Activo
+    // ======= mostrar/ocultar id_estudio =======
     function refreshEstudioVisibility() {
       if (activo.checked) {
         wrapEstudio.style.display = "block";
       } else {
         wrapEstudio.style.display = "none";
-        selectEstudio.value = ""; // por defecto => null
+        selectEstudio.value = ""; // => null simulado
         limpiarErrorDeCampo(selectEstudio);
+        limpiarErrorDeBloque(wrapEstudio);
       }
     }
+
     activo.addEventListener("change", function () {
       refreshEstudioVisibility();
-      limpiarErrorDeCampo(activo);
+      // si al marcar/desmarcar había errores asociados, los limpiamos
+      limpiarErrorDeCampo(fechaAlta);
     });
     refreshEstudioVisibility();
 
-    // ---------- validaciones ----------
-    function isValidEmail(v) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    // ======= fechas: hoy sin hora =======
+    function todayYMD() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return y + "-" + m + "-" + day;
     }
 
+    function isFutureDate(ymd) {
+      if (!ymd) return false;
+      // compara strings YYYY-MM-DD funciona para orden temporal
+      return ymd > todayYMD();
+    }
+
+    // ======= validación PERSONAL =======
     function validatePersonal() {
       limpiarErrores(formPersonal);
 
       let ok = true;
       let primerError = null;
 
-      if (nombre.value.trim() === "") {
-        ponerError(nombre, "El nombre es obligatorio.");
+      const n = nombre.value.trim();
+      const a = apellido.value.trim();
+      const em = email.value.trim();
+      const c = ciudad.value.trim();
+      const p = pais.value.trim();
+      const fn = fechaNacimiento.value;
+
+      if (n === "" || n.length < 2) {
+        ponerError(nombre, "El nombre es obligatorio y debe tener al menos 2 caracteres.");
         if (!primerError) primerError = nombre;
         ok = false;
       }
 
-      if (apellido.value.trim() === "") {
-        ponerError(apellido, "El apellido es obligatorio.");
+      if (a === "" || a.length < 2) {
+        ponerError(apellido, "El apellido es obligatorio y debe tener al menos 2 caracteres.");
         if (!primerError) primerError = apellido;
         ok = false;
       }
 
-      // email opcional, pero si está, debe ser válido
-      if (email.value.trim() !== "" && !isValidEmail(email.value.trim())) {
-        ponerError(email, "El email no tiene un formato válido.");
+      if (em !== "" && em.indexOf("@") === -1) {
+        ponerError(email, "El email debe contener @.");
         if (!primerError) primerError = email;
+        ok = false;
+      }
+
+      if (c !== "" && c.length < 2) {
+        ponerError(ciudad, "La ciudad debe tener al menos 2 caracteres si está rellena.");
+        if (!primerError) primerError = ciudad;
+        ok = false;
+      }
+
+      if (p !== "" && p.length < 2) {
+        ponerError(pais, "El país debe tener al menos 2 caracteres si está relleno.");
+        if (!primerError) primerError = pais;
+        ok = false;
+      }
+
+      if (fn && isFutureDate(fn)) {
+        ponerError(fechaNacimiento, "La fecha de nacimiento no puede ser futura.");
+        if (!primerError) primerError = fechaNacimiento;
         ok = false;
       }
 
@@ -232,25 +283,57 @@
       return ok;
     }
 
+    // ======= validación LABORAL (depende de activo) =======
     function validateLaboral() {
       limpiarErrores(formLaboral);
 
       let ok = true;
       let primerError = null;
 
-      if (fechaAlta.value === "") {
-        ponerError(fechaAlta, "La fecha de alta es obligatoria.");
-        if (!primerError) primerError = fechaAlta;
-        ok = false;
+      const fa = fechaAlta.value; // "" o YYYY-MM-DD
+      const isAct = activo.checked;
+
+      if (isAct) {
+        // fecha_alta obligatoria
+        if (fa === "") {
+          ponerError(fechaAlta, "La fecha de alta es obligatoria si Activo está marcado.");
+          if (!primerError) primerError = fechaAlta;
+          ok = false;
+        } else if (isFutureDate(fa)) {
+          ponerError(fechaAlta, "La fecha de alta no puede ser futura.");
+          if (!primerError) primerError = fechaAlta;
+          ok = false;
+        }
+
+        // id_estudio obligatorio (no puede ser "")
+        if (selectEstudio.value === "") {
+          // ponemos error en el select (campo)
+          ponerError(selectEstudio, "Debes seleccionar un estudio (no puede ser “Sin estudio”).");
+          if (!primerError) primerError = selectEstudio;
+          ok = false;
+        }
+      } else {
+        // NO activo:
+        // id_estudio oculto y debe enviarse null (lo haremos en getLaboralData)
+        // fecha_alta NO puede ser futura si está rellena (si está vacía, OK)
+        if (fa !== "" && isFutureDate(fa)) {
+          ponerError(fechaAlta, "La fecha de alta no puede ser futura.");
+          if (!primerError) primerError = fechaAlta;
+          ok = false;
+        }
       }
 
-      // id_estudio solo visible si activo, y "Sin estudio" es válido (null)
-      // Si quisieras obligar a escoger uno real cuando está activo, valida aquí.
-
-      if (!ok && primerError) primerError.focus();
+      if (!ok && primerError) {
+        // si el primer error es select de estudio pero está oculto, por seguridad mostramos
+        if (primerError === selectEstudio && wrapEstudio.style.display === "none") {
+          wrapEstudio.style.display = "block";
+        }
+        primerError.focus();
+      }
       return ok;
     }
 
+    // ======= construir payload (simulado) =======
     function getPersonalData() {
       const data = {
         nombre: nombre.value.trim(),
@@ -260,29 +343,25 @@
         pais: pais.value.trim(),
         fecha_nacimiento: fechaNacimiento.value || null
       };
-
-      // vacíos => null (para BD)
       Object.keys(data).forEach(function (k) {
         if (data[k] === "") data[k] = null;
       });
-
       return data;
     }
 
     function getLaboralData() {
-      const isActivo = activo.checked;
+      const isAct = activo.checked;
 
       let id_estudio = null;
-      if (isActivo) {
-        const v = selectEstudio.value;
-        id_estudio = (v === "") ? null : Number(v);
+      if (isAct) {
+        id_estudio = (selectEstudio.value === "") ? null : Number(selectEstudio.value);
       } else {
-        id_estudio = null;
+        id_estudio = null; // obligatorio: null si no activo
       }
 
       return {
         fecha_alta: fechaAlta.value || null,
-        activo: isActivo,
+        activo: isAct,
         id_estudio: id_estudio
       };
     }
@@ -296,19 +375,16 @@
         .replaceAll("'", "&#039;");
     }
 
-    // ---------- eventos ----------
-    // limpiar error al corregir
-    nombre.addEventListener("input", function () { limpiarErrorDeCampo(nombre); });
-    apellido.addEventListener("input", function () { limpiarErrorDeCampo(apellido); });
-    email.addEventListener("input", function () { limpiarErrorDeCampo(email); });
-    ciudad.addEventListener("input", function () { limpiarErrorDeCampo(ciudad); });
-    pais.addEventListener("input", function () { limpiarErrorDeCampo(pais); });
+    // ======= limpiar error al corregir =======
+    [nombre, apellido, email, ciudad, pais].forEach(function (el) {
+      el.addEventListener("input", function () { limpiarErrorDeCampo(el); });
+    });
     fechaNacimiento.addEventListener("change", function () { limpiarErrorDeCampo(fechaNacimiento); });
 
     fechaAlta.addEventListener("change", function () { limpiarErrorDeCampo(fechaAlta); });
     selectEstudio.addEventListener("change", function () { limpiarErrorDeCampo(selectEstudio); });
 
-    // Submit personal
+    // ======= SUBMITS =======
     formPersonal.addEventListener("submit", function (e) {
       e.preventDefault();
       resumen.innerHTML = "";
@@ -322,7 +398,6 @@
       }
     });
 
-    // Submit laboral (guarda personal + laboral)
     formLaboral.addEventListener("submit", function (e) {
       e.preventDefault();
       resumen.innerHTML = "";
@@ -333,13 +408,13 @@
 
       const payload = Object.assign({}, getPersonalData(), getLaboralData());
 
+      // si NO activo, id_estudio debe ir null (simulado)
       resumen.innerHTML =
         "<strong>Formulario válido (simulación de guardado)</strong><br>" +
-        "<pre>" + escapeHtml(JSON.stringify(payload, null, 2)) + "</pre>" +
-        "<div style='margin-top:6px; font-size:13px;'>Nota: <code>id_estudio</code> será <code>null</code> si eliges “Sin estudio” o si <code>activo</code> es <code>false</code>.</div>";
+        "<pre>" + escapeHtml(JSON.stringify(payload, null, 2)) + "</pre>";
     });
 
-    // Reset personal
+    // ======= RESET + FOCO =======
     formPersonal.addEventListener("reset", function () {
       setTimeout(function () {
         limpiarErrores(formPersonal);
@@ -348,14 +423,14 @@
       }, 0);
     });
 
-    // Reset laboral
     formLaboral.addEventListener("reset", function () {
       setTimeout(function () {
         limpiarErrores(formLaboral);
         resumen.innerHTML = "";
         activo.checked = false;
         refreshEstudioVisibility();
-        fechaAlta.focus();
+        fechaAlta.value = ""; // opcional: limpia fecha alta
+        nombre.focus();       // foco al primer campo del formulario global
       }, 0);
     });
 
