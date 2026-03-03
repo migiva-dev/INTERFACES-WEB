@@ -95,16 +95,6 @@
     const wrapEstudio = document.getElementById("wrapEstudio");
     const selectEstudio = document.getElementById("id_estudio");
 
-    // Estudios (simulados)
-    const estudiosActuales = [
-      { id: 1, nombre: "Larian Studios" },
-      { id: 2, nombre: "FromSoftware" },
-      { id: 3, nombre: "CD PROJEKT RED" },
-      { id: 4, nombre: "Supergiant Games" },
-      { id: 5, nombre: "Mojang Studios" },
-      { id: 6, nombre: "MercurySteam" }
-    ];
-
     // ======= utilidades errores (igual estilo ejemplo) =======
     function limpiarErrores(form) {
       form.querySelectorAll(".error").forEach(function (el) {
@@ -177,23 +167,32 @@
     bindSanitizer(pais, sanitizeNombreLike);
     bindSanitizer(email, sanitizeEmail);
 
-    // ======= select estudios (Sin estudio => "") =======
-    function fillEstudios() {
-      selectEstudio.innerHTML = "";
+    // ======= cargar estudios desde validacion.php =======
+    async function cargarEstudios() {
+      try {
+        const resp = await fetch("validacion.php?action=estudios");
+        const out = await resp.json();
+        if (!out.ok) throw new Error(out.message || "No se pudieron cargar los estudios.");
 
-      const optNull = document.createElement("option");
-      optNull.value = "";               // => "Sin estudio"
-      optNull.textContent = "Sin estudio";
-      selectEstudio.appendChild(optNull);
+        selectEstudio.innerHTML = "";
 
-      estudiosActuales.forEach(function (e) {
-        const opt = document.createElement("option");
-        opt.value = String(e.id);
-        opt.textContent = e.nombre;
-        selectEstudio.appendChild(opt);
-      });
+        const optNull = document.createElement("option");
+        optNull.value = "";
+        optNull.textContent = "Sin estudio";
+        selectEstudio.appendChild(optNull);
+
+        out.data.forEach(function (e) {
+          const opt = document.createElement("option");
+          opt.value = String(e.id);
+          opt.textContent = e.nombre;
+          selectEstudio.appendChild(opt);
+        });
+      } catch (err) {
+        selectEstudio.innerHTML = "<option value=''>Sin estudio</option>";
+        resumen.innerHTML = "<strong>Error</strong><br>No se pudieron cargar los estudios.";
+      }
     }
-    fillEstudios();
+    cargarEstudios();
 
     // ======= mostrar/ocultar id_estudio =======
     function refreshEstudioVisibility() {
@@ -201,7 +200,7 @@
         wrapEstudio.style.display = "block";
       } else {
         wrapEstudio.style.display = "none";
-        selectEstudio.value = ""; // => null simulado
+        selectEstudio.value = "";
         limpiarErrorDeCampo(selectEstudio);
         limpiarErrorDeBloque(wrapEstudio);
       }
@@ -209,7 +208,6 @@
 
     activo.addEventListener("change", function () {
       refreshEstudioVisibility();
-      // si al marcar/desmarcar había errores asociados, los limpiamos
       limpiarErrorDeCampo(fechaAlta);
     });
     refreshEstudioVisibility();
@@ -225,7 +223,6 @@
 
     function isFutureDate(ymd) {
       if (!ymd) return false;
-      // compara strings YYYY-MM-DD funciona para orden temporal
       return ymd > todayYMD();
     }
 
@@ -290,11 +287,10 @@
       let ok = true;
       let primerError = null;
 
-      const fa = fechaAlta.value; // "" o YYYY-MM-DD
+      const fa = fechaAlta.value;
       const isAct = activo.checked;
 
       if (isAct) {
-        // fecha_alta obligatoria
         if (fa === "") {
           ponerError(fechaAlta, "La fecha de alta es obligatoria si Activo está marcado.");
           if (!primerError) primerError = fechaAlta;
@@ -305,17 +301,12 @@
           ok = false;
         }
 
-        // id_estudio obligatorio (no puede ser "")
         if (selectEstudio.value === "") {
-          // ponemos error en el select (campo)
           ponerError(selectEstudio, "Debes seleccionar un estudio (no puede ser “Sin estudio”).");
           if (!primerError) primerError = selectEstudio;
           ok = false;
         }
       } else {
-        // NO activo:
-        // id_estudio oculto y debe enviarse null (lo haremos en getLaboralData)
-        // fecha_alta NO puede ser futura si está rellena (si está vacía, OK)
         if (fa !== "" && isFutureDate(fa)) {
           ponerError(fechaAlta, "La fecha de alta no puede ser futura.");
           if (!primerError) primerError = fechaAlta;
@@ -324,7 +315,6 @@
       }
 
       if (!ok && primerError) {
-        // si el primer error es select de estudio pero está oculto, por seguridad mostramos
         if (primerError === selectEstudio && wrapEstudio.style.display === "none") {
           wrapEstudio.style.display = "block";
         }
@@ -333,7 +323,7 @@
       return ok;
     }
 
-    // ======= construir payload (simulado) =======
+    // ======= construir payload =======
     function getPersonalData() {
       const data = {
         nombre: nombre.value.trim(),
@@ -356,7 +346,7 @@
       if (isAct) {
         id_estudio = (selectEstudio.value === "") ? null : Number(selectEstudio.value);
       } else {
-        id_estudio = null; // obligatorio: null si no activo
+        id_estudio = null;
       }
 
       return {
@@ -398,7 +388,8 @@
       }
     });
 
-    formLaboral.addEventListener("submit", function (e) {
+    // ✅ Guardar: POST al servidor
+    formLaboral.addEventListener("submit", async function (e) {
       e.preventDefault();
       resumen.innerHTML = "";
 
@@ -408,10 +399,56 @@
 
       const payload = Object.assign({}, getPersonalData(), getLaboralData());
 
-      // si NO activo, id_estudio debe ir null (simulado)
-      resumen.innerHTML =
-        "<strong>Formulario válido (simulación de guardado)</strong><br>" +
-        "<pre>" + escapeHtml(JSON.stringify(payload, null, 2)) + "</pre>";
+      try {
+        const resp = await fetch("validacion.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const out = await resp.json();
+
+        if (!out.ok) {
+          if (out.errors) {
+            // Pinta errores del servidor en los campos correspondientes
+            Object.keys(out.errors).forEach(function (field) {
+              const msg = out.errors[field];
+
+              if (field === "nombre") ponerError(nombre, msg);
+              else if (field === "apellido") ponerError(apellido, msg);
+              else if (field === "email") ponerError(email, msg);
+              else if (field === "ciudad") ponerError(ciudad, msg);
+              else if (field === "pais") ponerError(pais, msg);
+              else if (field === "fecha_nacimiento") ponerError(fechaNacimiento, msg);
+              else if (field === "fecha_alta") ponerError(fechaAlta, msg);
+              else if (field === "id_estudio") {
+                wrapEstudio.style.display = "block";
+                ponerError(selectEstudio, msg);
+              }
+            });
+
+            // foco al primer error
+            const orden = [nombre, apellido, email, ciudad, pais, fechaNacimiento, fechaAlta, selectEstudio];
+            for (let i = 0; i < orden.length; i++) {
+              if (orden[i].classList.contains("error")) {
+                orden[i].focus();
+                break;
+              }
+            }
+          } else {
+            resumen.innerHTML = "<strong>Error</strong><br>" + (out.message || "Error desconocido.");
+          }
+          return;
+        }
+
+        // OK
+        resumen.innerHTML =
+          "<strong>Guardado OK (servidor)</strong><br>" +
+          "<pre>" + escapeHtml(JSON.stringify(out, null, 2)) + "</pre>";
+
+      } catch (err) {
+        resumen.innerHTML = "<strong>Error</strong><br>No se pudo conectar con el servidor.";
+      }
     });
 
     // ======= RESET + FOCO =======
@@ -429,8 +466,8 @@
         resumen.innerHTML = "";
         activo.checked = false;
         refreshEstudioVisibility();
-        fechaAlta.value = ""; // opcional: limpia fecha alta
-        nombre.focus();       // foco al primer campo del formulario global
+        fechaAlta.value = "";
+        nombre.focus();
       }, 0);
     });
 
