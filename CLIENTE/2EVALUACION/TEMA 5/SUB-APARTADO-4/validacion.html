@@ -14,117 +14,114 @@
 </head>
 
 <body>
-  <h2>Formulario de encuesta</h2>
+  <h2>Formulario de desarrollador </h2>
 
-  <form id="formEncuesta">
+  <!-- =========================
+       FORMULARIO: PERSONAL
+       ========================= -->
+  <form id="formPersonal" novalidate>
     <fieldset>
-      <legend>Datos</legend>
+      <legend>Información personal</legend>
 
       <label for="nombre">Nombre (obligatorio)</label>
-      <input type="text" id="nombre" name="nombre">
+      <input type="text" id="nombre" name="nombre" maxlength="80">
 
-      <label for="comentarios">Comentarios (mín. 10 caracteres)</label>
-      <textarea id="comentarios" name="comentarios" rows="4"></textarea>
+      <label for="apellido">Apellido (obligatorio)</label>
+      <input type="text" id="apellido" name="apellido" maxlength="120">
 
-      <label for="edad">Edad (>= 18)</label>
-      <input type="number" id="edad" name="edad">
+      <label for="email">Email (opcional)</label>
+      <input type="email" id="email" name="email" maxlength="150">
 
-      <label for="fecha">Fecha (obligatoria)</label>
-      <input type="date" id="fecha" name="fecha">
+      <label for="ciudad">Ciudad (opcional)</label>
+      <input type="text" id="ciudad" name="ciudad" maxlength="80">
+
+      <label for="pais">País (opcional)</label>
+      <input type="text" id="pais" name="pais" maxlength="80" value="España">
+
+      <label for="fecha_nacimiento">Fecha de nacimiento (opcional)</label>
+      <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
+
+      <button type="submit" style="margin-top:12px;">Validar personal</button>
+      <button type="reset">Limpiar</button>
     </fieldset>
+  </form>
 
+  <!-- =========================
+       FORMULARIO 2: LABORAL
+       ========================= -->
+  <form id="formLaboral" novalidate>
     <fieldset>
-      <legend>Opciones</legend>
+      <legend>Datos laborales</legend>
 
-      <div id="bloqueGenero">
-        <div>Género (obligatorio)</div>
-        <label><input type="radio" name="genero" value="Hombre"> Hombre</label>
-        <label><input type="radio" name="genero" value="Mujer"> Mujer</label>
-        <label><input type="radio" name="genero" value="Otro"> Otro</label>
+      <label for="fecha_alta">Fecha de alta (obligatoria)</label>
+      <input type="date" id="fecha_alta" name="fecha_alta">
+
+      <div style="margin-top:12px;">
+        <input type="checkbox" id="activo" name="activo">
+        <label for="activo" style="display:inline; margin-top:0;">Activo</label>
       </div>
 
-      <div id="bloqueIntereses" style="margin-top: 12px;">
-        <div>Intereses (elige al menos 1)</div>
-        <label><input type="checkbox" name="intereses" value="Deporte"> Deporte</label>
-        <label><input type="checkbox" name="intereses" value="Tecnología"> Tecnología</label>
-        <label><input type="checkbox" name="intereses" value="Música"> Música</label>
-        <label><input type="checkbox" name="intereses" value="Cine"> Cine</label>
+      <!-- id_estudio SOLO si Activo -->
+      <div id="wrapEstudio" style="display:none; margin-top:12px;">
+        <label for="id_estudio">Estudio (solo si Activo)</label>
+        <select id="id_estudio" name="id_estudio"></select>
+        <div style="margin-top:6px; font-size:13px;">
+          “Sin estudio” enviará <code>null</code> a la base de datos.
+        </div>
       </div>
 
-      <label for="provincia" style="margin-top: 12px;">Provincia (obligatoria)</label>
-      <select id="provincia" name="provincia">
-        <option value="">-- Selecciona --</option>
-        <option value="Castellón">Castellón</option>
-        <option value="Valencia">Valencia</option>
-        <option value="Alicante">Alicante</option>
-      </select>
-
-      <label for="lenguajes" style="margin-top: 12px;">Lenguajes (elige al menos 1)</label>
-      <select id="lenguajes" name="lenguajes" multiple size="4">
-        <option value="Java">Java</option>
-        <option value="JavaScript">JavaScript</option>
-        <option value="Python">Python</option>
-        <option value="PHP">PHP</option>
-      </select>
-
-      <label for="satisfaccion" style="margin-top: 12px;">Satisfacción (mínimo 3)</label>
-      <input type="range" id="satisfaccion" name="satisfaccion" min="0" max="10" value="5">
-      <div id="valorSatisfaccion">Valor: 5</div>
-
-      <label for="color" style="margin-top: 12px;">Color favorito (obligatorio)</label>
-      <input type="color" id="color" name="color" value="#000000">
+      <button type="submit" style="margin-top:12px;">Guardar (personal + laboral)</button>
+      <button type="reset">Limpiar</button>
     </fieldset>
-
-    <button type="submit">Enviar</button>
-    <button type="reset">Limpiar</button>
   </form>
 
   <div id="resumen"></div>
 
   <script>
-    const form = document.getElementById("formEncuesta");
+    const formPersonal = document.getElementById("formPersonal");
+    const formLaboral = document.getElementById("formLaboral");
     const resumen = document.getElementById("resumen");
 
-    const satisfaccion = document.getElementById("satisfaccion");
-    const valorSatisfaccion = document.getElementById("valorSatisfaccion");
+    // Campos
+    const nombre = document.getElementById("nombre");
+    const apellido = document.getElementById("apellido");
+    const email = document.getElementById("email");
+    const ciudad = document.getElementById("ciudad");
+    const pais = document.getElementById("pais");
+    const fechaNacimiento = document.getElementById("fecha_nacimiento");
 
-    // Mostrar valor del range en tiempo real
-    satisfaccion.addEventListener("input", function () {
-      valorSatisfaccion.textContent = "Valor: " + satisfaccion.value;
-      limpiarErrorDeCampo(satisfaccion);
-    });
+    const fechaAlta = document.getElementById("fecha_alta");
+    const activo = document.getElementById("activo");
+    const wrapEstudio = document.getElementById("wrapEstudio");
+    const selectEstudio = document.getElementById("id_estudio");
 
-    // --------- utilidades de errores ----------
-    function limpiarErrores() {
+    // Estudios actuales (en producción vendrían de tu API)
+    const estudiosActuales = [
+      { id: 1, nombre: "Larian Studios" },
+      { id: 2, nombre: "FromSoftware" },
+      { id: 3, nombre: "CD PROJEKT RED" },
+      { id: 4, nombre: "Supergiant Games" },
+      { id: 5, nombre: "Mojang Studios" },
+      { id: 6, nombre: "MercurySteam" }
+    ];
+
+    // ---------- utilidades de errores ----------
+    function limpiarErrores(form) {
       form.querySelectorAll(".error").forEach(function (el) {
         el.classList.remove("error");
       });
       form.querySelectorAll(".msg-error").forEach(function (el) {
         el.remove();
       });
-      resumen.innerHTML = "";
     }
 
     function ponerError(elemento, mensaje) {
-      // Evitar duplicar mensajes si se valida varias veces
       limpiarErrorDeCampo(elemento);
-
       elemento.classList.add("error");
       const p = document.createElement("p");
       p.className = "msg-error";
       p.textContent = mensaje;
       elemento.insertAdjacentElement("afterend", p);
-    }
-
-    function ponerErrorBloque(bloque, mensaje) {
-      // Evitar duplicar mensajes
-      limpiarErrorDeBloque(bloque);
-
-      bloque.classList.add("error");
-      const p = document.createElement("p");
-      p.className = "msg-error";
-      p.textContent = mensaje;
-      bloque.appendChild(p);
     }
 
     function limpiarErrorDeCampo(elemento) {
@@ -135,193 +132,236 @@
       }
     }
 
-    function limpiarErrorDeBloque(bloque) {
-      bloque.classList.remove("error");
-      bloque.querySelectorAll(".msg-error").forEach(function (m) {
-        m.remove();
+    // ---------- sanitizado + maxlength ----------
+    function clampMaxLen(str, maxLen) {
+      if (typeof str !== "string") return "";
+      if (!maxLen || maxLen <= 0) return str;
+      return str.length > maxLen ? str.slice(0, maxLen) : str;
+    }
+
+    function sanitizeNombreLike(s) {
+      // letras (incl acentos), espacios, apóstrofe y guion
+      return s.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'\-]/g, "");
+    }
+
+    function sanitizeEmail(s) {
+      // sin espacios, en minúsculas
+      return s.replace(/\s+/g, "").toLowerCase();
+    }
+
+    function bindSanitizer(el, sanitizerFn) {
+      el.addEventListener("input", function () {
+        limpiarErrorDeCampo(el);
+        const max = el.maxLength;
+        const cleaned = clampMaxLen(sanitizerFn(el.value), max);
+        if (el.value !== cleaned) el.value = cleaned;
       });
     }
 
-    // --------- limpiar error al corregir ----------
-    const nombre = document.getElementById("nombre");
-    const comentarios = document.getElementById("comentarios");
-    const edad = document.getElementById("edad");
-    const fecha = document.getElementById("fecha");
-    const provincia = document.getElementById("provincia");
-    const lenguajes = document.getElementById("lenguajes");
-    const color = document.getElementById("color");
+    bindSanitizer(nombre, sanitizeNombreLike);
+    bindSanitizer(apellido, sanitizeNombreLike);
+    bindSanitizer(ciudad, sanitizeNombreLike);
+    bindSanitizer(pais, sanitizeNombreLike);
+    bindSanitizer(email, sanitizeEmail);
 
-    const bloqueGenero = document.getElementById("bloqueGenero");
-    const bloqueIntereses = document.getElementById("bloqueIntereses");
+    // ---------- estudios: select con "Sin estudio" => null ----------
+    function fillEstudios() {
+      selectEstudio.innerHTML = "";
 
+      const optNull = document.createElement("option");
+      optNull.value = ""; // luego => null
+      optNull.textContent = "Sin estudio";
+      selectEstudio.appendChild(optNull);
+
+      estudiosActuales.forEach(function (e) {
+        const opt = document.createElement("option");
+        opt.value = String(e.id);
+        opt.textContent = e.nombre;
+        selectEstudio.appendChild(opt);
+      });
+    }
+    fillEstudios();
+
+    // Mostrar/ocultar id_estudio según Activo
+    function refreshEstudioVisibility() {
+      if (activo.checked) {
+        wrapEstudio.style.display = "block";
+      } else {
+        wrapEstudio.style.display = "none";
+        selectEstudio.value = ""; // por defecto => null
+        limpiarErrorDeCampo(selectEstudio);
+      }
+    }
+    activo.addEventListener("change", function () {
+      refreshEstudioVisibility();
+      limpiarErrorDeCampo(activo);
+    });
+    refreshEstudioVisibility();
+
+    // ---------- validaciones ----------
+    function isValidEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
+
+    function validatePersonal() {
+      limpiarErrores(formPersonal);
+
+      let ok = true;
+      let primerError = null;
+
+      if (nombre.value.trim() === "") {
+        ponerError(nombre, "El nombre es obligatorio.");
+        if (!primerError) primerError = nombre;
+        ok = false;
+      }
+
+      if (apellido.value.trim() === "") {
+        ponerError(apellido, "El apellido es obligatorio.");
+        if (!primerError) primerError = apellido;
+        ok = false;
+      }
+
+      // email opcional, pero si está, debe ser válido
+      if (email.value.trim() !== "" && !isValidEmail(email.value.trim())) {
+        ponerError(email, "El email no tiene un formato válido.");
+        if (!primerError) primerError = email;
+        ok = false;
+      }
+
+      if (!ok && primerError) primerError.focus();
+      return ok;
+    }
+
+    function validateLaboral() {
+      limpiarErrores(formLaboral);
+
+      let ok = true;
+      let primerError = null;
+
+      if (fechaAlta.value === "") {
+        ponerError(fechaAlta, "La fecha de alta es obligatoria.");
+        if (!primerError) primerError = fechaAlta;
+        ok = false;
+      }
+
+      // id_estudio solo visible si activo, y "Sin estudio" es válido (null)
+      // Si quisieras obligar a escoger uno real cuando está activo, valida aquí.
+
+      if (!ok && primerError) primerError.focus();
+      return ok;
+    }
+
+    function getPersonalData() {
+      const data = {
+        nombre: nombre.value.trim(),
+        apellido: apellido.value.trim(),
+        email: email.value.trim(),
+        ciudad: ciudad.value.trim(),
+        pais: pais.value.trim(),
+        fecha_nacimiento: fechaNacimiento.value || null
+      };
+
+      // vacíos => null (para BD)
+      Object.keys(data).forEach(function (k) {
+        if (data[k] === "") data[k] = null;
+      });
+
+      return data;
+    }
+
+    function getLaboralData() {
+      const isActivo = activo.checked;
+
+      let id_estudio = null;
+      if (isActivo) {
+        const v = selectEstudio.value;
+        id_estudio = (v === "") ? null : Number(v);
+      } else {
+        id_estudio = null;
+      }
+
+      return {
+        fecha_alta: fechaAlta.value || null,
+        activo: isActivo,
+        id_estudio: id_estudio
+      };
+    }
+
+    function escapeHtml(s) {
+      return s
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // ---------- eventos ----------
+    // limpiar error al corregir
     nombre.addEventListener("input", function () { limpiarErrorDeCampo(nombre); });
-    comentarios.addEventListener("input", function () { limpiarErrorDeCampo(comentarios); });
-    edad.addEventListener("input", function () { limpiarErrorDeCampo(edad); });
-    fecha.addEventListener("change", function () { limpiarErrorDeCampo(fecha); });
-    provincia.addEventListener("change", function () { limpiarErrorDeCampo(provincia); });
-    lenguajes.addEventListener("change", function () { limpiarErrorDeCampo(lenguajes); });
-    color.addEventListener("change", function () { limpiarErrorDeCampo(color); });
+    apellido.addEventListener("input", function () { limpiarErrorDeCampo(apellido); });
+    email.addEventListener("input", function () { limpiarErrorDeCampo(email); });
+    ciudad.addEventListener("input", function () { limpiarErrorDeCampo(ciudad); });
+    pais.addEventListener("input", function () { limpiarErrorDeCampo(pais); });
+    fechaNacimiento.addEventListener("change", function () { limpiarErrorDeCampo(fechaNacimiento); });
 
-    // Radio - limpiar bloque al cambiar
-    Array.from(document.getElementsByName("genero")).forEach(function (r) {
-      r.addEventListener("change", function () {
-        limpiarErrorDeBloque(bloqueGenero);
-      });
+    fechaAlta.addEventListener("change", function () { limpiarErrorDeCampo(fechaAlta); });
+    selectEstudio.addEventListener("change", function () { limpiarErrorDeCampo(selectEstudio); });
+
+    // Submit personal
+    formPersonal.addEventListener("submit", function (e) {
+      e.preventDefault();
+      resumen.innerHTML = "";
+
+      const ok = validatePersonal();
+      if (ok) {
+        const data = getPersonalData();
+        resumen.innerHTML =
+          "<strong>Personal válido</strong><br>" +
+          "<pre>" + escapeHtml(JSON.stringify(data, null, 2)) + "</pre>";
+      }
     });
 
-    // Checkbox - limpiar bloque al cambiar
-    Array.from(document.getElementsByName("intereses")).forEach(function (c) {
-      c.addEventListener("change", function () {
-        limpiarErrorDeBloque(bloqueIntereses);
-      });
+    // Submit laboral (guarda personal + laboral)
+    formLaboral.addEventListener("submit", function (e) {
+      e.preventDefault();
+      resumen.innerHTML = "";
+
+      const okP = validatePersonal();
+      const okL = validateLaboral();
+      if (!okP || !okL) return;
+
+      const payload = Object.assign({}, getPersonalData(), getLaboralData());
+
+      resumen.innerHTML =
+        "<strong>Formulario válido (simulación de guardado)</strong><br>" +
+        "<pre>" + escapeHtml(JSON.stringify(payload, null, 2)) + "</pre>" +
+        "<div style='margin-top:6px; font-size:13px;'>Nota: <code>id_estudio</code> será <code>null</code> si eliges “Sin estudio” o si <code>activo</code> es <code>false</code>.</div>";
     });
 
-    // Reset: limpiar estilos y mensajes + foco al primer campo
-    form.addEventListener("reset", function () {
+    // Reset personal
+    formPersonal.addEventListener("reset", function () {
       setTimeout(function () {
-        limpiarErrores();
-        valorSatisfaccion.textContent = "Valor: " + satisfaccion.value;
+        limpiarErrores(formPersonal);
+        resumen.innerHTML = "";
         nombre.focus();
       }, 0);
     });
 
-    // Foco inicial al cargar
-    window.addEventListener("load", function () {
-      nombre.focus();
+    // Reset laboral
+    formLaboral.addEventListener("reset", function () {
+      setTimeout(function () {
+        limpiarErrores(formLaboral);
+        resumen.innerHTML = "";
+        activo.checked = false;
+        refreshEstudioVisibility();
+        fechaAlta.focus();
+      }, 0);
     });
 
-    // --------- validación en submit + foco al primer error ----------
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      limpiarErrores();
-
-      let valido = true;
-      let primerError = null;
-
-      // TEXT
-      if (nombre.value.trim() === "") {
-        ponerError(nombre, "El nombre es obligatorio.");
-        if (!primerError) primerError = nombre;
-        valido = false;
-      }
-
-      // TEXTAREA
-      if (comentarios.value.trim().length < 10) {
-        ponerError(comentarios, "Escribe al menos 10 caracteres.");
-        if (!primerError) primerError = comentarios;
-        valido = false;
-      }
-
-      // NUMBER
-      const edadNum = Number(edad.value);
-      if (edad.value === "" || Number.isNaN(edadNum) || edadNum < 18) {
-        ponerError(edad, "La edad es obligatoria y debe ser mayor o igual que 18.");
-        if (!primerError) primerError = edad;
-        valido = false;
-      }
-
-      // DATE
-      if (fecha.value === "") {
-        ponerError(fecha, "La fecha es obligatoria.");
-        if (!primerError) primerError = fecha;
-        valido = false;
-      }
-
-      // RADIO (sin :checked)
-      const radiosGenero = Array.from(document.getElementsByName("genero"));
-      let generoMarcado = null;
-
-      radiosGenero.forEach(function (radio) {
-        if (generoMarcado === null && radio.checked) {
-          generoMarcado = radio;
-        }
-      });
-
-      if (generoMarcado === null) {
-        ponerErrorBloque(bloqueGenero, "Selecciona un género.");
-        if (!primerError && radiosGenero.length > 0) primerError = radiosGenero[0];
-        valido = false;
-      }
-
-      // CHECKBOX (sin :checked)
-      const checksIntereses = Array.from(document.getElementsByName("intereses"));
-      const interesesMarcados = [];
-
-      checksIntereses.forEach(function (check) {
-        if (check.checked) {
-          interesesMarcados.push(check);
-        }
-      });
-
-      if (interesesMarcados.length === 0) {
-        ponerErrorBloque(bloqueIntereses, "Selecciona al menos un interés.");
-        if (!primerError && checksIntereses.length > 0) primerError = checksIntereses[0];
-        valido = false;
-      }
-
-      // SELECT
-      if (provincia.value === "") {
-        ponerError(provincia, "Selecciona una provincia.");
-        if (!primerError) primerError = provincia;
-        valido = false;
-      }
-
-      // SELECT MULTIPLE (mínimo 1)
-      const seleccionadas = Array.from(lenguajes.selectedOptions);
-      if (seleccionadas.length === 0) {
-        ponerError(lenguajes, "Selecciona al menos un lenguaje.");
-        if (!primerError) primerError = lenguajes;
-        valido = false;
-      }
-
-      // RANGE
-      const sat = Number(satisfaccion.value);
-      if (sat < 3) {
-        ponerError(satisfaccion, "La satisfacción debe ser al menos 3.");
-        if (!primerError) primerError = satisfaccion;
-        valido = false;
-      }
-
-      // COLOR
-      if (!color.value) {
-        ponerError(color, "Selecciona un color.");
-        if (!primerError) primerError = color;
-        valido = false;
-      }
-
-      // Foco al primer campo con error
-      if (!valido && primerError) {
-        primerError.focus();
-      }
-
-      // Si todo OK, mostrar resumen (simulación de envío)
-      if (valido) {
-        // Construir listas sin map
-        let interesesTxt = "";
-        interesesMarcados.forEach(function (ch, idx) {
-          if (idx > 0) interesesTxt += ", ";
-          interesesTxt += ch.value;
-        });
-
-        let lenguajesTxt = "";
-        seleccionadas.forEach(function (op, idx) {
-          if (idx > 0) lenguajesTxt += ", ";
-          lenguajesTxt += op.value;
-        });
-
-        resumen.innerHTML = ""
-          + "<strong>Formulario válido (simulación de envío)</strong><br>"
-          + "Nombre: " + nombre.value + "<br>"
-          + "Comentarios: " + comentarios.value + "<br>"
-          + "Edad: " + edadNum + "<br>"
-          + "Fecha: " + fecha.value + "<br>"
-          + "Género: " + generoMarcado.value + "<br>"
-          + "Intereses: " + interesesTxt + "<br>"
-          + "Provincia: " + provincia.value + "<br>"
-          + "Lenguajes: " + lenguajesTxt + "<br>"
-          + "Satisfacción: " + sat + "<br>"
-          + "Color: " + color.value;
-      }
+    // foco inicial
+    window.addEventListener("load", function () {
+      nombre.focus();
     });
   </script>
 </body>
