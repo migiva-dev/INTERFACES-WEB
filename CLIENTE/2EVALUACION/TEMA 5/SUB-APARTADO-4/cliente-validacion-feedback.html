@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CRUD Videojuegos</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 1100px; margin: 20px auto; }
+  .error { color: #b00020; }
+  .ok { color: #0a7a2f; }
+  table { width:100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { border: 1px solid #e3e3e3; padding: 8px; text-align: left; vertical-align: top; }
+  th { background: #fafafa; }
+  textarea { width: 520px; }
+</style>
+</head>
+<body>
+
+<h2>CRUD - Tabla videojuego</h2>
+<p id="mensaje"></p>
+
+<form id="formCrud">
+
+  <label>ID:</label><br>
+  <input type="number" name="id" id="id"><br><br>
+
+  <label>Título:</label><br>
+  <input type="text" name="titulo" id="titulo"><br><br>
+
+  <label>Fecha Lanzamiento:</label><br>
+  <input type="date" name="fecha_lanzamiento" id="fecha_lanzamiento"><br><br>
+
+  <label>PEGI:</label><br>
+  <input type="number" name="pegi" id="pegi" min="0" max="21"><br><br>
+
+  <label>Precio:</label><br>
+  <input type="number" step="0.01" name="precio" id="precio"><br><br>
+
+  <label>Motor:</label><br>
+  <input type="text" name="motor" id="motor"><br><br>
+
+  <label>Multijugador:</label><br>
+  <select id="multijugador">
+    <option value="0">No</option>
+    <option value="1">Sí</option>
+  </select><br><br>
+
+  <label>Descripción:</label><br>
+  <textarea name="descripcion" id="descripcion" rows="4"></textarea><br><br>
+
+  <button id="btnAdd" type="button">Añadir</button>
+  <button id="btnUpdate" type="button">Actualizar</button>
+  <button id="btnDelete" type="button">Eliminar</button>
+</form>
+
+<hr>
+
+<h3>Mostrar</h3>
+<button id="btnReadAll" type="button">Mostrar toda la tabla</button>
+<button id="btnReadId" type="button">Mostrar fila por ID (usa el campo ID)</button>
+<button id="btnReadTitle" type="button">Mostrar fila por Título (usa el campo Título)</button>
+
+<table id="tabla" style="display:none">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Título</th>
+      <th>Fecha</th>
+      <th>PEGI</th>
+      <th>Precio</th>
+      <th>Motor</th>
+      <th>Multijugador</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+const URL = "servidor.php";
+
+const form = document.getElementById("formCrud");
+const mensaje = document.getElementById("mensaje");
+const tabla = document.getElementById("tabla");
+const tbody = document.getElementById("tbody");
+
+function setMensaje(txt, ok=true){
+  mensaje.className = ok ? "ok" : "error";
+  mensaje.textContent = txt;
+}
+
+function esc(v){ return (v === null || v === undefined) ? "" : String(v); }
+
+function multiTxt(v){
+  return String(v) === "1" ? "Sí" : "No";
+}
+
+function pintarTabla(filas){
+  tbody.innerHTML = "";
+  if (!Array.isArray(filas) || filas.length === 0) { tabla.style.display = "none"; return; }
+
+  filas.forEach(f => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${esc(f.id_videojuego)}</td>
+      <td>${esc(f.titulo)}</td>
+      <td>${esc(f.fecha_lanzamiento)}</td>
+      <td>${esc(f.pegi)}</td>
+      <td>${esc(f.precio_base)}</td>
+      <td>${esc(f.motor)}</td>
+      <td>${multiTxt(f.es_multijugador)}</td>
+      <td>${esc(f.descripcion)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tabla.style.display = "";
+}
+
+async function postFD(fd){
+  const resp = await fetch(URL, { method:"POST", body: fd });
+  const data = await resp.json().catch(()=> ({}));
+  if (!resp.ok) throw new Error(data?.error || "Error servidor");
+  return data;
+}
+
+function buildFD(accion){
+  const fd = new FormData(form);
+  fd.set("accion", accion);
+
+  // multijugador: enviamos 0/1 aunque el usuario vea Sí/No
+  fd.set("es_multijugador", document.getElementById("multijugador").value);
+
+  return fd;
+}
+
+// ADD
+document.getElementById("btnAdd").addEventListener("click", async () => {
+  try {
+    setMensaje("Añadiendo...", true);
+    const data = await postFD(buildFD("add"));
+    setMensaje("Añadido OK (mostrando fila añadida)", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// UPDATE
+document.getElementById("btnUpdate").addEventListener("click", async () => {
+  try {
+    setMensaje("Actualizando...", true);
+    const data = await postFD(buildFD("update"));
+    setMensaje("Actualizado OK (mostrando fila actualizada)", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// DELETE
+document.getElementById("btnDelete").addEventListener("click", async () => {
+  const id = document.getElementById("id").value;
+  if (!id) return setMensaje("Pon un ID para borrar", false);
+
+  const fd = new FormData();
+  fd.set("accion", "delete");
+  fd.set("id", id);
+
+  try {
+    setMensaje("Borrando...", true);
+    const data = await postFD(fd);
+    setMensaje("Borrado OK (mostrando fila borrada)", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// READ ALL
+document.getElementById("btnReadAll").addEventListener("click", async () => {
+  const fd = new FormData();
+  fd.set("accion", "read_all");
+  try {
+    setMensaje("Cargando tabla...", true);
+    const data = await postFD(fd);
+    setMensaje(`Mostrando ${data.total} videojuego(s)`, true);
+    pintarTabla(data.filas);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// READ ID
+document.getElementById("btnReadId").addEventListener("click", async () => {
+  const id = document.getElementById("id").value;
+  const fd = new FormData();
+  fd.set("accion", "read_id");
+  fd.set("id", id);
+
+  try {
+    setMensaje("Buscando por ID...", true);
+    const data = await postFD(fd);
+    setMensaje("Fila encontrada por ID", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
+
+// READ TITLE
+document.getElementById("btnReadTitle").addEventListener("click", async () => {
+  const titulo = document.getElementById("titulo").value;
+  const fd = new FormData();
+  fd.set("accion", "read_title");
+  fd.set("titulo", titulo);
+
+  try {
+    setMensaje("Buscando por título...", true);
+    const data = await postFD(fd);
+    setMensaje("Fila encontrada por título", true);
+    pintarTabla([data.fila]);
+  } catch(e) { setMensaje(String(e), false); }
+});
+</script>
+
+</body>
+</html>
