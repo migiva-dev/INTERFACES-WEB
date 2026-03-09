@@ -119,6 +119,9 @@ $cursor = $collection->find();
 
 
 // Recorrer los documentos obtenidos
+
+$cursor = $collection->find();
+
 foreach ($cursor as $juego) {
 
     if (isset($juego["_id"])) {
@@ -129,24 +132,84 @@ foreach ($cursor as $juego) {
         echo "Título: " . $juego["titulo"] . "<br>";
     }
 
-    if (isset($juego["precio"])) {
-        echo "Precio: " . $juego["precio"] . "<br>";
-    }
-
     if (isset($juego["fecha_lanzamiento"])) {
-        echo "Fecha lanzamiento: " . $juego["fecha_lanzamiento"] . "<br>";
-    }
-
-    if (isset($juego["genero"])) {
-        echo "Género: " . $juego["genero"] . "<br>";
+        echo "Fecha de lanzamiento: " . $juego["fecha_lanzamiento"] . "<br>";
     }
 
     if (isset($juego["pegi"])) {
         echo "PEGI: " . $juego["pegi"] . "<br>";
     }
 
+    if (isset($juego["precio_base"])) {
+        echo "Precio base: " . $juego["precio_base"] . "<br>";
+    }
+
     if (isset($juego["motor"])) {
         echo "Motor: " . $juego["motor"] . "<br>";
+    }
+
+    if (isset($juego["es_multijugador"])) {
+        echo "Es multijugador: " . ($juego["es_multijugador"] ? "Sí" : "No") . "<br>";
+    }
+
+    if (isset($juego["descripcion"])) {
+        echo "Descripción: " . $juego["descripcion"] . "<br>";
+    }
+
+    if (isset($juego["juego_padre"])) {
+        echo "Juego padre: " . $juego["juego_padre"] . "<br>";
+    }
+
+    if (isset($juego["estudio"])) {
+        echo "<strong>Estudio:</strong><br>";
+
+        if (isset($juego["estudio"]["nombre"])) {
+            echo "Nombre: " . $juego["estudio"]["nombre"] . "<br>";
+        }
+
+        if (isset($juego["estudio"]["pais"])) {
+            echo "País: " . $juego["estudio"]["pais"] . "<br>";
+        }
+
+        if (isset($juego["estudio"]["ciudad"])) {
+            echo "Ciudad: " . $juego["estudio"]["ciudad"] . "<br>";
+        }
+
+        if (isset($juego["estudio"]["fundado_en"])) {
+            echo "Fundado en: " . $juego["estudio"]["fundado_en"] . "<br>";
+        }
+
+        if (isset($juego["estudio"]["web"])) {
+            echo "Web: " . $juego["estudio"]["web"] . "<br>";
+        }
+
+        if (isset($juego["estudio"]["telefono"])) {
+            echo "Teléfono: " . $juego["estudio"]["telefono"] . "<br>";
+        }
+
+        if (isset($juego["estudio"]["correo"])) {
+            echo "Correo: " . $juego["estudio"]["correo"] . "<br>";
+        }
+    }
+
+    if (isset($juego["dlcs"]) && count($juego["dlcs"]) > 0) {
+        echo "<strong>DLCs:</strong><br>";
+
+        foreach ($juego["dlcs"] as $dlc) {
+            if (isset($dlc["titulo"])) {
+                echo "Título DLC: " . $dlc["titulo"] . "<br>";
+            }
+
+            if (isset($dlc["fecha_lanzamiento"])) {
+                echo "Fecha DLC: " . $dlc["fecha_lanzamiento"] . "<br>";
+            }
+
+            if (isset($dlc["precio"])) {
+                echo "Precio DLC: " . $dlc["precio"] . "<br>";
+            }
+
+            echo "<br>";
+        }
     }
 
     echo "<hr>";
