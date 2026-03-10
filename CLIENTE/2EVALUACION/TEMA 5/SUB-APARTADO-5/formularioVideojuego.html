@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Formularios</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  margin: 25px;
+  background: #ffffff;
+  color: #000000;
+}
+
+fieldset{
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+}
+
+label{
+  display: block;
+  margin-top: 10px;
+}
+
+input,
+select,
+textarea{
+  width: 100%;
+  max-width: 420px;
+  padding: 6px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+textarea{
+  height: 80px;
+}
+
+.error{
+  border: 2px solid red;
+  background: #ffecec;
+}
+
+.msg-error{
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+button{
+  margin-top: 15px;
+  padding: 7px 15px;
+}
+
+pre{
+  background: #eeeeee;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Formulario Videojuegos</h2>
+
+<form id="formJuego">
+
+<fieldset>
+
+<label>Titulo *</label>
+<input type="text" id="titulo">
+
+<label>Fecha lanzamiento *</label>
+<input type="date" id="fecha_lanzamiento">
+
+<label>PEGI *</label>
+<select id="pegi">
+<option value="">Selecciona</option>
+<option>3</option>
+<option>7</option>
+<option>12</option>
+<option>16</option>
+<option>18</option>
+</select>
+
+<label>Precio base *</label>
+<input type="number" id="precio_base" step="0.01">
+
+<label>Motor *</label>
+<input type="text" id="motor">
+
+<label>
+<input type="checkbox" id="multijugador">
+Es multijugador
+</label>
+
+<label>Descripcion *</label>
+<textarea id="descripcion"></textarea>
+
+<button type="submit">Enviar</button>
+<button type="reset">Limpiar</button>
+
+</fieldset>
+
+</form>
+
+<h2>Formulario Estudio</h2>
+
+<form id="formEstudio">
+
+<fieldset>
+
+<label>Nombre *</label>
+<input type="text" id="nombre_estudio">
+
+<label>Pais *</label>
+<input type="text" id="pais_estudio">
+
+<label>Ciudad *</label>
+<input type="text" id="ciudad_estudio">
+
+<label>Fundado en *</label>
+<input type="date" id="fundado">
+
+<label>Web *</label>
+<input type="text" id="web">
+
+<label>Telefono *</label>
+<input type="text" id="telefono">
+
+<label>Correo *</label>
+<input type="text" id="correo">
+
+<button type="submit">Enviar</button>
+<button type="reset">Limpiar</button>
+
+</fieldset>
+
+</form>
+
+<h2>Formulario DLC / Producto</h2>
+
+<form id="formProducto">
+
+<fieldset>
+
+<label>Titulo *</label>
+<input type="text" id="titulo_producto">
+
+<label>Fecha lanzamiento *</label>
+<input type="date" id="fecha_producto">
+
+<label>Precio *</label>
+<input type="number" id="precio_producto" step="0.01">
+
+<button type="submit">Enviar</button>
+<button type="reset">Limpiar</button>
+
+</fieldset>
+
+</form>
+
+<div id="resumen"></div>
+
+<script>
+
+const resumen = document.getElementById("resumen")
+
+function error(el,mensaje){
+
+limpiarError(el)
+
+el.classList.add("error")
+
+let p=document.createElement("p")
+
+p.className="msg-error"
+
+p.textContent=mensaje
+
+el.after(p)
+
+}
+
+function limpiarError(el){
+
+el.classList.remove("error")
+
+if(el.nextElementSibling && el.nextElementSibling.classList.contains("msg-error"))
+el.nextElementSibling.remove()
+
+}
+
+function limpiarTodo(){
+
+document.querySelectorAll(".error").forEach(e=>e.classList.remove("error"))
+document.querySelectorAll(".msg-error").forEach(e=>e.remove())
+
+}
+
+function limpiarTexto(txt){
+return txt.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ .,-]/g,'')
+}
+
+document.getElementById("formJuego").addEventListener("submit",function(e){
+
+e.preventDefault()
+
+limpiarTodo()
+
+let valido=true
+
+let titulo=document.getElementById("titulo")
+let fecha=document.getElementById("fecha_lanzamiento")
+let pegi=document.getElementById("pegi")
+let precio=document.getElementById("precio_base")
+let motor=document.getElementById("motor")
+let descripcion=document.getElementById("descripcion")
+
+titulo.value=limpiarTexto(titulo.value)
+
+if(titulo.value.length<2){
+error(titulo,"Titulo obligatorio")
+valido=false
+}
+
+if(!fecha.value){
+error(fecha,"Fecha obligatoria")
+valido=false
+}
+
+if(pegi.value==""){
+error(pegi,"Selecciona PEGI")
+valido=false
+}
+
+if(precio.value=="" || precio.value<=0){
+error(precio,"Precio inválido")
+valido=false
+}
+
+if(motor.value.length<2){
+error(motor,"Motor obligatorio")
+valido=false
+}
+
+if(descripcion.value.length<10){
+error(descripcion,"Descripcion mínima 10 caracteres")
+valido=false
+}
+
+if(!valido) return
+
+const datos={
+titulo:titulo.value,
+fecha_lanzamiento:fecha.value,
+pegi:pegi.value,
+precio_base:precio.value,
+motor:motor.value,
+multijugador:document.getElementById("multijugador").checked?1:0,
+descripcion:descripcion.value
+}
+
+resumen.innerHTML="<pre>"+JSON.stringify(datos,null,2)+"</pre>"
+
+})
+
+document.getElementById("formEstudio").addEventListener("submit",function(e){
+
+e.preventDefault()
+
+limpiarTodo()
+
+let valido=true
+
+let nombre=document.getElementById("nombre_estudio")
+let pais=document.getElementById("pais_estudio")
+let ciudad=document.getElementById("ciudad_estudio")
+let fundado=document.getElementById("fundado")
+let web=document.getElementById("web")
+let telefono=document.getElementById("telefono")
+let correo=document.getElementById("correo")
+
+const regTelefono=/^[0-9]{9}$/
+const regCorreo=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const regWeb=/^(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w\-]*)*\/?$/
+
+if(nombre.value.length<2){
+error(nombre,"Nombre obligatorio")
+valido=false
+}
+
+if(pais.value.length<2){
+error(pais,"Pais obligatorio")
+valido=false
+}
+
+if(ciudad.value.length<2){
+error(ciudad,"Ciudad obligatoria")
+valido=false
+}
+
+if(fundado.value<1900 || fundado.value>new Date().getFullYear()){
+error(fundado,"Año inválido")
+valido=false
+}
+
+if(!regWeb.test(web.value)){
+error(web,"Web inválida")
+valido=false
+}
+
+if(!regTelefono.test(telefono.value)){
+error(telefono,"Telefono inválido")
+valido=false
+}
+
+if(!regCorreo.test(correo.value)){
+error(correo,"Correo inválido")
+valido=false
+}
+
+if(!valido) return
+
+const datos={
+nombre:nombre.value,
+pais:pais.value,
+ciudad:ciudad.value,
+fundado_en:fundado.value,
+web:web.value,
+telefono:telefono.value,
+correo:correo.value
+}
+
+resumen.innerHTML="<pre>"+JSON.stringify(datos,null,2)+"</pre>"
+
+})
+
+document.getElementById("formProducto").addEventListener("submit",function(e){
+
+e.preventDefault()
+
+limpiarTodo()
+
+let valido=true
+
+let titulo=document.getElementById("titulo_producto")
+let fecha=document.getElementById("fecha_producto")
+let precio=document.getElementById("precio_producto")
+
+if(titulo.value.length<2){
+error(titulo,"Titulo obligatorio")
+valido=false
+}
+
+if(!fecha.value){
+error(fecha,"Fecha obligatoria")
+valido=false
+}
+
+if(precio.value<=0){
+error(precio,"Precio inválido")
+valido=false
+}
+
+if(!valido) return
+
+const datos={
+titulo:titulo.value,
+fecha_lanzamiento:fecha.value,
+precio:precio.value
+}
+
+resumen.innerHTML="<pre>"+JSON.stringify(datos,null,2)+"</pre>"
+
+})
+
+</script>
+
+</body>
+</html>
