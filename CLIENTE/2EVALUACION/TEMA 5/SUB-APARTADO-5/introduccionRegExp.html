@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ejemplo de RegExp en formulario</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 24px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+    }
+
+    input {
+      width: 320px;
+      padding: 6px;
+      margin-top: 4px;
+    }
+
+    button {
+      margin-top: 16px;
+      margin-right: 8px;
+      padding: 8px 12px;
+    }
+
+    .error {
+      border: 2px solid red;
+      background-color: #ffecec;
+    }
+
+    .msg-error {
+      color: #b00020;
+      font-size: 13px;
+      margin: 4px 0 0;
+    }
+
+    #resultado {
+      margin-top: 20px;
+      padding: 12px;
+      background: #f2f2f2;
+      border: 1px solid #ccc;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Formulario con expresiones regulares</h2>
+
+  <form id="formulario">
+    <label for="nombre">Nombre</label>
+    <input type="text" id="nombre" name="nombre">
+
+    <label for="telefono">Teléfono</label>
+    <input type="text" id="telefono" name="telefono">
+
+    <label for="email">Email</label>
+    <input type="text" id="email" name="email">
+
+    <label for="web">Web</label>
+    <input type="text" id="web" name="web">
+
+    <button type="submit">Validar</button>
+    <button type="button" id="btnReemplazar">Aplicar replace</button>
+    <button type="reset">Limpiar</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <script>
+    const formulario = document.getElementById("formulario");
+    const nombre = document.getElementById("nombre");
+    const telefono = document.getElementById("telefono");
+    const email = document.getElementById("email");
+    const web = document.getElementById("web");
+    const resultado = document.getElementById("resultado");
+    const btnReemplazar = document.getElementById("btnReemplazar");
+
+    function limpiarErrores() {
+      document.querySelectorAll(".error").forEach(function (campo) {
+        campo.classList.remove("error");
+      });
+
+      document.querySelectorAll(".msg-error").forEach(function (mensaje) {
+        mensaje.remove();
+      });
+
+      resultado.textContent = "";
+    }
+
+    function ponerError(elemento, mensaje) {
+      elemento.classList.add("error");
+
+      const p = document.createElement("p");
+      p.className = "msg-error";
+      p.textContent = mensaje;
+
+      elemento.insertAdjacentElement("afterend", p);
+    }
+
+    function limpiarErrorDeCampo(elemento) {
+      elemento.classList.remove("error");
+
+      const siguiente = elemento.nextElementSibling;
+      if (siguiente && siguiente.classList.contains("msg-error")) {
+        siguiente.remove();
+      }
+    }
+
+    nombre.addEventListener("input", function () {
+      limpiarErrorDeCampo(nombre);
+    });
+
+    telefono.addEventListener("input", function () {
+      limpiarErrorDeCampo(telefono);
+    });
+
+    email.addEventListener("input", function () {
+      limpiarErrorDeCampo(email);
+    });
+
+    web.addEventListener("input", function () {
+      limpiarErrorDeCampo(web);
+    });
+
+    formulario.addEventListener("reset", function () {
+      setTimeout(function () {
+        limpiarErrores();
+        nombre.focus();
+      }, 0);
+    });
+
+    window.addEventListener("load", function () {
+      nombre.focus();
+    });
+
+    formulario.addEventListener("submit", function (e) {
+      e.preventDefault();
+      limpiarErrores();
+
+      let valido = true;
+      let primerError = null;
+
+      /*
+        PRINCIPALES FORMAS DE CREAR UNA EXPRESIÓN REGULAR
+
+        1) Forma literal:
+           /patron/flags
+
+           Ejemplo:
+           /^[0-9]+$/
+
+        2) Forma constructor:
+           new RegExp("patron", "flags")
+
+           Ejemplo:
+           new RegExp("^[0-9]+$")
+
+        PRINCIPALES SÍMBOLOS
+
+        ^   -> inicio de la cadena
+        $   -> final de la cadena
+        []  -> conjunto de caracteres permitidos
+               Ejemplo: [0-9] números del 0 al 9
+        ()  -> agrupar partes del patrón
+        +   -> una o más repeticiones
+        *   -> cero o más repeticiones
+        ?   -> cero o una vez / parte opcional
+        {n} -> exactamente n repeticiones
+        {n,m} -> entre n y m repeticiones
+        .   -> cualquier carácter
+        \d  -> un dígito
+        \s  -> un espacio en blanco
+
+        FLAGS MÁS HABITUALES
+
+        g -> global
+        i -> ignorar mayúsculas/minúsculas
+        m -> multilínea
+      */
+
+      // Patrón de teléfono:
+      // Empieza por 6 o 9 y después 8 dígitos más
+      const patronTelefono = /^[69][0-9]{8}$/;
+
+      // Patrón simple de email
+      // "^ dentro de [] significa negacion de un caracter dentro del bloque"
+      const patronEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      // Patrón simple de web: http:// o https:// opcional, www. opcional y dominio válido
+      const patronWeb = /^(https?:\/\/)?(www\.)?[a-z0-9-]+\.[a-z]{2,}$/i;
+
+      if (nombre.value.trim() === "") {
+        ponerError(nombre, "El nombre es obligatorio.");
+        if (!primerError) primerError = nombre;
+        valido = false;
+      }
+
+      if (!patronTelefono.test(telefono.value.trim())) {
+        ponerError(telefono, "El teléfono debe tener 9 cifras y empezar por 6 o 9.");
+        if (!primerError) primerError = telefono;
+        valido = false;
+      }
+
+      if (!patronEmail.test(email.value.trim())) {
+        ponerError(email, "El email no tiene un formato válido.");
+        if (!primerError) primerError = email;
+        valido = false;
+      }
+
+      if (!patronWeb.test(web.value.trim())) {
+        ponerError(web, "La web no tiene un formato válido.");
+        if (!primerError) primerError = web;
+        valido = false;
+      }
+
+      if (!valido && primerError) {
+        primerError.focus();
+      }
+
+      if (valido) {
+        resultado.textContent =
+          "Formulario válido.\n" +
+          "Nombre: " + nombre.value + "\n" +
+          "Teléfono: " + telefono.value + "\n" +
+          "Email: " + email.value + "\n" +
+          "Web: " + web.value;
+      }
+    });
+
+    btnReemplazar.addEventListener("click", function () {
+      limpiarErrores();
+
+      const emailOriginal = email.value.trim();
+      const webOriginal = web.value.trim();
+
+      // Reemplazar dominio del email
+      const emailNuevo = emailOriginal.replace(/@hotmail\.com$/i, "@gmail.com");
+
+      // Reemplazar dominio .com de la web por .es
+      const webNueva = webOriginal.replace(/\.com$/i, ".es");
+
+      resultado.textContent =
+        "Resultado de replace():\n\n" +
+        "Email original: " + emailOriginal + "\n" +
+        "Email modificado: " + emailNuevo + "\n\n" +
+        "Web original: " + webOriginal + "\n" +
+        "Web modificada: " + webNueva;
+    });
+  </script>
+</body>
+</html>
