@@ -23,7 +23,7 @@ try {
 
     // TODO 3:
     // Seleccionar la colección llamada JuegosBase.
-    $coleccion = $bd->JuegosBase;
+    $coleccion = $VideoJuegos->JuegosBase;
 
     $filtro = [
         "precio_base" => ['$lte' => $precioMax],
