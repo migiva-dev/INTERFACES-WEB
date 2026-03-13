@@ -14,14 +14,11 @@ $accion = $data["accion"] ?? "";
 
 try {
     // TODO 1:
-
     // Crear la conexión PDO con MySQL
-    
-
-
+    $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
+    $pdo = new PDO($dsn, $user, $pass);
 
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
 
     // NO TOCAR: Creación de la tabla favorito
     $sqlCrearTabla = "
@@ -50,9 +47,17 @@ try {
             // - precio_base
             //
             // Usa parámetros con nombre.
+            $sql = "INSERT INTO favorito (titulo, fecha_lanzamiento, precio_base)
+                    VALUES (:titulo, :fecha_lanzamiento, :precio_base)";
+            $stmt = $pdo->prepare($sql);
 
             // TODO 3:
             // Ejecutar la consulta preparada enviando los valores del juego recibido en el JSON.
+            $stmt->execute([
+                ":titulo" => $juego["titulo"] ?? null,
+                ":fecha_lanzamiento" => $juego["fecha_lanzamiento"] ?? null,
+                ":precio_base" => $juego["precio_base"] ?? null
+            ]);
 
             echo json_encode([
                 "ok" => true,
@@ -78,6 +83,9 @@ try {
         // - fecha_lanzamiento
         // - precio_base
         // - guardado_en
+        $sql = "SELECT id_favorito, titulo, fecha_lanzamiento, precio_base, guardado_en
+                FROM favorito";
+        $stmt = $pdo->query($sql);
 
         $favoritos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -97,10 +105,16 @@ try {
         // filtrando por su id_favorito.
         //
         // Debe usarse un parámetro con nombre.
+        $sql = "DELETE FROM favorito WHERE id_favorito = :id_favorito";
+        $stmt = $pdo->prepare($sql);
 
         // TODO 6:
         // Ejecutar la consulta preparada enviando el id_favorito recibido
         // en el JSON de entrada.
+        
+        $stmt->execute([
+            ":id_favorito" => $idFavorito
+        ]);
 
         echo json_encode([
             "ok" => true,
