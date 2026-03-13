@@ -156,9 +156,11 @@ function crearBloqueJuego(juego) {
   btnGuardar.addEventListener("click", async function () {
     estado.textContent = "Guardando favorito en MySQL...";
 
-    // TODO 1:
-    // Crear un AbortController para esta petición de guardado.
-    // Después, crear un temporizador para abortar la petición si tarda más de TIMEOUT_MS milisegundos.
+    // TODO 1
+    const controller = new AbortController();
+    const temporizador = setTimeout(function () {
+      controller.abort();
+    }, TIMEOUT_MS);
 
     try {
       const resp = await fetch("favoritos_mysql.php", {
@@ -170,14 +172,13 @@ function crearBloqueJuego(juego) {
         body: JSON.stringify({
           accion: "guardar_favorito",
           juego: juego
-        })
-
-        // TODO 2:
-        // Añadir aquí la propiedad signal
+        }),
+        // TODO 2
+        signal: controller.signal
       });
 
-      // TODO 3:
-      // Si la respuesta llega a tiempo, detener el temporizador con clearTimeout.
+      // TODO 3
+      clearTimeout(temporizador);
 
       const data = await resp.json();
       estado.textContent = data.mensaje;
@@ -221,11 +222,11 @@ function crearBloqueFavorito(favorito) {
   btnEliminar.addEventListener("click", async function () {
     estado.textContent = "Eliminando favorito...";
 
-    // TODO 4:
-    // Repetir aquí el mismo patrón de timeout usado en el guardado:
-    // - crear AbortController
-    // - crear temporizador con setTimeout
-    // - abortar si se supera TIMEOUT_MS
+    // TODO 4
+    const controller = new AbortController();
+    const temporizador = setTimeout(function () {
+      controller.abort();
+    }, TIMEOUT_MS);
 
     try {
       const resp = await fetch("favoritos_mysql.php", {
@@ -237,14 +238,13 @@ function crearBloqueFavorito(favorito) {
         body: JSON.stringify({
           accion: "eliminar_favorito",
           id_favorito: favorito.id_favorito
-        })
-
-        // TODO 5:
-        // Añadir la señal del controller a esta petición fetch.
+        }),
+        // TODO 5
+        signal: controller.signal
       });
 
-      // TODO 6:
-      // Si la petición termina correctamente, detener el temporizador.
+      // TODO 6
+      clearTimeout(temporizador);
 
       const data = await resp.json();
       estado.textContent = data.mensaje;
@@ -270,18 +270,23 @@ function crearBloqueFavorito(favorito) {
 /* ==================================================
    EVENTOS DE FORMULARIO
 ================================================== */
-// TODO 7:
-// Añadir un listener "input" a cada uno de los tres campos.
-// Cada vez que el usuario escriba o cambie el valor,
-// se debe limpiar el error visual de ese campo llamando
-// a limpiarErrorCampo(...) con el input correspondiente.
+// TODO 7
+[tituloInput, precioInput, anioInput].forEach(function (campo) {
+  campo.addEventListener("input", function () {
+    limpiarErrorCampo(campo);
+  });
+});
 
+// TODO 8
+[tituloInput, precioInput, anioInput].forEach(function (campo) {
+  campo.addEventListener("focus", function () {
+    campo.classList.add("focused");
+  });
 
-// TODO 8:
-// Añadir listeners "focus" y "blur" a los tres campos.
-// Cuando un campo reciba el foco, se le debe añadir la clase "focused".
-// Cuando lo pierda, se le debe quitar esa clase.
-
+  campo.addEventListener("blur", function () {
+    campo.classList.remove("focused");
+  });
+});
 
 /* ==================================================
    EVENTO DE TECLADO
@@ -313,31 +318,47 @@ formBusqueda.addEventListener("submit", async function (event) {
   const patronPrecio = /^\d+(\.\d{1,2})?$/;
   const patronAnio = /^\d{4}$/;
 
-  // TODO 9:
-  // Validar los tres campos usando las expresiones regulares.
-  // Si un campo es incorrecto:
-  // - llamar a ponerError(...)
-  // - guardar ese campo en primerError si aún no hay ninguno
-  // - cambiar valido a false
-  //
-  // Además:
-  // - el precio debe ser mayor que 0
-  // - el año debe ser como mínimo 1970
+  // TODO 9
+  if (!patronTitulo.test(titulo)) {
+    ponerError(tituloInput, "El título debe tener al menos 2 caracteres válidos.");
+    if (!primerError) {
+      primerError = tituloInput;
+    }
+    valido = false;
+  }
+
+  if (!patronPrecio.test(precio) || parseFloat(precio) <= 0) {
+    ponerError(precioInput, "El precio debe ser un número mayor que 0.");
+    if (!primerError) {
+      primerError = precioInput;
+    }
+    valido = false;
+  }
+
+  if (!patronAnio.test(anio) || parseInt(anio) < 1970) {
+    ponerError(anioInput, "El año debe tener 4 cifras y ser como mínimo 1970.");
+    if (!primerError) {
+      primerError = anioInput;
+    }
+    valido = false;
+  }
 
   if (!valido) {
-    // TODO 10:
-    // Si existe primerError, enviar el foco a ese campo.
-    // Después mostrar en el div "estado" que el formulario tiene errores.
+    // TODO 10
+    if (primerError) {
+      primerError.focus();
+    }
+    estado.textContent = "El formulario tiene errores.";
     return;
   }
 
   estado.textContent = "Consultando MongoDB...";
 
-  // TODO 11:
-  // Implementar el timeout de esta petición de búsqueda:
-  // - crear AbortController
-  // - crear temporizador con setTimeout
-  // - abortar tras TIMEOUT_MS
+  // TODO 11
+  const controller = new AbortController();
+  const temporizador = setTimeout(function () {
+    controller.abort();
+  }, TIMEOUT_MS);
 
   try {
     const resp = await fetch("buscar_videojuegos_mongo.php", {
@@ -350,14 +371,13 @@ formBusqueda.addEventListener("submit", async function (event) {
         accion: "buscar_videojuegos",
         precio_max: parseFloat(precio),
         anio_min: parseInt(anio)
-      })
-
-      // TODO 12:
-      // Añadir aquí la señal del AbortController.
+      }),
+      // TODO 12
+      signal: controller.signal
     });
 
-    // TODO 13:
-    // Si la petición responde correctamente, detener el temporizador.
+    // TODO 13
+    clearTimeout(temporizador);
 
     const data = await resp.json();
 
@@ -400,12 +420,11 @@ async function cargarFavoritos() {
   estado.textContent = "Cargando favoritos desde MySQL...";
   favoritos.innerHTML = "";
 
-  // TODO 14:
-  // Implementar el timeout de esta petición de listado de favoritos.
-  // Debe seguir el mismo patrón que las demás:
-  // - AbortController
-  // - setTimeout
-  // - abortar si tarda demasiado
+  // TODO 14
+  const controller = new AbortController();
+  const temporizador = setTimeout(function () {
+    controller.abort();
+  }, TIMEOUT_MS);
 
   try {
     const resp = await fetch("favoritos_mysql.php", {
@@ -416,14 +435,13 @@ async function cargarFavoritos() {
       },
       body: JSON.stringify({
         accion: "listar_favoritos"
-      })
-
-      // TODO 15:
-      // Añadir aquí la señal del AbortController.
+      }),
+      // TODO 15
+      signal: controller.signal
     });
 
-    // TODO 16:
-    // Si la respuesta llega a tiempo, detener el temporizador.
+    // TODO 16
+    clearTimeout(temporizador);
 
     const data = await resp.json();
 
@@ -455,8 +473,7 @@ async function cargarFavoritos() {
 /* ==================================================
    BOTÓN VER FAVORITOS
 ================================================== */
-// TODO 17:
-// Añade un listener al botón "btnVerFavoritos" que llame a la función para cargar los favoritos
+// TODO 17
 btnVerFavoritos.addEventListener("click", function () {
   cargarFavoritos();
 });
@@ -464,8 +481,7 @@ btnVerFavoritos.addEventListener("click", function () {
 /* ==================================================
    EVENTO LOAD
 ================================================== */
-// TODO 18:
-// Añade un lister de carga de la página que envíe el foco a "tituloInput"
+// TODO 18
 window.addEventListener("load", function () {
   tituloInput.focus();
 });
