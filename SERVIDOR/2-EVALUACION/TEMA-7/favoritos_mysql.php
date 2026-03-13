@@ -14,7 +14,11 @@ $accion = $data["accion"] ?? "";
 
 try {
     // TODO 1:
+
     // Crear la conexión PDO con MySQL
+    
+
+
 
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
