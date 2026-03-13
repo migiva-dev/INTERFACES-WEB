@@ -20,10 +20,11 @@ try {
     // TODO 2:
     // Seleccionar la base de datos llamada Videojuegos.
     $bd = $client->Videojuegos;
+   
 
     // TODO 3:
     // Seleccionar la colección llamada JuegosBase.
-    $coleccion = $VideoJuegos->JuegosBase;
+    $coleccion = $bd->JuegosBase;
 
     $filtro = [
         "precio_base" => ['$lte' => $precioMax],
