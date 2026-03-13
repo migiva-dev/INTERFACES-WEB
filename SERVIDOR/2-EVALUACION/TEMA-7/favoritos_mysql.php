@@ -15,11 +15,17 @@ $accion = $data["accion"] ?? "";
 try {
     // TODO 1:
     // Crear la conexión PDO con MySQL
-    $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
-    $pdo = new PDO($dsn, $user, $pass);
+    $pdo = new PDO (
+        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
+        $user,
+        $pass
+    );
 
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);  
 
+
+
+    
     // NO TOCAR: Creación de la tabla favorito
     $sqlCrearTabla = "
         CREATE TABLE IF NOT EXISTS favorito (
@@ -111,7 +117,7 @@ try {
         // TODO 6:
         // Ejecutar la consulta preparada enviando el id_favorito recibido
         // en el JSON de entrada.
-        
+
         $stmt->execute([
             ":id_favorito" => $idFavorito
         ]);
