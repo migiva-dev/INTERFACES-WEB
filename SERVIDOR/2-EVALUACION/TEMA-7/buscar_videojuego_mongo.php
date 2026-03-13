@@ -36,20 +36,21 @@ try {
     // TODO 4:
     // Ejecutar la consulta sobre la colección usando el filtro anterior (pasaselo como parámetro)
     // El resultado debe guardarse en una variable para poder recorrerlo después.
-    $resultado = $coleccion->find($filtro);
-
-    foreach ($resultado as $documento) {
-        $juegos[] = [
-            "titulo" => $documento["titulo"] ?? "",
-            "fecha_lanzamiento" => $documento["fecha_lanzamiento"] ?? "",
-            "pegi" => $documento["pegi"] ?? "",
-            "precio_base" => $documento["precio_base"] ?? "",
-            "motor" => $documento["motor"] ?? "",
-            "genero" => $documento["genero"] ?? "",
-            "descripcion" => $documento["descripcion"] ?? ""
-        ];
+    if ($accion === "buscar_juegos") {
+        $titulo = trim($POST["titulo"] ?? "");
+        $fecha_lanzamiento = trim($POST["fecha_lanzamiento"] ?? "");
+        $pegi = trim($POST["pegi"] ?? "");
+        $precio = trim($POST["precio_base"] ?? "");
+        $motor = trim($POST["motor"] ?? "");
+        $genero = trim($POST["genero"] ?? "");
+        $descripcion = trim($POST["descripcion"] ?? "");
     }
-    
+
+     $resultado = $coleccion->find($filtro);
+
+    $juegos = [];
+
+   
     // TODO 5:
     // Recorrer todos los documentos devueltos por MongoDB
     // y construir el array $juegos.
@@ -64,6 +65,19 @@ try {
     // - descripcion
     //
     // Si algún campo no existe, devolver cadena vacía como valor por defecto.
+    
+     foreach ($resultado as $juegos) {
+
+        $juegos[] = [
+            "titulo" => $juegos["titulo"] ?? "",
+            "fecha_lanzamiento" => $juegos["fecha_lanzamiento"] ?? "",
+            "pegi" => $juegos["pegi"] ?? "",
+            "precio_base" => $juegos["precio_base"] ?? "",
+            "motor" => $juegos["motor"] ?? "",
+            "genero" => $juegos["genero"] ?? "",
+            "descripcion" => $juegos["descripcion"] ?? ""
+        ];
+    }
 
 
 
