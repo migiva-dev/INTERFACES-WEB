@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pestañas Modernas</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 20px;
+        color: #333;
+      }
+
+      h1 {
+        color: white;
+      }
+
+      .tabs {
+        margin-bottom: 20px;
+      }
+
+      .tab-buttons button {
+        padding: 10px 15px;
+        margin-right: 5px;
+        cursor: pointer;
+        background: white;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: 0.3s;
+      }
+
+      .tab-buttons button:hover {
+        background: #eee;
+        transform: translateY(-2px);
+      }
+
+      .tab-section {
+        display: none;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .counter {
+        display: inline-block;
+        padding: 20px;
+        border-radius: 12px;
+        width: 150px;
+        text-align: center;
+        background: #f0f0f0;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      button {
+        margin: 5px;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .comprobarBoton {
+        padding: 10px 20px;
+        background: #ff4b5c;
+        color: white;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+
+      .comprobarBoton:hover {
+        background: #e63e4d;
+      }
+
+      .alert {
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        color: white;
+      }
+
+      .adulto {
+        background: #28a745;
+      }
+
+      .menor {
+        background: #dc3545;
+      }
+
+      .casi {
+        background: #ffc107;
+        color: #000;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        animation: aparecer 0.3s ease;
+      }
+
+      @keyframes aparecer {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      #botonFiesta {
+        background: #00c9a7;
+        color: white;
+        font-weight: bold;
+      }
+
+      #botonFiesta:hover {
+        background: #00a98b;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Pestañas con JavaScript</h1>
+
+    <div id="tabsContainer"></div>
+
+    <section id="edad" class="tab-section">
+      <h2>Edad</h2>
+      <div id="edades"></div>
+    </section>
+
+    <section id="comprobarEdad" class="tab-section">
+      <h2>Comprobar edad</h2>
+      <button id="botonComprobarEdad" class="comprobarBoton">
+        Comprobar edad
+      </button>
+      <div id="contenedorAlertas"></div>
+    </section>
+
+    <section id="fiesta" class="tab-section">
+      <h2>Fiesta</h2>
+      <button id="botonFiesta">Salir de fiesta 🎉</button>
+    </section>
+
+    <div id="modalEvento" class="modal">
+      <div class="modal-content">
+        <h2>🎉 Invitación</h2>
+        <p>Estás invitado a salir de fiesta</p>
+        <button id="botonCerrarModal">Cerrar</button>
+      </div>
+    </div>
+
+    <script src="pestañas.js"></script>
+    <script src="counter.js"></script>
+    <script src="alerts.js"></script>
+
+    <script>
+      const botonFiesta = document.getElementById("botonFiesta");
+      const modalEvento = document.getElementById("modalEvento");
+      const botonCerrarModal = document.getElementById("botonCerrarModal");
+
+      botonFiesta.onclick = () => {
+        const edadActual = counter.getValor();
+
+        if (edadActual >= 18) {
+          modalEvento.style.display = "flex";
+        }
+      };
+
+      botonCerrarModal.onclick = () => {
+        modalEvento.style.display = "none";
+      };
+    </script>
+  </body>
+</html>
