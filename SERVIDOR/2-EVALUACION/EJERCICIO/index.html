@@ -478,14 +478,35 @@
         marcarCorrecto("fechaNacimiento");
       }
 
-      if (formularioValido) {
-        resultado.textContent = "Formulario válido. Todos los campos son correctos.";
+          if (formularioValido) {
+      const datos = new FormData();
+      datos.append("nombre", nombre);
+      datos.append("dni", dni);
+      datos.append("nie", nie);
+      datos.append("matricula", matricula);
+      datos.append("password", password);
+      datos.append("descripcion", descripcion);
+      datos.append("fechaNacimiento", fechaNacimiento);
+
+      fetch("guardar.php", {
+        method: "POST",
+        body: datos
+      })
+      .then(response => response.text())
+      .then(data => {
+        resultado.textContent = data;
         resultado.className = "resultado-ok";
-      } else {
-        resultado.textContent = "Hay errores en el formulario.";
+      })
+      .catch(error => {
+        resultado.textContent = "Error al enviar los datos al servidor";
         resultado.className = "resultado-error";
-      }
-    });
+      });
+    } else {
+      resultado.textContent = "Hay errores en el formulario.";
+      resultado.className = "resultado-error";
+    }
+        
+  });
   </script>
 </body>
 </html>
