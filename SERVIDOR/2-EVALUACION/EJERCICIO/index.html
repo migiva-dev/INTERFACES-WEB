@@ -17,7 +17,7 @@
     }
 
     .contenedor {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       background: white;
       padding: 25px;
@@ -25,7 +25,7 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
 
-    h1 {
+    h1, h2 {
       text-align: center;
       margin-bottom: 25px;
       color: #111827;
@@ -90,18 +90,22 @@
       font-size: 16px;
       cursor: pointer;
       font-weight: bold;
+      margin-top: 8px;
     }
 
     button:hover {
       background: #1d4ed8;
     }
 
-    #resultado {
+    #resultado,
+    #resultadoBuscar,
+    #resultadoActualizar,
+    #resultadoEliminar {
       margin-top: 20px;
       padding: 12px;
       border-radius: 8px;
       font-weight: bold;
-      text-align: center;
+      white-space: pre-wrap;
       display: none;
     }
 
@@ -123,6 +127,12 @@
       font-size: 12px;
       color: #6b7280;
       margin-top: 4px;
+    }
+
+    .seccion {
+      margin-top: 40px;
+      padding-top: 25px;
+      border-top: 2px solid #e5e7eb;
     }
   </style>
 </head>
@@ -190,10 +200,46 @@
         <small class="error" id="error-documento"></small>
       </div>
 
-      <button type="submit">Validar formulario</button>
+      <button type="submit">Insertar usuario</button>
     </form>
 
     <div id="resultado"></div>
+
+    <div class="seccion">
+      <h2>Buscar usuario por nombre</h2>
+      <div class="campo">
+        <label for="buscarNombre">Nombre</label>
+        <input type="text" id="buscarNombre" />
+      </div>
+      <button type="button" onclick="buscarUsuario()">Buscar</button>
+      <div id="resultadoBuscar"></div>
+    </div>
+
+    <div class="seccion">
+      <h2>Actualizar descripción por nombre</h2>
+      <div class="campo">
+        <label for="actualizarNombre">Nombre</label>
+        <input type="text" id="actualizarNombre" />
+      </div>
+
+      <div class="campo">
+        <label for="nuevaDescripcion">Nueva descripción</label>
+        <input type="text" id="nuevaDescripcion" />
+      </div>
+
+      <button type="button" onclick="actualizarUsuario()">Actualizar descripción</button>
+      <div id="resultadoActualizar"></div>
+    </div>
+
+    <div class="seccion">
+      <h2>Eliminar usuario por nombre</h2>
+      <div class="campo">
+        <label for="eliminarNombre">Nombre</label>
+        <input type="text" id="eliminarNombre" />
+      </div>
+      <button type="button" onclick="eliminarUsuario()">Eliminar</button>
+      <div id="resultadoEliminar"></div>
+    </div>
   </div>
 
   <script>
@@ -216,6 +262,12 @@
       resultado.textContent = "";
       resultado.className = "";
       resultado.style.display = "none";
+    }
+
+    function mostrarCaja(id, texto, ok = true) {
+      const caja = document.getElementById(id);
+      caja.textContent = texto;
+      caja.className = ok ? "resultado-ok" : "resultado-error";
     }
 
     function mostrarError(idCampo, mensaje) {
@@ -478,35 +530,100 @@
         marcarCorrecto("fechaNacimiento");
       }
 
-          if (formularioValido) {
-      const datos = new FormData();
-      datos.append("nombre", nombre);
-      datos.append("dni", dni);
-      datos.append("nie", nie);
-      datos.append("matricula", matricula);
-      datos.append("password", password);
-      datos.append("descripcion", descripcion);
-      datos.append("fechaNacimiento", fechaNacimiento);
+      if (formularioValido) {
+        const datos = new FormData();
+        datos.append("accion", "insertar");
+        datos.append("nombre", nombre);
+        datos.append("dni", dni);
+        datos.append("nie", nie);
+        datos.append("matricula", matricula);
+        datos.append("password", password);
+        datos.append("descripcion", descripcion);
+        datos.append("fechaNacimiento", fechaNacimiento);
 
-      fetch("guardar.php", {
+        fetch("conexion.php", {
+          method: "POST",
+          body: datos
+        })
+        .then(response => response.text())
+        .then(data => {
+          mostrarCaja("resultado", data, !data.toLowerCase().startsWith("error"));
+        })
+        .catch(() => {
+          mostrarCaja("resultado", "Error al enviar los datos al servidor", false);
+        });
+      } else {
+        mostrarCaja("resultado", "Hay errores en el formulario.", false);
+      }
+    });
+
+    function buscarUsuario() {
+      const nombre = document.getElementById("buscarNombre").value.trim();
+
+      const datos = new FormData();
+      datos.append("accion", "buscar");
+      datos.append("nombre", nombre);
+
+      fetch("conexion.php", {
         method: "POST",
         body: datos
       })
       .then(response => response.text())
       .then(data => {
-        resultado.textContent = data;
-        resultado.className = "resultado-ok";
+        mostrarCaja("resultadoBuscar", data, !data.toLowerCase().startsWith("error") && !data.toLowerCase().includes("no se encontró"));
       })
-      .catch(error => {
-        resultado.textContent = "Error al enviar los datos al servidor";
-        resultado.className = "resultado-error";
+      .catch(() => {
+        mostrarCaja("resultadoBuscar", "Error al buscar el usuario", false);
       });
-    } else {
-      resultado.textContent = "Hay errores en el formulario.";
-      resultado.className = "resultado-error";
     }
-        
-  });
+
+    function actualizarUsuario() {
+      const nombre = document.getElementById("actualizarNombre").value.trim();
+      const descripcion = document.getElementById("nuevaDescripcion").value.trim();
+
+      const errorDescripcion = validarDescripcion(descripcion);
+      if (errorDescripcion) {
+        mostrarCaja("resultadoActualizar", errorDescripcion, false);
+        return;
+      }
+
+      const datos = new FormData();
+      datos.append("accion", "actualizar");
+      datos.append("nombre", nombre);
+      datos.append("descripcion", descripcion);
+
+      fetch("conexion.php", {
+        method: "POST",
+        body: datos
+      })
+      .then(response => response.text())
+      .then(data => {
+        mostrarCaja("resultadoActualizar", data, !data.toLowerCase().startsWith("error"));
+      })
+      .catch(() => {
+        mostrarCaja("resultadoActualizar", "Error al actualizar el usuario", false);
+      });
+    }
+
+    function eliminarUsuario() {
+      const nombre = document.getElementById("eliminarNombre").value.trim();
+
+      const datos = new FormData();
+      datos.append("accion", "eliminar");
+      datos.append("nombre", nombre);
+
+      fetch("conexion.php", {
+        method: "POST",
+        body: datos
+      })
+      .then(response => response.text())
+      .then(data => {
+        mostrarCaja("resultadoEliminar", data, !data.toLowerCase().startsWith("error") && !data.toLowerCase().includes("no existe"));
+      })
+      .catch(() => {
+        mostrarCaja("resultadoEliminar", "Error al eliminar el usuario", false);
+      });
+    }
   </script>
 </body>
 </html>
