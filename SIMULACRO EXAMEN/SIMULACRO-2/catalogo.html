@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Catálogo </title>
+    <style>
+        @font-face {
+            font-family:"Mi fuente" ;
+            src: url(Ubuntu-R.ttf);
+        }
+         :root {
+            --color-principal: #004aad;   /* Azul principal */
+            --color-acento: #f7b500;      /* Amarillo acento */
+        }
+        body{
+            font-family: 'Ubuntu', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header, footer {
+        background-color: var(--color-principal);
+        color: white;
+        padding: 15px;
+      }
+      nav ul {
+        list-style: none;
+        padding: 0;
+      }
+      nav li {
+        display: inline-block;
+        margin: 0 15px;
+      }
+
+      nav a {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+      }
+
+      main {
+        padding: 200px;
+        text-align: center;
+      }
+
+      div.producto{
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        padding: 10px;
+        margin: 10px;
+        width: 150px;
+        display: inline-block;
+        
+      }
+
+      .producto button {
+        background-color: var(--color-acento);
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        color: #333;
+        font-weight: bold;
+      }
+       .producto button:hover {
+        background-color: #ffd84d;
+      }
+
+
+      section{
+        margin: 40px 0;
+      }
+      footer {
+        font-size: 0.9em;
+      }
+
+
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1> Mini tienda online </h1>
+      <nav>
+        <ul>
+          <li><a href="#">Inicio</a></li>
+          <li><a href="#">Productos</a></li>
+          <li><a href="#">Contacto</a></li>
+        </ul>
+      </nav>
+
+    </header>
+
+    <main>
+      <section id="listado">
+          <div class="producto">
+            <h3>Producto 1</h3>
+            <p>Descripción breve</p>
+            <button>🛒 Comprar</button>
+          </div>
+
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>🛒 Comprar</button>
+          </div>
+
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>🛒 Comprar</button>
+          </div>
+
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>🛒 Comprar</button>
+          </div>
+
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>🛒 Comprar</button>
+          </div>
+
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>🛒 Comprar</button>
+          </div>
+
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>⭐ Favorito</button>
+          </div>
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>⭐ Favorito</button>
+          </div>
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>⭐ Favorito</button>
+          </div>
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>⭐ Favorito</button>
+          </div>
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>⭐ Favorito</button>
+          </div>
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>⭐ Favorito</button>
+          </div>
+          <div class="producto">
+            <h3>Producto 2</h3>
+            <p>Descripción breve</p>
+            <button>⭐ Favorito</button>
+          </div>
+          
+
+      </section>
+
+    </main>
+
+    <footer>
+       <p>© 2025 Mini tienda online | Desarrollado por Miguel</p>
+    </footer>
+  </body>
+</html>

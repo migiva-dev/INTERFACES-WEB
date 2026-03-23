@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="002-estilo.css">
+</head>
+<body>
+
+
+    <!--
+    id PK
+    Titulo
+    isbn
+    autor
+    editorial FK
+    categoria FK
+    num paginas
+    -->
+
+    <!-- CREATE -->
+    <form action="002-procesar.php" method="POST">
+
+        <label for="Titulo">Titulo:</label>
+        <input type="text" name="Titulo" id="Titulo">
+        
+        <label for="isbn">ISBN:</label>
+        <input type="text" name="isbn" id="isbn">
+        
+        <label for="autor">Autor:</label>
+        <input type="text" name="autor" id="autor">
+        
+        <label for="editorial">Editorial:</label>
+        <input type="text" name="editorial" id="editorial">
+        
+        <label for="categoria">Categoria:</label>
+        <input type="text" name="categoria" id="categoria">
+        
+        <label for="num_paginas">Numero de paginas:</label>
+        <input type="number" name="num_paginas" id="num_paginas">
+        
+        <input type="submit" value="Enviar">
+
+    </form>
+
+       
+</body>
+</html>

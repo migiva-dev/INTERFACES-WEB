@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio Modal con Navegación - JOCARSA</title>
+  <style>
+    /* === ESTILOS GENERALES === */
+    body{
+      font-family: system-ui, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+
+    h1{
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    /* === GALERÍA DE IMÁGENES === */
+    .gallery{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+
+    .gallery .thumb{
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      cursor: pointer;
+      border-radius: .5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform .2s;
+    }
+
+    .gallery .thumb:hover{
+      transform: scale(1.03);
+    }
+
+    /* === MODAL === */
+    #modal{
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 1000;
+    }
+
+    #modal.is-open{
+      display: grid;
+    }
+
+    .modal__backdrop{
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+    }
+
+    .modal__dialog{
+      position: relative;
+      max-width: min(90vw, 1100px);
+      max-height: 90vh;
+      background: #111;
+      padding: 1rem 3.5rem;
+      border-radius: .75rem;
+      display: grid;
+      align-items: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    }
+
+    .modal__figure{
+      margin: 0;
+      display: grid;
+      gap: .5rem;
+      justify-items: center;
+    }
+
+    #modalImg{
+      width: auto;
+      max-width: 100%;
+      max-height: 70vh;
+      height: auto; /* CLAVE: mantiene proporción */
+      object-fit: contain;
+      border-radius: .5rem;
+    }
+
+    #modalCaption{
+      color: #ddd;
+      font-size: .9rem;
+      text-align: center;
+    }
+
+    /* === BOTONES DEL MODAL === */
+    .modal__close{
+      position: absolute;
+      top: .5rem;
+      right: .5rem;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
+    .modal__nav{
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,.1);
+      border: 0;
+      color: #fff;
+      font-size: 2rem;
+      padding: .5rem .75rem;
+      cursor: pointer;
+      border-radius: .5rem;
+      transition: background .2s;
+    }
+
+    #prevBtn { left: .5rem; }
+    #nextBtn { right: .5rem; }
+
+    .modal__nav:hover,
+    .modal__close:hover {
+      background: rgba(255,255,255,.25);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Ejercicio Modal con Navegación</h1>
+
+  <!-- Galería de imágenes -->
+  <section class="gallery" id="gallery">
+    <img src="https://picsum.photos/id/1018/600/400" alt="Montañas" class="thumb">
+    <img src="https://picsum.photos/id/1025/600/400" alt="Perro" class="thumb">
+    <img src="https://picsum.photos/id/1039/600/400" alt="Bosque" class="thumb">
+    <img src="https://picsum.photos/id/1041/600/400" alt="Carretera" class="thumb">
+    <img src="https://picsum.photos/id/1043/600/400" alt="Puente" class="thumb">
+    <img src="https://picsum.photos/id/1069/600/400" alt="Playa" class="thumb">
+  </section>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal__backdrop" data-close="true"></div>
+    <div class="modal__dialog" role="document">
+      <button id="modalClose" class="modal__close" aria-label="Cerrar (Esc)">&times;</button>
+      <figure class="modal__figure">
+        <img id="modalImg" src="" alt="">
+        <figcaption id="modalCaption"></figcaption>
+      </figure>
+      <button id="prevBtn" class="modal__nav" aria-label="Imagen anterior">&#10094;</button>
+      <button id="nextBtn" class="modal__nav" aria-label="Imagen siguiente">&#10095;</button>
+    </div>
+  </div>
+
+  <script>
+    // === SCRIPT PRINCIPAL DEL MODAL ===
+    (function () {
+      const thumbs = Array.from(document.querySelectorAll('#gallery .thumb'));
+      const modal = document.getElementById('modal');
+      const modalImg = document.getElementById('modalImg');
+      const modalCaption = document.getElementById('modalCaption');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const closeBtn = document.getElementById('modalClose');
+      const backdrop = modal.querySelector('.modal__backdrop');
+
+      let currentIndex = -1;
+
+      // Abre el modal en el índice dado
+      function openAt(index) {
+        currentIndex = index;
+        updateImage();
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.documentElement.style.overflow = 'hidden';
+      }
+
+      // Cierra el modal
+      function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.documentElement.style.overflow = '';
+        currentIndex = -1;
+      }
+
+      // Actualiza la imagen del modal
+      function updateImage() {
+        const el = thumbs[currentIndex];
+        if (!el) return;
+        modalImg.src = el.src;
+        modalImg.alt = el.alt;
+        modalCaption.textContent = el.alt;
+      }
+
+      // Navegación circular
+      function showNext() {
+        currentIndex = (currentIndex + 1) % thumbs.length;
+        updateImage();
+      }
+
+      function showPrev() {
+        currentIndex = (currentIndex - 1 + thumbs.length) % thumbs.length;
+        updateImage();
+      }
+
+      // Eventos
+      thumbs.forEach((img, idx) => {
+        img.addEventListener('click', () => openAt(idx));
+      });
+
+      nextBtn.addEventListener('click', showNext);
+      prevBtn.addEventListener('click', showPrev);
+      closeBtn.addEventListener('click', closeModal);
+      backdrop.addEventListener('click', closeModal);
+
+      // Teclas: Escape y flechas
+      window.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowRight') showNext();
+        if (e.key === 'ArrowLeft') showPrev();
+      });
+    })();
+  </script>
+</body>
+</html>

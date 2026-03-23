@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Mi Portafolio Profesional</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="Ubuntu-R.ttf">
+    
+    <style>
+        /* Variables de Colores Corporativos */
+        :root {
+            --color-primario: #3498DB; /* Azul Cían (Profesionalismo) */
+            --color-secundario: #2C3E50; /* Azul Oscuro (Legibilidad) */
+            --color-acento: #E74C3C; /* Rojo Ladrillo (Acentuar) */
+            --color-fondo: #ECF0F1; /* Gris Claro (Fondo Suave) */
+            --color-texto-claro: white;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-secundario);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--color-secundario);
+        }
+
+        /* Contenedores Principales */
+        header, main, footer {
+            background: var(--color-texto-claro);
+            padding: 20px;
+            margin: 20px auto; 
+            width: 90%;
+            max-width: 800px; 
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        /* FLEXBOX: Header y Navegación */
+        header {
+            background-color: var(--color-primario);
+            color: var(--color-texto-claro);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header h1 {
+            color: var(--color-texto-claro);
+            margin-bottom: 10px;
+        }
+        nav a {
+            color: var(--color-texto-claro);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: var(--color-acento);
+        }
+
+        /* GRID: Contenedor de Proyectos */
+        #proyectos-listado {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 20px; 
+            padding: 20px 0;
+        }
+
+        /* Tarjeta de Proyecto */
+        .proyecto-card {
+            background: var(--color-fondo);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            text-align: left;
+            overflow: hidden;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .proyecto-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .proyecto-card h4 {
+            color: var(--color-primario);
+            margin-bottom: 5px;
+            font-size: 1.2em;
+        }
+        .card-img {
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .card-link-btn {
+            color: #000; 
+            border: none;
+            padding: 8px 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .card-link-btn:hover {
+            background-color: var(--color-primario);
+        }
+        
+        /* --- (FLEXBOX) --- */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000; 
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); 
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--color-texto-claro);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-img {
+            width: 100%;
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .close-btn {
+            color: var(--color-secundario);
+            font-size: 35px;
+            font-weight: bold;
+            position: absolute;
+            top: 5px; right: 20px;
+            cursor: pointer;
+        }
+        
+    </style>
+    </head>
+<body>
+    <header>
+        <h1>Portafolio Miguel  </h1>
+        <nav>
+            <a href="#proyectos-listado">Proyectos</a>
+            <a href="#contacto-form">Contacto</a>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Mis Proyectos Recientes</h2>
+        
+        <section id="proyectos-listado">
+            <p>Cargando proyectos...</p>
+        </section>
+        
+        <section id="contacto-form" style="margin-top: 40px; border-top: 1px solid var(--color-fondo); padding-top: 20px;">
+            <h3>Contacto</h3>
+            <form id="formContacto" style="display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin: 0 auto;">
+                <input type="text" placeholder="Tu Nombre" required style="padding: 10px; border: 1px solid var(--color-fondo); border-radius: 4px;">
+                <input type="email" placeholder="Tu Email" required style="padding: 10px; border: 1px solid var(--color-fondo); border-radius: 4px;">
+                <textarea placeholder="Tu Mensaje" rows="4" required style="padding: 10px; border: 1px solid var(--color-fondo); border-radius: 4px;"></textarea>
+                <button type="submit" class="card-link-btn" style="background-color: var(--color-acento);">Enviar Mensaje</button>
+            </form>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 | Desarrollador Web.</p>
+    </footer>
+    
+    <div id="projectModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="modal-title" style="color: var(--color-primario);">Título del Proyecto</h2>
+            <div id="modal-image" class="modal-img"></div>
+            <p id="modal-description"></p>
+            <div style="margin-top: 15px;">
+                <strong>Tecnologías:</strong> <span id="modal-tech"></span>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Variables para guardar los datos una vez cargados
+        let portfolioData = []; 
+
+        // Función para abrir el modal
+        function openModal(projectId) {
+            // Busca el proyecto en el array cargado
+            const project = portfolioData.find(p => p.id === projectId); 
+            if (!project) return;
+
+            const modal = document.getElementById('projectModal');
+            
+            // Llenar el contenido
+            document.getElementById('modal-title').textContent = project.titulo;
+            document.getElementById('modal-description').textContent = project.descripcion;
+            document.getElementById('modal-image').style.backgroundImage = `url('${project.imagen}')`; 
+            
+            // Tecnologías
+            const techHTML = project.tecnologias.map(tech => 
+                `<span style="display:inline-block; background-color: var(--color-fondo); padding: 3px 8px; border-radius: 3px; margin-right: 5px; margin-bottom: 5px; color: var(--color-secundario);">${tech}</span>`
+            ).join('');
+            document.getElementById('modal-tech').innerHTML = techHTML;
+
+            // Mostrar modal
+            modal.style.display = 'flex'; 
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        // Función para cerrar el modal
+        function closeModal() {
+            const modal = document.getElementById('projectModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; 
+        }
+
+        // Función principal para cargar y renderizar
+        async function loadAndRenderProjects() {
+            const container = document.getElementById('proyectos-listado');
+
+            try {
+                // 1. Usar fetch para obtener el JSON
+                const response = await fetch('datos.json');
+                if (!response.ok) {
+                    throw new Error(`Error al cargar los datos: ${response.statusText}`);
+                }
+                
+                // 2. Convertir la respuesta a JSON y guardar en la variable global
+                portfolioData = await response.json(); 
+                container.innerHTML = ''; 
+
+                // 3. Renderizar Proyectos
+                portfolioData.forEach(proyecto => {
+                    const card = document.createElement('div');
+                    card.className = 'proyecto-card';
+                    card.dataset.projectId = proyecto.id;
+
+                    card.innerHTML = `
+                        <div class="card-img" style="background-image: url('${proyecto.imagen}');"></div>
+                        <h4>${proyecto.titulo}</h4>
+                        <p style="font-size: 0.9em; margin-bottom: 5px;">${proyecto.descripcion.substring(0, 50)}...</p>
+                        <button class="card-link-btn" data-id="${proyecto.id}">Ver Detalles</button>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+                
+                // 4. Asignar Eventos de Modal después de renderizar
+                document.querySelectorAll('.card-link-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const projectId = parseInt(e.currentTarget.dataset.id);
+                        openModal(projectId);
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error al cargar los proyectos:", error);
+                container.innerHTML = '<p style="color: var(--color-acento);">No se pudieron cargar los proyectos. Asegúrate de que "data.json" existe.</p>';
+            }
+        }
+
+
+        // Lógica de eventos al cargar el documento
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAndRenderProjects();
+
+            // Asignar eventos de cerrar modal
+            document.querySelector('.close-btn').addEventListener('click', closeModal);
+            window.addEventListener('click', (e) => {
+                const modal = document.getElementById('projectModal');
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Manejo del formulario de contacto (ejemplo básico)
+            document.getElementById("formContacto").onsubmit = e => {
+                e.preventDefault();
+                alert("Mensaje enviado correctamente. Gracias por contactarme!");
+                e.target.reset();
+            };
+        });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+body{
+    background: blue;
+    font-family: sans-serif;
+    display: flex;          /* NUEVO */
+}
+
+form,table{
+    background: white;
+    margin: auto;
+                            /* HE QUITADO DEL WIDTH */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+input{
+    padding: 5px;
+}
+
+input[type="submit"]{
+    background: blue;
+    color: white;
+    border: none;
+}

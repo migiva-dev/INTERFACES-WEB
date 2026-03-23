@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portada Manual Corporativo — Valencia CF</title>
+  <style>
+    :root {
+      --naranja: #f56600;
+      --negro: #000000;
+      --blanco: #ffffff;
+      --margen: 32px;
+    }
+    body { margin:0; display:grid; place-items:center; min-height:100vh; background:#f3f4f6; font-family: Arial, sans-serif; }
+    .portada {
+      width: min(820px, 92vw);
+      aspect-ratio: 1 / 1.414;
+      background: var(--blanco);
+      color: var(--negro);
+      padding: var(--margen);
+      border: 4px solid var(--naranja);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    }
+    header { text-align:center; }
+    .logo { width:120px; }
+    h1 { margin:12px 0 0; font-size: 32px; }
+    .sub { margin:4px 0 0; font-size:16px; opacity:.8; }
+    footer { font-size:14px; text-align:center; opacity:.9; }
+  </style>
+</head>
+<body>
+  <section class="portada">
+    <header>
+      <!-- Logo Valencia CF simplificado -->
+      <img class="logo" src="https://upload.wikimedia.org/wikipedia/en/7/75/Valencia_CF_logo.svg" alt="Escudo Valencia CF" />
+      <h1>Manual Corporativo</h1>
+      <p class="sub">Identidad visual inspirada en el Valencia CF</p>
+    </header>
+
+    <main>
+      <p><strong>Colores:</strong> Naranja, negro y blanco como base.</p>
+      <p><strong>Márgenes:</strong> Espacios claros para destacar el escudo y el título.</p>
+      <p><strong>Aplicación:</strong> Adaptable a cartelería y documentos oficiales del club.</p>
+    </main>
+
+    <footer>
+      © Valencia CF · 2025
+    </footer>
+  </section>
+</body>
+</html>

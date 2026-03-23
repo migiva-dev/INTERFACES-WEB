@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plantilla</title>
+</head>
+<body>
+    <template id="elementomenu">
+        <button>
+            <span>L</span>
+            Letra
+        </button>
+    </template>
+    <script>
+        let contenedor = document.querySelector("nav");                 //Contenedor
+        let plantilla = document.querySelector("#elementomenu");        //Plantilla en memoria
+        let clon = plantilla.content.cloneNode("true");                 // Clon en memoria
+        contenedor.appendChild(clon);                                   // Pongo la plantilla en contenedor
+    </script>
+</body>
+</html>

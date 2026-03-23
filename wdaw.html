@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio — App de ejemplo</title>
+
+  <!-- Tipografías: Inter para UI legible + Merriweather para títulos con presencia -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* -----------------------
+       Variables de diseño
+       -----------------------*/
+    :root{
+      --bg: #0f1724; /* fondo oscuro para contraste */
+      --surface: #0b1220; /* tarjetas */
+      --muted: #9aa6b2; /* texto secundario */
+      --accent: #07a6a6; /* color corporativo primario (turquesa moderno) */
+      --accent-2: #2563eb; /* color secundario (azul intenso) */
+      --glass: rgba(255,255,255,0.04);
+      --radius: 12px;
+      --max-width: 1100px;
+      --gap: 20px;
+    }
+
+    /* -----------------------
+       Reset y utilidades
+       -----------------------*/
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(180deg,var(--bg), #07101a 80%);
+      color: #e6eef6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      justify-content:center;
+      padding:40px 20px;
+    }
+
+    .container{
+      width:100%;
+      max-width:var(--max-width);
+    }
+
+    /* -----------------------
+       Header (flexbox)
+       -----------------------*/
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:var(--gap);
+      margin-bottom:28px;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:52px;height:52px;border-radius:14px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Merriweather',serif;font-size:18px;color:white;box-shadow:0 6px 18px rgba(2,6,23,0.6);
+    }
+    .brand h1{margin:0;font-family:'Merriweather',serif;font-size:18px}
+    .brand p{margin:0;color:var(--muted);font-size:13px}
+
+    nav{display:flex;gap:12px;align-items:center}
+    nav a{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600}
+    nav a.primary{background:linear-gradient(90deg, rgba(7,166,166,0.12), rgba(37,99,235,0.08));color:var(--accent)}
+
+    /* -----------------------
+       Hero / Intro (flexbox)
+       -----------------------*/
+    .hero{
+      display:flex;gap:24px;align-items:center;margin-bottom:26px;padding:22px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;box-shadow:0 8px 30px rgba(2,6,23,0.5)
+    }
+    .hero .left{flex:1}
+    .hero h2{font-family:'Merriweather',serif;margin:0;font-size:26px}
+    .hero p{color:var(--muted);margin-top:8px;line-height:1.5}
+    .cta{margin-top:14px;display:flex;gap:10px}
+    .btn{padding:10px 16px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
+    .btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
+
+    .hero .right{width:300px;display:flex;align-items:center;justify-content:center}
+    .profile-card{width:100%;border-radius:12px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));display:flex;flex-direction:column;align-items:center;gap:10px}
+    .avatar{width:92px;height:92px;border-radius:12px;background:linear-gradient(135deg,#0f1724, rgba(255,255,255,0.03));display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    /* -----------------------
+       Gallery (CSS Grid)
+       -----------------------*/
+    .gallery{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap:var(--gap);
+      margin-top:22px;
+    }
+    .card{
+      background:var(--surface);
+      border-radius:12px;
+      padding:12px;
+      display:flex;flex-direction:column;gap:10px;min-height:220px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.02)
+    }
+    .thumb{height:120px;border-radius:8px;background-size:cover;background-position:center}
+    .tags{display:flex;gap:8px;flex-wrap:wrap}
+    .tag{font-size:12px;padding:6px 8px;border-radius:999px;background:var(--glass);color:var(--muted)}
+    .card h3{margin:0;font-size:16px}
+    .card p{margin:0;color:var(--muted);font-size:14px}
+    .meta{margin-top:auto;display:flex;gap:8px;align-items:center}
+    .meta button{border:0;padding:8px 10px;border-radius:8px;background:transparent;color:var(--accent);cursor:pointer;font-weight:700}
+
+    /* -----------------------
+       Modal (simple)
+       -----------------------*/
+    .modal{position:fixed;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);backdrop-filter:blur(4px);z-index:40;}
+    .modal-card{width:92%;max-width:900px;background:var(--surface);border-radius:14px;padding:20px}
+    .modal-media{height:320px;border-radius:10px;background-size:cover;background-position:center}
+    .close{position:absolute;right:18px;top:18px;border-radius:10px;padding:6px 8px;background:rgba(255,255,255,0.03);border:0;color:var(--muted)}
+
+    /* -----------------------
+       Footer
+       -----------------------*/
+    footer{margin-top:28px;color:var(--muted);font-size:13px;text-align:center}
+
+    /* -----------------------
+       Responsive tweaks
+       -----------------------*/
+    @media (max-width:720px){
+      .hero{flex-direction:column}
+      .hero .right{width:100%}
+      header{flex-direction:column;align-items:flex-start;gap:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">MP</div>
+        <div>
+          <h1>Mi Portafolio</h1>
+          <p>Diseño & Desarrollo — Visual, Web & Producto</p>
+        </div>
+      </div>
+      <nav>
+        <a href="#" class="primary">Proyectos</a>
+        <a href="#about">Sobre mí</a>
+        <a href="#contact" class="btn-outline">Contacto</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="about">
+      <div class="left">
+        <h2>Hola — Soy <span style="color:var(--accent)">María Pérez</span>.</h2>
+        <p>Desarrolladora front-end y diseñadora de producto. Aquí encontrarás muestras seleccionadas de proyectos personales y trabajo freelance — interfaces, branding y prototipos interactivos.</p>
+        <div class="cta">
+          <button class="btn btn-primary" id="viewAllBtn">Ver proyectos</button>
+          <button class="btn btn-outline" id="downloadBtn">Descargar CV</button>
+        </div>
+      </div>
+      <div class="right">
+        <div class="profile-card">
+          <div class="avatar">MP</div>
+          <div style="text-align:center">
+            <div style="font-weight:700">María Pérez</div>
+            <div style="color:var(--muted);font-size:13px">Front-end Developer & UI Designer</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <div class="gallery" id="gallery">
+        <!-- Cards renderizados por JavaScript desde JSON -->
+      </div>
+    </main>
+
+    <footer id="contact">© <span id="year"></span> María Pérez — contacto@ejemplo.com</footer>
+  </div>
+
+  <!-- Modal (inicialmente oculto) -->
+  <div id="modal" class="modal" style="display:none">
+    <div class="modal-card">
+      <button class="close" id="closeModal">Cerrar ✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    /* -----------------------
+       Datos estáticos JSON (portafolio)
+       ---------------------------------
+       El JSON está embebido aquí como `portfolioData` para simplificar. En
+       una app real se cargará desde /data/portfolio.json o una API.
+    */
+    const portfolioData = {
+      "owner": "María Pérez",
+      "role": "Front-end Developer & UI Designer",
+      "projects": [
+        {
+          "id": "p1",
+          "title": "Panel de Analítica — Fintech",
+          "description": "Diseño de panel responsivo para análisis financiero con visualizaciones interactivas.",
+          "long": "Proyecto full-stack (UI) centrado en usabilidad: dashboards, filtros avanzados y diseño de componentes. Implementado como prototipo en React + D3.",
+          "image": "https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=aaa",
+          "tags": ["React","D3","Dashboard"]
+        },
+        {
+          "id": "p2",
+          "title": "Marca & Web — Café Local",
+          "description": "Branding y web one-page para cafetería con enfoque en storytelling y comercio local.",
+          "long": "Creación de identidad visual, packaging y landing con foco en conversión. Implementada en HTML/CSS y CMS ligero.",
+          "image": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=bbb",
+          "tags": ["Branding","WordPress","Copywriting"]
+        },
+        {
+          "id": "p3",
+          "title": "App móvil — Salud",
+          "description": "Prototipo de app para seguimiento de hábitos y bienestar con micro-interacciones.",
+          "long": "Diseño de flujo de usuario, prototipado en Figma y pruebas de usabilidad con 12 participantes.",
+          "image": "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=ccc",
+          "tags": ["Figma","UX","Mobile"]
+        },
+        {
+          "id": "p4",
+          "title": "E-commerce Propio",
+          "description": "Tienda online con diseño modular y estrategia de conversión.",
+          "long": "Implementación de front modular y performance optimizada; integración con pasarela de pago y panel de administración.",
+          "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=ddd",
+          "tags": ["Performance","Shopify","PWA"]
+        },
+        {
+          "id": "p5",
+          "title": "Ilustraciones y Assets",
+          "description": "Pack de ilustraciones vectoriales para onboarding de producto.",
+          "long": "Creación de recursos reutilizables y sistema de iconografía que armoniza con la interfaz.",
+          "image": "https://images.unsplash.com/photo-1527689368864-3a821dbccc34?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=eee",
+          "tags": ["Illustration","SVG","Design System"]
+        },
+        {
+          "id": "p6",
+          "title": "Microinteracciones CSS/JS",
+          "description": "Colección de componentes animados y accesibles para mejorar engagement.",
+          "long": "Biblioteca pequeña de componentes: acordeones, modales y micro-animaciones con enfoque en rendimiento.",
+          "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=fff",
+          "tags": ["CSS","Accessibility","Animations"]
+        }
+      ]
+    };
+
+    // Renderizado de la galería
+    const gallery = document.getElementById('gallery');
+    const yearEl = document.getElementById('year');
+    yearEl.textContent = new Date().getFullYear();
+
+    function createCard(p){
+      const el = document.createElement('article');
+      el.className = 'card';
+      el.innerHTML = `
+        <div class="thumb" style="background-image:url(${p.image})" aria-hidden="true"></div>
+        <div>
+          <h3>${p.title}</h3>
+          <p>${p.description}</p>
+          <div class="tags">${p.tags.map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
+        </div>
+        <div class="meta">
+          <button data-id="${p.id}" class="openBtn">Ver detalles</button>
+          <span style="margin-left:auto;color:var(--muted);font-size:13px">ID: ${p.id}</span>
+        </div>
+      `;
+      return el;
+    }
+
+    function populate(){
+      gallery.innerHTML = '';
+      portfolioData.projects.forEach(p => gallery.appendChild(createCard(p)));
+    }
+
+    populate();
+
+    // Eventos: abrir modal con más info
+    document.addEventListener('click', (e)=>{
+      const open = e.target.closest('.openBtn');
+      if(open){
+        const id = open.dataset.id;
+        const project = portfolioData.projects.find(x=>x.id===id);
+        showModal(project);
+      }
+    });
+
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modalContent');
+    document.getElementById('closeModal').addEventListener('click', ()=>{modal.style.display='none'; modalContent.innerHTML='';});
+
+    function showModal(project){
+      modalContent.innerHTML = `
+        <div style="display:flex;gap:18px;align-items:flex-start;flex-direction:column">
+          <div style="font-family:'Merriweather',serif;font-size:20px;font-weight:700">${project.title}</div>
+          <div class="modal-media" style="background-image:url(${project.image})"></div>
+          <p style="color:var(--muted)">${project.long}</p>
+          <div class="tags">${project.tags.map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
+        </div>
+      `;
+      modal.style.display = 'flex';
+    }
+
+    // Acciones de los CTAs
+    document.getElementById('viewAllBtn').addEventListener('click', ()=>{window.location.href='#';document.getElementById('gallery').scrollIntoView({behavior:'smooth'})});
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{alert('Descargar CV - placeholder (en una app real descargará un PDF)')});
+
+    // Accesibilidad: cerrar modal con Escape
+    document.addEventListener('keydown', (e)=>{if(e.key==='Escape'){modal.style.display='none';}});
+
+    /* -----------------------
+       Notas de diseño (justificación de colores y tipografías)
+       --------------------------------------------------------
+       - Colores: Se eligió una paleta con un fondo oscuro (contrastado) y un
+         acento turquesa (#07a6a6) combinado con un azul intenso (#2563eb).
+         Razón: el turquesa transmite modernidad, tecnología y confianza;
+         el azul aporta autoridad y profesionalismo. El fondo oscuro hace que
+         los proyectos visuales destaquen y mejora la legibilidad en pantallas.
+
+       - Tipografías: 'Inter' para el texto UI por su alta legibilidad en
+         tamaños pequeños y buena densidad en interfaces; 'Merriweather' para
+         títulos por su presencia y contraste clásico que ayuda a jerarquizar.
+
+       - Layout: Flexbox en header/hero para alinear y distribuir elementos
+         de forma responsiva; Grid en la galería para un masonry responsivo
+         controlando el número y ancho de columnas. Esto facilita adaptarse a
+         distintas anchuras sin media-queries excesivas.
+
+       - Accesibilidad: contrastes altos, botones grandes y control de cierre
+         de modal con teclado (Escape). En producción añadir tabindex y aria-
+         labels según sea necesario.
+    */
+  </script>
+</body>
+</html>

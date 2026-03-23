@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fútbol en Canvas</title>
+    <style>
+      body { display:flex; min-height:100vh; align-items:center; justify-content:center; margin:0; background:#0b1020; font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+      .wrap { text-align:center; color:#e8eef9; }
+      canvas { background:#0a7f2e; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+      p { opacity:.8; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <canvas id="lienzo" width="512" height="512"></canvas>
+      <p>Un jugador se mueve automáticamente. (Canvas + JavaScript puro)</p>
+    </div>
+
+    <script>
+      // 1) Atrapar el lienzo y el contexto 2D
+      const lienzo = document.getElementById("lienzo");
+      const ctx = lienzo.getContext("2d");
+
+      // 2) Dibujo del campo para dar contexto futbolístico (opcional, sin librerías)
+      function dibujarCampo() {
+        const w = lienzo.width, h = lienzo.height;
+        // Césped ya es el color de fondo del canvas (CSS), pero pintamos un degradado sutil
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, "#0a7f2e");
+        grad.addColorStop(1, "#096d27");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Líneas blancas del campo
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(10, 10, w - 20, h - 20); // perímetro
+        // Línea de medio campo
+        ctx.beginPath();
+        ctx.moveTo(w/2, 10);
+        ctx.lineTo(w/2, h-10);
+        ctx.stroke();
+        // Círculo central
+        ctx.beginPath();
+        ctx.arc(w/2, h/2, 40, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // 3) Dibujar un jugador (un círculo) con una sombra simple
+      function dibujarJugador(x, y, color = "red") {
+        // sombra
+        ctx.globalAlpha = 0.15;
+        ctx.beginPath();
+        ctx.ellipse(x, y + 18, 24, 10, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#000";
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // cuerpo
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        // detalle: balón pequeño delante del jugador
+        ctx.beginPath();
+        ctx.arc(x + 26, y + 4, 6, 0, Math.PI * 2);
+        ctx.fillStyle = "#f5f5f5";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x + 26, y + 4, 6, 0, Math.PI * 2);
+        ctx.strokeStyle = "#222";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // 4) Estado inicial y bucle de animación (temporizador)
+      let x = 50;     // posición inicial X del jugador
+      let y = 256;    // posición inicial Y del jugador
+      const velocidad = 2; // píxeles por cuadro
+
+      function bucle() {
+        // Limpiar y redibujar escena completa
+        ctx.clearRect(0, 0, lienzo.width, lienzo.height);
+        dibujarCampo();
+        dibujarJugador(x, y, "red");
+
+        // Actualizar posición (movimiento hacia la derecha)
+        x += velocidad;
+        // Reiniciar al salir por la derecha
+        if (x - 20 > lienzo.width) { // -20 para tener en cuenta el radio del jugador
+          x = -20; // reaparece justo por la izquierda
+        }
+
+        // Temporizador clásico: 20 ms ~= 50 FPS
+        setTimeout(bucle, 20);
+      }
+
+      // Iniciar animación
+      bucle();
+
+      
+    </script>
+  </body>
+</html>
