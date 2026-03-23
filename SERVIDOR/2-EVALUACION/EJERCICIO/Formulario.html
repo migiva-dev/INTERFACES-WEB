@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario con validaciones</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .contenedor {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #111827;
+    }
+
+    .campo {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #1f2937;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #2563eb;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .error {
+      display: block;
+      margin-top: 5px;
+      color: #dc2626;
+      font-size: 13px;
+      min-height: 16px;
+    }
+
+    .input-error {
+      border: 2px solid #dc2626;
+      background: #fef2f2;
+    }
+
+    .input-ok {
+      border: 2px solid #16a34a;
+      background: #f0fdf4;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    #resultado {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      display: none;
+    }
+
+    .resultado-ok {
+      display: block !important;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+
+    .resultado-error {
+      display: block !important;
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .ayuda {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Formulario con validaciones</h1>
+
+    <form id="formulario" novalidate>
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" />
+        <small class="ayuda">Mínimo 2 caracteres, solo letras y espacios.</small>
+        <small class="error" id="error-nombre"></small>
+      </div>
+
+      <div class="campo">
+        <label for="dni">DNI</label>
+        <input type="text" id="dni" name="dni" maxlength="9" />
+        <small class="ayuda">8 números y 1 letra. Ejemplo: 12345678Z</small>
+        <small class="error" id="error-dni"></small>
+      </div>
+
+      <div class="campo">
+        <label for="nie">NIE</label>
+        <input type="text" id="nie" name="nie" maxlength="9" />
+        <small class="ayuda">X, Y o Z + 7 números + 1 letra. Ejemplo: X1234567L</small>
+        <small class="error" id="error-nie"></small>
+      </div>
+
+      <div class="campo">
+        <label for="matricula">Matrícula</label>
+        <input type="text" id="matricula" name="matricula" maxlength="7" />
+        <small class="ayuda">4 números y 3 letras, sin vocales, ñ ni q. Ejemplo: 1234BCD</small>
+        <small class="error" id="error-matricula"></small>
+      </div>
+
+      <div class="campo">
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" />
+        <small class="ayuda">Solo letras, números, guion (-) y guion bajo (_).</small>
+        <small class="error" id="error-password"></small>
+      </div>
+
+      <div class="campo">
+        <label for="confirmarPassword">Confirmar contraseña</label>
+        <input type="password" id="confirmarPassword" name="confirmarPassword" />
+        <small class="error" id="error-confirmarPassword"></small>
+      </div>
+
+      <div class="campo">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" name="descripcion"></textarea>
+        <small class="ayuda">Entre 10 y 100 caracteres. Prohibidas: Miguel, Mate, CocaCola.</small>
+        <small class="error" id="error-descripcion"></small>
+      </div>
+
+      <div class="campo">
+        <label for="fechaNacimiento">Fecha de nacimiento</label>
+        <input type="date" id="fechaNacimiento" name="fechaNacimiento" />
+        <small class="ayuda">No puede ser posterior a hoy ni anterior a 1910.</small>
+        <small class="error" id="error-fechaNacimiento"></small>
+      </div>
+
+      <div class="campo">
+        <small class="error" id="error-documento"></small>
+      </div>
+
+      <button type="submit">Validar formulario</button>
+    </form>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    const formulario = document.getElementById("formulario");
+    const resultado = document.getElementById("resultado");
+
+    const TABLA_DNI = "TRWAGMYFPDXBNJZSQVHLCKE";
+    const PALABRAS_PROHIBIDAS = ["miguel", "mate", "cocacola"];
+
+    function limpiarErrores() {
+      const errores = document.querySelectorAll(".error");
+      errores.forEach(error => error.textContent = "");
+
+      const campos = document.querySelectorAll("input, textarea");
+      campos.forEach(campo => {
+        campo.classList.remove("input-error");
+        campo.classList.remove("input-ok");
+      });
+
+      resultado.textContent = "";
+      resultado.className = "";
+      resultado.style.display = "none";
+    }
+
+    function mostrarError(idCampo, mensaje) {
+      const error = document.getElementById("error-" + idCampo);
+      const input = document.getElementById(idCampo);
+
+      if (error) error.textContent = mensaje;
+      if (input) {
+        input.classList.add("input-error");
+        input.classList.remove("input-ok");
+      }
+    }
+
+    function marcarCorrecto(idCampo) {
+      const input = document.getElementById(idCampo);
+      if (input && input.value.trim() !== "") {
+        input.classList.remove("input-error");
+        input.classList.add("input-ok");
+      }
+    }
+
+    function validarNombre(nombre) {
+      if (nombre.trim() !== nombre) {
+        return "El nombre no puede tener espacios al principio o al final";
+      }
+
+      if (nombre.length < 2) {
+        return "El nombre debe tener al menos 2 caracteres";
+      }
+
+      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ]/.test(nombre)) {
+        return "El nombre debe empezar por letra";
+      }
+
+      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/.test(nombre)) {
+        return "El nombre solo puede contener letras y espacios";
+      }
+
+      return "";
+    }
+
+    function validarDNI(dni) {
+      dni = dni.toUpperCase();
+
+      if (dni.length !== 9) {
+        return "El DNI debe tener 9 caracteres";
+      }
+
+      if (!/^\d{8}[A-Z]$/.test(dni)) {
+        return "El DNI debe tener 8 números y 1 letra";
+      }
+
+      const numero = parseInt(dni.substring(0, 8), 10);
+      const letra = dni.charAt(8);
+      const letraCorrecta = TABLA_DNI[numero % 23];
+
+      if (letra !== letraCorrecta) {
+        return "La letra del DNI no es correcta";
+      }
+
+      return "";
+    }
+
+    function validarNIE(nie) {
+      nie = nie.toUpperCase();
+
+      if (nie.length !== 9) {
+        return "El NIE debe tener 9 caracteres";
+      }
+
+      if (!/^[XYZ]\d{7}[A-Z]$/.test(nie)) {
+        return "El NIE debe tener 1 letra (X,Y,Z), 7 números y 1 letra";
+      }
+
+      let inicial = nie.charAt(0);
+      let equivalencia = "";
+
+      if (inicial === "X") equivalencia = "0";
+      if (inicial === "Y") equivalencia = "1";
+      if (inicial === "Z") equivalencia = "2";
+
+      const numeroTexto = equivalencia + nie.substring(1, 8);
+      const numero = parseInt(numeroTexto, 10);
+      const letra = nie.charAt(8);
+      const letraCorrecta = TABLA_DNI[numero % 23];
+
+      if (letra !== letraCorrecta) {
+        return "La letra del NIE no es correcta";
+      }
+
+      return "";
+    }
+
+    function validarMatricula(matricula) {
+      matricula = matricula.toUpperCase();
+
+      if (!/^\d{4}[BCDFGHJKLMNPRSTVWXYZ]{3}$/.test(matricula)) {
+        return "La matrícula debe tener 4 números y 3 letras sin vocales, ñ ni q";
+      }
+
+      const numeros = parseInt(matricula.substring(0, 4), 10);
+
+      if (numeros < 0 || numeros > 9999) {
+        return "Los números de la matrícula deben estar entre 0000 y 9999";
+      }
+
+      return "";
+    }
+
+    function validarPassword(password) {
+      if (password.length === 0) {
+        return "La contraseña es obligatoria";
+      }
+
+      if (!/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(password)) {
+        return "La contraseña debe empezar por letra o número y solo puede contener letras, números, - y _";
+      }
+
+      return "";
+    }
+
+    function validarConfirmarPassword(password, confirmarPassword) {
+      if (confirmarPassword.length === 0) {
+        return "Debes confirmar la contraseña";
+      }
+
+      if (password !== confirmarPassword) {
+        return "Las contraseñas no coinciden";
+      }
+
+      return "";
+    }
+
+    function validarDescripcion(descripcion) {
+      if (descripcion.length < 10 || descripcion.length > 100) {
+        return "La descripción debe tener entre 10 y 100 caracteres";
+      }
+
+      const textoMinusculas = descripcion.toLowerCase();
+
+      for (let palabra of PALABRAS_PROHIBIDAS) {
+        if (textoMinusculas.includes(palabra.toLowerCase())) {
+          return "La descripción contiene una palabra prohibida: " + palabra;
+        }
+      }
+
+      return "";
+    }
+
+    function validarFechaNacimiento(fechaTexto) {
+      if (!fechaTexto) {
+        return "La fecha de nacimiento es obligatoria";
+      }
+
+      const fecha = new Date(fechaTexto + "T00:00:00");
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+
+      const fechaMinima = new Date("1910-01-01T00:00:00");
+
+      if (fecha > hoy) {
+        return "La fecha de nacimiento no puede ser posterior a la actual";
+      }
+
+      if (fecha < fechaMinima) {
+        return "La fecha de nacimiento no puede ser anterior a 1910";
+      }
+
+      return "";
+    }
+
+    formulario.addEventListener("submit", function (e) {
+      e.preventDefault();
+      limpiarErrores();
+
+      const nombre = document.getElementById("nombre").value;
+      const dni = document.getElementById("dni").value.trim().toUpperCase();
+      const nie = document.getElementById("nie").value.trim().toUpperCase();
+      const matricula = document.getElementById("matricula").value.trim().toUpperCase();
+      const password = document.getElementById("password").value;
+      const confirmarPassword = document.getElementById("confirmarPassword").value;
+      const descripcion = document.getElementById("descripcion").value;
+      const fechaNacimiento = document.getElementById("fechaNacimiento").value;
+
+      let formularioValido = true;
+
+      const errorNombre = validarNombre(nombre);
+      if (errorNombre) {
+        mostrarError("nombre", errorNombre);
+        formularioValido = false;
+      } else {
+        marcarCorrecto("nombre");
+      }
+
+      if (dni === "" && nie === "") {
+        document.getElementById("error-documento").textContent = "Debes introducir un DNI o un NIE";
+        formularioValido = false;
+      } else if (dni !== "" && nie !== "") {
+        document.getElementById("error-documento").textContent = "Introduce solo un DNI o un NIE, no ambos";
+        formularioValido = false;
+      } else {
+        if (dni !== "") {
+          const errorDNI = validarDNI(dni);
+          if (errorDNI) {
+            mostrarError("dni", errorDNI);
+            formularioValido = false;
+          } else {
+            marcarCorrecto("dni");
+          }
+        }
+
+        if (nie !== "") {
+          const errorNIE = validarNIE(nie);
+          if (errorNIE) {
+            mostrarError("nie", errorNIE);
+            formularioValido = false;
+          } else {
+            marcarCorrecto("nie");
+          }
+        }
+      }
+
+      const errorMatricula = validarMatricula(matricula);
+      if (errorMatricula) {
+        mostrarError("matricula", errorMatricula);
+        formularioValido = false;
+      } else {
+        marcarCorrecto("matricula");
+      }
+
+      const errorPassword = validarPassword(password);
+      if (errorPassword) {
+        mostrarError("password", errorPassword);
+        formularioValido = false;
+      } else {
+        marcarCorrecto("password");
+      }
+
+      const errorConfirmar = validarConfirmarPassword(password, confirmarPassword);
+      if (errorConfirmar) {
+        mostrarError("confirmarPassword", errorConfirmar);
+        formularioValido = false;
+      } else {
+        marcarCorrecto("confirmarPassword");
+      }
+
+      const errorDescripcion = validarDescripcion(descripcion);
+      if (errorDescripcion) {
+        mostrarError("descripcion", errorDescripcion);
+        formularioValido = false;
+      } else {
+        marcarCorrecto("descripcion");
+      }
+
+      const errorFecha = validarFechaNacimiento(fechaNacimiento);
+      if (errorFecha) {
+        mostrarError("fechaNacimiento", errorFecha);
+        formularioValido = false;
+      } else {
+        marcarCorrecto("fechaNacimiento");
+      }
+
+      if (formularioValido) {
+        resultado.textContent = "Formulario válido. Todos los campos son correctos.";
+        resultado.className = "resultado-ok";
+      } else {
+        resultado.textContent = "Hay errores en el formulario.";
+        resultado.className = "resultado-error";
+      }
+    });
+  </script>
+</body>
+</html>
