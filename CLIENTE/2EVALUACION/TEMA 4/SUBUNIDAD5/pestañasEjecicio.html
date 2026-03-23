@@ -2,136 +2,193 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pestañas Modernas</title>
 
     <style>
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: "Segoe UI", sans-serif;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        padding: 20px;
-        color: #333;
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #eef2ff, #f8fafc);
+        color: #1f2937;
+        padding: 30px;
       }
 
       h1 {
-        color: white;
+        text-align: center;
+        margin-bottom: 30px;
+        color: #111827;
       }
 
       .tabs {
+        max-width: 800px;
+        margin: 0 auto 20px;
+      }
+
+      .tab-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
         margin-bottom: 20px;
       }
 
       .tab-buttons button {
-        padding: 10px 15px;
-        margin-right: 5px;
+        padding: 12px 18px;
         cursor: pointer;
-        background: white;
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transition: 0.3s;
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        color: #374151;
+        font-weight: 600;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
       }
 
       .tab-buttons button:hover {
-        background: #eee;
+        background: #e0e7ff;
+        border-color: #818cf8;
         transform: translateY(-2px);
       }
 
       .tab-section {
         display: none;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        max-width: 800px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       }
 
       .counter {
         display: inline-block;
         padding: 20px;
-        border-radius: 12px;
-        width: 150px;
+        border: 1px solid #d1d5db;
+        border-radius: 16px;
+        min-width: 220px;
         text-align: center;
-        background: #f0f0f0;
-        font-size: 18px;
+        background: #f9fafb;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      .counter p {
+        font-size: 32px;
         font-weight: bold;
+        margin: 0 0 15px;
+        color: #111827;
       }
 
       button {
         margin: 5px;
-        padding: 8px 12px;
+        padding: 10px 14px;
         border: none;
-        border-radius: 6px;
+        border-radius: 10px;
         cursor: pointer;
+        font-weight: 600;
+        transition: 0.25s ease;
       }
 
-      .comprobarBoton {
-        padding: 10px 20px;
-        background: #ff4b5c;
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .boton-comprobar {
+        padding: 12px 20px;
+        background: #7c3aed;
         color: white;
-        font-weight: bold;
-        transition: 0.3s;
       }
 
-      .comprobarBoton:hover {
-        background: #e63e4d;
+      .boton-comprobar:hover {
+        background: #6d28d9;
       }
 
-      .alert {
+      .boton-fiesta {
+        background: #ec4899;
+        color: white;
+      }
+
+      .boton-fiesta:hover {
+        background: #db2777;
+      }
+
+      .alerta {
         padding: 15px;
         margin: 10px 0;
-        border-radius: 8px;
+        border-radius: 12px;
         color: white;
+        font-weight: 500;
+        display: none;
       }
 
       .adulto {
-        background: #28a745;
+        background: #16a34a;
       }
 
       .menor {
-        background: #dc3545;
+        background: #dc2626;
       }
 
       .casi {
-        background: #ffc107;
-        color: #000;
+        background: #facc15;
+        color: #111827;
       }
 
       .modal {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.7);
+        width: 100%;
+        height: 100%;
+        background: rgba(17, 24, 39, 0.65);
         justify-content: center;
         align-items: center;
+        padding: 20px;
       }
 
       .modal-content {
         background: white;
         padding: 30px;
-        border-radius: 12px;
+        border-radius: 18px;
         text-align: center;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        animation: aparecer 0.3s ease;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        animation: aparecer 0.25s ease;
+      }
+
+      .modal-content h2 {
+        margin-top: 0;
+        color: #111827;
+      }
+
+      .modal-content p {
+        color: #4b5563;
+        margin-bottom: 20px;
+      }
+
+      .boton-cerrar {
+        background: #111827;
+        color: white;
+      }
+
+      .boton-cerrar:hover {
+        background: #000000;
       }
 
       @keyframes aparecer {
         from {
-          transform: scale(0.8);
           opacity: 0;
+          transform: scale(0.92);
         }
         to {
-          transform: scale(1);
           opacity: 1;
+          transform: scale(1);
         }
-      }
-
-      #botonFiesta {
-        background: #00c9a7;
-        color: white;
-        font-weight: bold;
-      }
-
-      #botonFiesta:hover {
-        background: #00a98b;
       }
     </style>
   </head>
@@ -139,16 +196,17 @@
   <body>
     <h1>Pestañas con JavaScript</h1>
 
-    <div id="tabsContainer"></div>
+    <div id="contenedorTabs"></div>
 
     <section id="edad" class="tab-section">
       <h2>Edad</h2>
-      <div id="edades"></div>
+      <p>Bienvenido a la sección de la edad.</p>
+      <div id="contenedorEdades"></div>
     </section>
 
     <section id="comprobarEdad" class="tab-section">
       <h2>Comprobar edad</h2>
-      <button id="botonComprobarEdad" class="comprobarBoton">
+      <button id="botonComprobarEdad" class="boton-comprobar">
         Comprobar edad
       </button>
       <div id="contenedorAlertas"></div>
@@ -156,36 +214,197 @@
 
     <section id="fiesta" class="tab-section">
       <h2>Fiesta</h2>
-      <button id="botonFiesta">Salir de fiesta 🎉</button>
+      <p>Puedes comprobar si ya puedes salir de fiesta.</p>
+      <button id="botonFiesta" class="boton-fiesta">Salir de fiesta 🎉</button>
     </section>
 
-    <div id="modalEvento" class="modal">
+    <div id="modalFiesta" class="modal">
       <div class="modal-content">
         <h2>🎉 Invitación</h2>
-        <p>Estás invitado a salir de fiesta</p>
-        <button id="botonCerrarModal">Cerrar</button>
+        <p>Estás invitado a salir de fiesta.</p>
+        <button id="botonCerrarModal" class="boton-cerrar">Cerrar</button>
       </div>
     </div>
 
-    <script src="pestañas.js"></script>
-    <script src="counter.js"></script>
-    <script src="alerts.js"></script>
-
     <script>
+      class Tabs {
+        constructor(nombresTabs, idsSecciones) {
+          this.nombresTabs = nombresTabs;
+          this.idsSecciones = idsSecciones;
+
+          this.contenedor = document.createElement("div");
+          this.contenedor.className = "tabs";
+
+          this.areaBotones = document.createElement("div");
+          this.areaBotones.className = "tab-buttons";
+
+          this.contenedor.appendChild(this.areaBotones);
+
+          this.crearBotones();
+          this.mostrarTab(0);
+        }
+
+        crearBotones() {
+          this.nombresTabs.forEach((nombreTab, indice) => {
+            const botonTab = document.createElement("button");
+            botonTab.textContent = nombreTab;
+            botonTab.onclick = () => this.mostrarTab(indice);
+            this.areaBotones.appendChild(botonTab);
+          });
+        }
+
+        mostrarTab(indice) {
+          document.querySelectorAll(".tab-section").forEach((seccion) => {
+            seccion.style.display = "none";
+          });
+
+          const idSeccion = this.idsSecciones[indice];
+          document.getElementById(idSeccion).style.display = "block";
+        }
+
+        renderizar(contenedorPadre) {
+          contenedorPadre.appendChild(this.contenedor);
+        }
+      }
+
+      class Counter {
+        constructor() {
+          this.valor = 0;
+
+          this.elemento = document.createElement("div");
+          this.elemento.className = "counter";
+
+          this.pantalla = document.createElement("p");
+          this.pantalla.textContent = this.valor;
+
+          this.botonIncrementar = document.createElement("button");
+          this.botonIncrementar.textContent = "Incrementar";
+          this.botonIncrementar.onclick = () => this.incrementar();
+
+          this.botonDecrementar = document.createElement("button");
+          this.botonDecrementar.textContent = "Decrementar";
+          this.botonDecrementar.onclick = () => this.decrementar();
+
+          this.botonResetear = document.createElement("button");
+          this.botonResetear.textContent = "Resetear";
+          this.botonResetear.onclick = () => this.resetear();
+
+          this.elemento.append(
+            this.pantalla,
+            this.botonIncrementar,
+            this.botonDecrementar,
+            this.botonResetear
+          );
+        }
+
+        incrementar() {
+          this.valor++;
+          this.pantalla.textContent = this.valor;
+        }
+
+        decrementar() {
+          this.valor--;
+          this.pantalla.textContent = this.valor;
+        }
+
+        resetear() {
+          this.valor = 0;
+          this.pantalla.textContent = this.valor;
+        }
+
+        renderizar(contenedorPadre) {
+          contenedorPadre.appendChild(this.elemento);
+        }
+
+        obtenerValor() {
+          return this.valor;
+        }
+      }
+
+      class CajaAlerta {
+        constructor(tipo, mensaje) {
+          this.tipo = tipo;
+          this.mensaje = mensaje;
+
+          this.elemento = document.createElement("div");
+          this.elemento.className = `alerta ${tipo}`;
+          this.elemento.textContent = mensaje;
+        }
+
+        mostrar() {
+          this.elemento.style.display = "block";
+
+          setTimeout(() => {
+            this.elemento.style.display = "none";
+          }, 2500);
+        }
+
+        renderizar(contenedorPadre) {
+          contenedorPadre.appendChild(this.elemento);
+        }
+      }
+
+      const misTabs = new Tabs(
+        ["Edad", "Comprobar Edad", "Fiesta"],
+        ["edad", "comprobarEdad", "fiesta"]
+      );
+
+      misTabs.renderizar(document.getElementById("contenedorTabs"));
+
+      const contadorEdad = new Counter();
+      contadorEdad.renderizar(document.getElementById("contenedorEdades"));
+
+      const alertaAdulto = new CajaAlerta(
+        "adulto",
+        "Ya puedes salir de fiesta"
+      );
+      const alertaCasiAdulto = new CajaAlerta(
+        "casi",
+        "Ya te queda poco para ser mayor de edad"
+      );
+      const alertaMenorEdad = new CajaAlerta(
+        "menor",
+        "Todavía eres muy pequeño"
+      );
+
+      const contenedorAlertas = document.getElementById("contenedorAlertas");
+      alertaAdulto.renderizar(contenedorAlertas);
+      alertaCasiAdulto.renderizar(contenedorAlertas);
+      alertaMenorEdad.renderizar(contenedorAlertas);
+
+      const botonComprobarEdad = document.getElementById("botonComprobarEdad");
       const botonFiesta = document.getElementById("botonFiesta");
-      const modalEvento = document.getElementById("modalEvento");
+      const ventanaModalFiesta = document.getElementById("modalFiesta");
       const botonCerrarModal = document.getElementById("botonCerrarModal");
 
-      botonFiesta.onclick = () => {
-        const edadActual = counter.getValor();
+      botonComprobarEdad.onclick = () => {
+        const edadActual = contadorEdad.obtenerValor();
 
         if (edadActual >= 18) {
-          modalEvento.style.display = "flex";
+          alertaAdulto.mostrar();
+        } else if (edadActual >= 15) {
+          alertaCasiAdulto.mostrar();
+        } else {
+          alertaMenorEdad.mostrar();
+        }
+      };
+
+      botonFiesta.onclick = () => {
+        const edadActual = contadorEdad.obtenerValor();
+
+        if (edadActual >= 18) {
+          ventanaModalFiesta.style.display = "flex";
         }
       };
 
       botonCerrarModal.onclick = () => {
-        modalEvento.style.display = "none";
+        ventanaModalFiesta.style.display = "none";
+      };
+
+      ventanaModalFiesta.onclick = (evento) => {
+        if (evento.target === ventanaModalFiesta) {
+          ventanaModalFiesta.style.display = "none";
+        }
       };
     </script>
   </body>
