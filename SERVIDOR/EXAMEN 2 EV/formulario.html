@@ -527,10 +527,6 @@
     document.getElementById("btnInsertarTorneo").addEventListener("click", async (e) => {
       e.preventDefault();
 
-      // TODO 1:
-      // Crear un objeto con la información del torneo que se quiere insertar.
-      // Ese objeto debe incluir la acción de insertar ("insertar") y los valores de nombre del torneo, videojuego, plataforma, modalidad, máximo de participantes y premio.
-      // Cada valor debe obtenerse de los campos del formulario correspondientes.
       const torneo = {
         accion: "insertar",
         nombre_torneo: document.getElementById("torneoNombre").value.trim(),
@@ -541,12 +537,6 @@
         premio: document.getElementById("torneoPremio").value.trim()
       };
 
-
-     
-      // TODO 2:
-      // Realizar una petición al archivo de torneos usando POST.
-      // Enviar al servidor el objeto anterior convertido a JSON.
-      // Indicar en las cabeceras que se envía JSON y que se espera recibir JSON.
       const respuesta = await fetch("torneosMySQL.php", {
         method: "POST",
         headers: {
@@ -556,27 +546,17 @@
         body: JSON.stringify(torneo)
       });
 
-      // TODO 3:
-      // Recoger la respuesta del servidor y transformarla desde JSON a un objeto JavaScript.
-        const json = await respuesta.json();
-      
+      const json = await respuesta.json();
       mostrarJsonBonito(json);
     });
 
     document.getElementById("btnConsultarTorneos").addEventListener("click", async (e) => {
       e.preventDefault();
 
-      // TODO 4:
-      // Crear un objeto para pedir al servidor la lista completa de torneos.
-      // Ese objeto solo debe incluir la acción necesaria para solicitar el listado ("listar").
       const consulta = {
         accion: "listar"
       };
 
-      // TODO 5:
-      // Realizar una petición al archivo de torneos usando POST.
-      // Enviar el objeto de consulta convertido a JSON.
-      // Indicar en las cabeceras que la petición envía JSON y que la respuesta esperada también será JSON.
       const respuesta = await fetch("torneosMySQL.php", {
         method: "POST",
         headers: {
@@ -586,30 +566,20 @@
         body: JSON.stringify(consulta)
       });
 
-      // TODO 6:
-      // Recoger la respuesta del servidor y transformarla desde JSON a un objeto JavaScript.
       const json = await respuesta.json();
-      
       mostrarJsonBonito(json);
     });
 
     document.getElementById("btnActualizarTorneo").addEventListener("click", async (e) => {
       e.preventDefault();
 
-      // TODO 7:
-      // Crear un objeto con los datos necesarios para actualizar un torneo.
-      // Debe incluir la acción de actualizar ("actualizar"), el id del torneo, el nombre del campo elegido y el nuevo valor.
       const actualizacion = {
         accion: "actualizar",
         id_torneo: parseInt(document.getElementById("torneoIdActualizar").value, 10),
         campo: document.getElementById("campoActualizarTorneo").value,
-        nuevo_valor: document.getElementById("nuevoValorTorneo").value.trim()
+        valor: document.getElementById("nuevoValorTorneo").value.trim()
       };
 
-      // TODO 8:
-      // Realizar una petición al archivo de torneos usando POST.
-      // Enviar el objeto de actualización en formato JSON.
-      // Indicar en las cabeceras que se manda JSON y que se espera recibir JSON.
       const respuesta = await fetch("torneosMySQL.php", {
         method: "POST",
         headers: {
@@ -619,20 +589,13 @@
         body: JSON.stringify(actualizacion)
       });
 
-      // TODO 9:
-      // Recoger la respuesta del servidor y transformarla desde JSON a un objeto JavaScript.
       const json = await respuesta.json();
-      
       mostrarJsonBonito(json);
     });
 
     document.getElementById("btnInsertarParticipante").addEventListener("click", async (e) => {
       e.preventDefault();
 
-      // TODO 10:
-      // Crear un objeto con la información del participante que se quiere insertar ("insertar").
-      // Debe incluir la acción de insertar y los datos de torneo, nombre, nick, email, edad, nombre del equipo y teléfono.
-      // Todos los valores deben obtenerse del formulario.
       const participante = {
         accion: "insertar",
         torneoInscripcion: document.getElementById("participanteTorneo").value.trim(),
@@ -644,11 +607,6 @@
         telefono: document.getElementById("participanteTelefono").value.trim()
       };
 
-
-      // TODO 11:
-      // Realizar una petición al archivo de participantes usando POST.
-      // Enviar el objeto del participante convertido a JSON.
-      // Indicar en las cabeceras que se envía JSON y que se espera recibir JSON.
       const respuesta = await fetch("participantesMongoDB.php", {
         method: "POST",
         headers: {
@@ -658,26 +616,15 @@
         body: JSON.stringify(participante)
       });
 
-
-      // TODO 12:
-      // Recoger la respuesta del servidor y transformarla desde JSON a un objeto JavaScript.
       const json = await respuesta.json();
-
-
       mostrarJsonBonito(json);
     });
 
     document.getElementById("btnEliminarParticipante").addEventListener("click", async (e) => {
       e.preventDefault();
 
-      // TODO 13:
-      // Obtener del formulario el nombre del participante que se quiere eliminar ("eliminar").
       const nombreParticipanteEliminar = document.getElementById("nombreParticipanteEliminar").value.trim();
 
-      // TODO 14:
-      // Realizar una petición al archivo de participantes usando POST simple.
-      // Enviar los datos con formato de formulario clásico.
-      // La información enviada debe incluir la acción de eliminar y el nombre del participante a borrar.
       const respuesta = await fetch("participantesMongoDB.php", {
         method: "POST",
         headers: {
@@ -685,12 +632,10 @@
         },
         body: new URLSearchParams({
           accion: "eliminar",
-          nombreParticipante: nombreParticipanteEliminar
+          nombreParticipanteBusqueda: nombreParticipanteEliminar
         })
       });
 
-      // TODO 15:
-      // Recoger la respuesta del servidor como texto simple.
       const texto = await respuesta.text();
 
       mostrarTextoPlano(
@@ -708,17 +653,11 @@
 
       setCookie("nombreParticipanteConsulta", nombre, 1);
 
-      // TODO 16:
-      // Realizar una petición al archivo de participantes para consultar un participante usando la cookie guardada previamente.
-      // La petición debe hacerse con el método GET.
-      // Hay que asegurarse de que en la petición viajen las cookies del navegador.
-      const respuesta = await fetch("participantesMongoDB.php", {
+      const respuesta = await fetch("participantesMongoDB.php?accion=consultar_cookie", {
         method: "GET",
         credentials: "include"
       });
 
-      // TODO 17:
-      // Recoger la respuesta del servidor como texto simple.
       const texto = await respuesta.text();
 
       try {

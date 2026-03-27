@@ -252,6 +252,7 @@ try {
         // TODO 16:
         // Cancelar la transacción actual para deshacer los cambios si se ha producido un error.
         $pdo->rollBack();
+        
     }
 
     header("Content-Type: application/json; charset=utf-8");
