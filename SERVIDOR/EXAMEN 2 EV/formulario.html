@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario - Torneos y Participantes</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f2f4f7;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px 30px 20px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .intro {
+      margin-bottom: 25px;
+      color: #555;
+    }
+
+    .grid-principal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .bloque {
+      background: white;
+      border: 1px solid #d6dbe1;
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .bloque h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .subbloque {
+      border-top: 1px solid #e5e7eb;
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+
+    .subbloque:first-of-type {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .subbloque h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      color: #1f2937;
+    }
+
+    .tipo-conexion {
+      margin: 0 0 12px 0;
+      font-size: 0.9rem;
+      color: #374151;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+    }
+
+    .campo-completo {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+      font-size: 0.92rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid #c7ced6;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background: #fff;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+    }
+
+    .acciones {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secundario {
+      background: #4b5563;
+    }
+
+    .btn-secundario:hover {
+      background: #374151;
+    }
+
+    .resultado {
+      margin-top: 24px;
+    }
+
+    .mensaje-resultado {
+      margin: 0 0 15px 0;
+      padding: 12px;
+      border-radius: 8px;
+      min-height: 45px;
+      border: 1px solid #c7d2fe;
+      background: #eef2ff;
+      color: #1f2937;
+    }
+
+    .mensaje-resultado.ok {
+      background: #ecfdf3;
+      border: 1px solid #86efac;
+      color: #166534;
+    }
+
+    .mensaje-resultado.error {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+    }
+
+    .lista-resultado {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tarjeta-resultado {
+      background: #ffffff;
+      border: 1px solid #d6dbe1;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .tarjeta-resultado h4 {
+      margin: 0 0 10px 0;
+      color: #111827;
+    }
+
+    .tarjeta-resultado p {
+      margin: 4px 0;
+    }
+
+    @media (max-width: 900px) {
+      .grid-principal {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Gestión de torneos y participantes</h1>
+    <p class="intro">
+      Formulario preparado para trabajar con <strong>torneosMySQL.php</strong> y
+      <strong>participantesMongoDB.php</strong>.
+    </p>
+
+    <div class="grid-principal">
+
+      <div class="bloque">
+        <h2>Torneos (MySQL)</h2>
+
+        <div class="subbloque">
+          <h3>Insertar torneo</h3>
+          <p class="tipo-conexion">
+            Tipo de conexión: <strong>POST enviando JSON y recibiendo JSON</strong>
+          </p>
+
+          <div class="form-grid">
+            <div>
+              <label for="torneoNombre">Nombre del torneo</label>
+              <input type="text" id="torneoNombre">
+            </div>
+
+            <div>
+              <label for="torneoVideojuego">Videojuego</label>
+              <input type="text" id="torneoVideojuego">
+            </div>
+
+            <div>
+              <label for="torneoPlataforma">Plataforma</label>
+              <input type="text" id="torneoPlataforma">
+            </div>
+
+            <div>
+              <label for="torneoModalidad">Modalidad</label>
+              <select id="torneoModalidad">
+                <option value="">Selecciona</option>
+                <option value="Individual">Individual</option>
+                <option value="Parejas">Parejas</option>
+                <option value="Equipos">Equipos</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="torneoMaxParticipantes">Máximo de participantes</label>
+              <input type="number" id="torneoMaxParticipantes">
+            </div>
+
+            <div>
+              <label for="torneoPremio">Premio</label>
+              <input type="text" id="torneoPremio">
+            </div>
+          </div>
+
+          <div class="acciones">
+            <button id="btnInsertarTorneo">Insertar torneo</button>
+          </div>
+        </div>
+
+        <div class="subbloque">
+          <h3>Consultar lista completa</h3>
+          <p class="tipo-conexion">
+            Tipo de conexión: <strong>POST enviando JSON y recibiendo JSON</strong>
+          </p>
+
+          <div class="acciones">
+            <button id="btnConsultarTorneos" class="btn-secundario">Consultar torneos</button>
+          </div>
+        </div>
+
+        <div class="subbloque">
+          <h3>Actualizar un dato del torneo</h3>
+          <p class="tipo-conexion">
+            Tipo de conexión: <strong>POST recibiendo JSON y respondiendo JSON</strong>
+          </p>
+
+          <div class="form-grid">
+            <div>
+              <label for="torneoIdActualizar">ID del torneo</label>
+              <input type="number" id="torneoIdActualizar">
+            </div>
+
+            <div>
+              <label for="campoActualizarTorneo">Campo a actualizar</label>
+              <select id="campoActualizarTorneo">
+                <option value="">Selecciona</option>
+                <option value="nombre_torneo">Nombre del torneo</option>
+                <option value="videojuego">Videojuego</option>
+                <option value="plataforma">Plataforma</option>
+                <option value="modalidad">Modalidad</option>
+                <option value="max_participantes">Máximo de participantes</option>
+                <option value="premio">Premio</option>
+              </select>
+            </div>
+
+            <div class="campo-completo">
+              <label for="nuevoValorTorneo">Nuevo valor</label>
+              <input type="text" id="nuevoValorTorneo">
+            </div>
+          </div>
+
+          <div class="acciones">
+            <button id="btnActualizarTorneo">Actualizar torneo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <h2>Participantes (MongoDB)</h2>
+
+        <div class="subbloque">
+          <h3>Añadir participante</h3>
+          <p class="tipo-conexion">
+            Tipo de conexión: <strong>POST enviando JSON y recibiendo JSON</strong>
+          </p>
+
+          <div class="form-grid">
+            <div>
+              <label for="participanteTorneo">Nombre del torneo</label>
+              <input type="text" id="participanteTorneo">
+            </div>
+
+            <div>
+              <label for="participanteNombre">Nombre del participante</label>
+              <input type="text" id="participanteNombre">
+            </div>
+
+            <div>
+              <label for="participanteNick">Nick</label>
+              <input type="text" id="participanteNick">
+            </div>
+
+            <div>
+              <label for="participanteEmail">Email</label>
+              <input type="email" id="participanteEmail">
+            </div>
+
+            <div>
+              <label for="participanteEdad">Edad</label>
+              <input type="number" id="participanteEdad">
+            </div>
+
+            <div>
+              <label for="participanteEquipo">Nombre del equipo</label>
+              <input type="text" id="participanteEquipo">
+            </div>
+
+            <div class="campo-completo">
+              <label for="participanteTelefono">Teléfono</label>
+              <input type="text" id="participanteTelefono">
+            </div>
+          </div>
+
+          <div class="acciones">
+            <button id="btnInsertarParticipante">Añadir participante</button>
+          </div>
+        </div>
+
+        <div class="subbloque">
+          <h3>Eliminar participante</h3>
+          <p class="tipo-conexion">
+            Tipo de conexión: <strong>POST simple con respuesta simple</strong>
+          </p>
+
+          <div class="form-grid">
+            <div class="campo-completo">
+              <label for="nombreParticipanteEliminar">Nombre del participante a eliminar</label>
+              <input type="text" id="nombreParticipanteEliminar">
+            </div>
+          </div>
+
+          <div class="acciones">
+            <button id="btnEliminarParticipante">Eliminar participante</button>
+          </div>
+        </div>
+
+        <div class="subbloque">
+          <h3>Consultar un participante mediante cookie</h3>
+          <p class="tipo-conexion">
+            Tipo de conexión: <strong>consulta mediante cookie</strong>
+          </p>
+
+          <div class="form-grid">
+            <div class="campo-completo">
+              <label for="nombreParticipanteCookie">Nombre del participante para guardar en cookie</label>
+              <input type="text" id="nombreParticipanteCookie">
+            </div>
+          </div>
+
+          <div class="acciones">
+            <button id="btnConsultarParticipanteCookie" class="btn-secundario">Consultar participante</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bloque resultado">
+      <h2>Resultado</h2>
+      <div id="mensajeResultado" class="mensaje-resultado">Aquí aparecerá la respuesta del servidor.</div>
+      <div id="listaResultado" class="lista-resultado"></div>
+    </div>
+  </div>
+
+  <script>
+    const mensajeResultado = document.getElementById("mensajeResultado");
+    const listaResultado = document.getElementById("listaResultado");
+
+    function limpiarResultado() {
+      mensajeResultado.textContent = "Aquí aparecerá la respuesta del servidor.";
+      mensajeResultado.className = "mensaje-resultado";
+      listaResultado.innerHTML = "";
+    }
+
+    function mostrarTextoPlano(texto, esError = false) {
+      limpiarResultado();
+      mensajeResultado.textContent = texto;
+      mensajeResultado.classList.add(esError ? "error" : "ok");
+    }
+
+    function crearTarjeta(titulo, campos) {
+      const tarjeta = document.createElement("div");
+      tarjeta.className = "tarjeta-resultado";
+
+      let html = `<h4>${titulo}</h4>`;
+
+      for (const campo of campos) {
+        html += `<p><strong>${campo.etiqueta}:</strong> ${campo.valor ?? ""}</p>`;
+      }
+
+      tarjeta.innerHTML = html;
+      listaResultado.appendChild(tarjeta);
+    }
+
+    function pintarTorneos(lista) {
+      lista.forEach((torneo) => {
+        crearTarjeta(`Torneo ID ${torneo.id_torneo}`, [
+          { etiqueta: "Nombre", valor: torneo.nombre_torneo },
+          { etiqueta: "Videojuego", valor: torneo.videojuego },
+          { etiqueta: "Plataforma", valor: torneo.plataforma },
+          { etiqueta: "Modalidad", valor: torneo.modalidad },
+          { etiqueta: "Máximo participantes", valor: torneo.max_participantes },
+          { etiqueta: "Premio", valor: torneo.premio }
+        ]);
+      });
+    }
+
+    function pintarParticipantes(lista) {
+      lista.forEach((participante, indice) => {
+        crearTarjeta(`Participante ${indice + 1}`, [
+          { etiqueta: "ID", valor: participante._id },
+          { etiqueta: "Torneo", valor: participante.torneoInscripcion },
+          { etiqueta: "Nombre", valor: participante.nombreParticipante },
+          { etiqueta: "Nick", valor: participante.nick },
+          { etiqueta: "Email", valor: participante.email },
+          { etiqueta: "Edad", valor: participante.edad },
+          { etiqueta: "Equipo", valor: participante.nombreEquipo },
+          { etiqueta: "Teléfono", valor: participante.telefono }
+        ]);
+      });
+    }
+
+    function pintarParticipanteUnico(participante, titulo = "Participante") {
+      crearTarjeta(titulo, [
+        { etiqueta: "ID", valor: participante._id },
+        { etiqueta: "Torneo", valor: participante.torneoInscripcion },
+        { etiqueta: "Nombre", valor: participante.nombreParticipante },
+        { etiqueta: "Nick", valor: participante.nick },
+        { etiqueta: "Email", valor: participante.email },
+        { etiqueta: "Edad", valor: participante.edad },
+        { etiqueta: "Equipo", valor: participante.nombreEquipo },
+        { etiqueta: "Teléfono", valor: participante.telefono }
+      ]);
+    }
+
+    function mostrarJsonBonito(json) {
+      limpiarResultado();
+
+      const esError = json.ok === false;
+      const mensaje = json.mensaje ?? "Respuesta recibida correctamente.";
+
+      mensajeResultado.textContent = mensaje;
+      mensajeResultado.classList.add(esError ? "error" : "ok");
+
+      if (Array.isArray(json.lista_completa)) {
+        pintarTorneos(json.lista_completa);
+      }
+
+      if (json.torneo_insertado) {
+        crearTarjeta("Torneo insertado", [
+          { etiqueta: "ID", valor: json.torneo_insertado.id_torneo },
+          { etiqueta: "Nombre", valor: json.torneo_insertado.nombre_torneo },
+          { etiqueta: "Videojuego", valor: json.torneo_insertado.videojuego },
+          { etiqueta: "Plataforma", valor: json.torneo_insertado.plataforma },
+          { etiqueta: "Modalidad", valor: json.torneo_insertado.modalidad },
+          { etiqueta: "Máximo participantes", valor: json.torneo_insertado.max_participantes },
+          { etiqueta: "Premio", valor: json.torneo_insertado.premio }
+        ]);
+      }
+
+      if (Array.isArray(json.participantes)) {
+        pintarParticipantes(json.participantes);
+      }
+
+      if (json.participante_insertado) {
+        pintarParticipanteUnico(json.participante_insertado, "Participante insertado");
+      }
+
+      if (json.participante) {
+        pintarParticipanteUnico(json.participante, "Participante consultado");
+      }
+    }
+
+    function setCookie(nombre, valor, dias) {
+      const fecha = new Date();
+      fecha.setTime(fecha.getTime() + (dias * 24 * 60 * 60 * 1000));
+      const expiracion = "expires=" + fecha.toUTCString();
+      document.cookie = nombre + "=" + encodeURIComponent(valor) + ";" + expiracion + ";path=/";
+    }
+
+    document.getElementById("btnInsertarTorneo").addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      // TODO 1:
+      // Crear un objeto con la información del torneo que se quiere insertar.
+      // Ese objeto debe incluir la acción de insertar ("insertar") y los valores de nombre del torneo, videojuego, plataforma, modalidad, máximo de participantes y premio.
+      // Cada valor debe obtenerse de los campos del formulario correspondientes.
+
+      // TODO 2:
+      // Realizar una petición al archivo de torneos usando POST.
+      // Enviar al servidor el objeto anterior convertido a JSON.
+      // Indicar en las cabeceras que se envía JSON y que se espera recibir JSON.
+
+      // TODO 3:
+      // Recoger la respuesta del servidor y transformarla desde JSON a un objeto JavaScript.
+      
+      mostrarJsonBonito(json);
+    });
+
+    document.getElementById("btnConsultarTorneos").addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      // TODO 4:
+      // Crear un objeto para pedir al servidor la lista completa de torneos.
+      // Ese objeto solo debe incluir la acción necesaria para solicitar el listado ("listar").
+
+      // TODO 5:
+      // Realizar una petición al archivo de torneos usando POST.
+      // Enviar el objeto de consulta convertido a JSON.
+      // Indicar en las cabeceras que la petición envía JSON y que la respuesta esperada también será JSON.
+
+      // TODO 6:
+      // Recoger la respuesta del servidor y transformarla desde JSON a un objeto JavaScript.
+      
+      mostrarJsonBonito(json);
+    });
+
+    document.getElementById("btnActualizarTorneo").addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      // TODO 7:
+      // Crear un objeto con los datos necesarios para actualizar un torneo.
+      // Debe incluir la acción de actualizar ("actualizar"), el id del torneo, el nombre del campo elegido y el nuevo valor.
+
+      // TODO 8:
+      // Realizar una petición al archivo de torneos usando POST.
+      // Enviar el objeto de actualización en formato JSON.
+      // Indicar en las cabeceras que se manda JSON y que se espera recibir JSON.
+
+      // TODO 9:
+      // Recoger la respuesta del servidor y transformarla desde JSON a un objeto JavaScript.
+      
+      mostrarJsonBonito(json);
+    });
+
+    document.getElementById("btnInsertarParticipante").addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      // TODO 10:
+      // Crear un objeto con la información del participante que se quiere insertar ("insertar").
+      // Debe incluir la acción de insertar y los datos de torneo, nombre, nick, email, edad, nombre del equipo y teléfono.
+      // Todos los valores deben obtenerse del formulario.
+
+      // TODO 11:
+      // Realizar una petición al archivo de participantes usando POST.
+      // Enviar el objeto del participante convertido a JSON.
+      // Indicar en las cabeceras que se envía JSON y que se espera recibir JSON.
+
+      // TODO 12:
+      // Recoger la respuesta del servidor y transformarla desde JSON a un objeto JavaScript.
+
+      mostrarJsonBonito(json);
+    });
+
+    document.getElementById("btnEliminarParticipante").addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      // TODO 13:
+      // Obtener del formulario el nombre del participante que se quiere eliminar ("eliminar").
+
+      // TODO 14:
+      // Realizar una petición al archivo de participantes usando POST simple.
+      // Enviar los datos con formato de formulario clásico.
+      // La información enviada debe incluir la acción de eliminar y el nombre del participante a borrar.
+
+      // TODO 15:
+      // Recoger la respuesta del servidor como texto simple.
+
+      mostrarTextoPlano(
+        texto,
+        texto.toLowerCase().includes("no se encontró") ||
+        texto.toLowerCase().includes("debes indicar") ||
+        texto.toLowerCase().includes("no válida")
+      );
+    });
+
+    document.getElementById("btnConsultarParticipanteCookie").addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const nombre = document.getElementById("nombreParticipanteCookie").value.trim();
+
+      setCookie("nombreParticipanteConsulta", nombre, 1);
+
+      // TODO 16:
+      // Realizar una petición al archivo de participantes para consultar un participante usando la cookie guardada previamente.
+      // La petición debe hacerse con el método GET.
+      // Hay que asegurarse de que en la petición viajen las cookies del navegador.
+
+      // TODO 17:
+      // Recoger la respuesta del servidor como texto simple.
+
+      try {
+        const json = JSON.parse(texto);
+        mostrarJsonBonito(json);
+      } catch {
+        mostrarTextoPlano(texto, false);
+      }
+    });
+  </script>
+</body>
+</html>
