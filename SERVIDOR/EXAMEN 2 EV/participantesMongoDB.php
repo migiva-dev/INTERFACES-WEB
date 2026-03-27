@@ -4,33 +4,44 @@ require 'vendor/autoload.php';
 
 use MongoDB\Client;
 
+// Crear conexión con MongoDB
 $client = new Client("mongodb://localhost:27017");
 
-// TODO 1:
-// Seleccionar la base de datos y la colección con las que se va a trabajar.
-// La base de datos debe ser la de videojuegos ("Videojuegos") y la colección la de participantes del torneo ("participantes_torneo").
+// =====================================================
+// TODO 1: Seleccionar base de datos y colección
+// =====================================================
+$baseDatos = $client->Videojuegos; // Base de datos
+$coleccion = $baseDatos->participantes_torneo; // Colección
 
 // =====================================================
-// 1) CONSULTAR PARTICIPANTE MEDIANTE COOKIE
+// 1) CONSULTAR PARTICIPANTE MEDIANTE COOKIE (GET)
 // =====================================================
 if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
+    // Se recoge la acción desde la URL
     $accion = $_GET["accion"] ?? "";
 
+    // Solo se ejecuta si la acción es consultar por cookie
     if ($accion === "consultar_cookie") {
 
         header("Content-Type: application/json; charset=utf-8");
 
+        // Leer el nombre del participante desde la cookie
         $nombreParticipante = trim($_COOKIE["nombreParticipanteConsulta"] ?? "");
 
         if ($nombreParticipante !== "") {
 
-            // TODO 2:
-            // Buscar en la colección un único documento cuyo nombre de participante
-            // coincida exactamente con el valor recibido en la cookie.
+            // =====================================================
+            // TODO 2: Buscar participante por nombre
+            // =====================================================
+            $documento = $coleccion->findOne([
+                "nombreParticipante" => $nombreParticipante
+            ]);
 
+            // Si se encuentra el documento
             if ($documento !== null) {
 
+                // Se prepara la respuesta
                 $participante = [
                     "_id" => isset($documento["_id"]) ? (string)$documento["_id"] : "",
                     "torneoInscripcion" => $documento["torneoInscripcion"] ?? "",
@@ -49,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 ]);
 
             } else {
+                // No encontrado
                 echo json_encode([
                     "ok" => false,
                     "mensaje" => "No se encontró ningún participante con ese nombre."
@@ -56,6 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
             }
 
         } else {
+            // No hay cookie
             echo json_encode([
                 "ok" => false,
                 "mensaje" => "No se ha recibido ninguna cookie con el nombre del participante."
@@ -67,36 +80,36 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 }
 
 // =====================================================
-// 2) AÑADIR PARTICIPANTE MEDIANTE POST + JSON
-// 3) ELIMINAR PARTICIPANTE MEDIANTE POST SIMPLE
+// 2) AÑADIR PARTICIPANTE (POST + JSON)
+// 3) ELIMINAR PARTICIPANTE (POST simple)
 // =====================================================
+
+
+$contenido = file_get_contents("php://input");
+$datos = json_decode($contenido, true);
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
+    // Intentar obtener acción desde POST (formulario clásico)
     $accion = $_POST["accion"] ?? "";
 
     // -------------------------------------------------
-    // INSERTAR PARTICIPANTE
+    // Si viene JSON, la acción no estará en $_POST
     // -------------------------------------------------
-    // Como el insert se envía en JSON, $_POST["accion"] no llegará.
-    // Entonces leemos el cuerpo de la petición y extraemos la acción.
     if ($accion === "") {
-
-        // TODO 3:
-        // Leer el contenido bruto que llega en la petición HTTP.
-        // Después, convertir ese contenido desde JSON a un array asociativo de PHP ("$datos").
-
         if (is_array($datos)) {
             $accion = $datos["accion"] ?? "";
         }
     }
 
-    // -------------------------------------------------
-    // INSERTAR CON JSON
-    // -------------------------------------------------
+    // =====================================================
+    // INSERTAR PARTICIPANTE (JSON)
+    // =====================================================
     if ($accion === "insertar") {
 
         header("Content-Type: application/json; charset=utf-8");
 
+        // Validar JSON
         if (!isset($datos) || !is_array($datos)) {
             $contenido = file_get_contents("php://input");
             $datos = json_decode($contenido, true);
@@ -110,6 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
+        // Recoger datos
         $torneoInscripcion = trim($datos["torneoInscripcion"] ?? "");
         $nombreParticipante = trim($datos["nombreParticipante"] ?? "");
         $nick = trim($datos["nick"] ?? "");
@@ -120,16 +134,44 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $documento = [];
 
-        // TODO 4:
-        // Construir el documento que se va a insertar en MongoDB.
-        // Añadir solo los campos que no estén vacíos.
-        // Incluir torneo, nombre del participante, nick, email, edad, nombre del equipo y teléfono.
+        // =====================================================
+        // TODO 4: Construir documento dinámicamente
+        // =====================================================
+        if ($torneoInscripcion !== "") {
+            $documento["torneoInscripcion"] = $torneoInscripcion;
+        }
 
+        if ($nombreParticipante !== "") {
+            $documento["nombreParticipante"] = $nombreParticipante;
+        }
+
+        if ($nick !== "") {
+            $documento["nick"] = $nick;
+        }
+
+        if ($email !== "") {
+            $documento["email"] = $email;
+        }
+
+        if ($edad !== "") {
+            $documento["edad"] = (int)$edad;
+        }
+
+        if ($nombreEquipo !== "") {
+            $documento["nombreEquipo"] = $nombreEquipo;
+        }
+
+        if ($telefono !== "") {
+            $documento["telefono"] = $telefono;
+        }
+
+        // Si hay datos para insertar
         if (!empty($documento)) {
 
-            // TODO 5:
-            // Insertar en la colección el documento construido anteriormente
-            // y guardar el resultado de la operación para poder recuperar el id generado.
+            // =====================================================
+            // TODO 5: Insertar en MongoDB
+            // =====================================================
+            $resultado = $coleccion->insertOne($documento);
 
             $participanteInsertado = [
                 "_id" => (string)$resultado->getInsertedId(),
@@ -158,18 +200,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    // -------------------------------------------------
-    // ELIMINAR CON POST SIMPLE
-    // -------------------------------------------------
+    // =====================================================
+    // ELIMINAR PARTICIPANTE (POST simple)
+    // =====================================================
     if ($accion === "eliminar") {
 
+        // Obtener nombre desde formulario
         $nombreBuscado = trim($_POST["nombreParticipanteBusqueda"] ?? "");
 
         if ($nombreBuscado !== "") {
 
-            // TODO 6:
-            // Eliminar de la colección un único documento cuyo nombre de participante
-            // coincida exactamente con el nombre recibido en el formulario.
+            // =====================================================
+            // TODO 6: Eliminar participante
+            // =====================================================
+            $resultado = $coleccion->deleteOne([
+                "nombreParticipante" => $nombreBuscado
+            ]);
 
             if ($resultado->getDeletedCount() > 0) {
                 echo "Participante eliminado correctamente.";
