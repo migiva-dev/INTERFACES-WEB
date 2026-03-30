@@ -758,7 +758,7 @@
            ----------------------------------------------------- */
         this.cola = new Cola();
         // TODO 31: crear una pila para guardar el historial de personas atendidas
-        this.historial = new Cola();
+        this.historial = new Pila();
         this.ultimoNumeroTurno = 0;
 
         /* -----------------------------------------------------
@@ -819,7 +819,6 @@
           this.nombre.focus();
           this.actualizarUI();
         });
-        
 
         // TODO 2: crear el listener de submit del formulario.
         // Debe usar this.form.addEventListener("submit", ...)
@@ -860,7 +859,7 @@
         // y:
         // - permitir solo dígitos
         // - limpiar el error de este campo
-         this.telefono.addEventListener("input", () => {
+        this.telefono.addEventListener("input", () => {
           this.telefono.value = this.telefono.value.replace(/\D/g, "");
           this.limpiarError(this.telefono);
         });
@@ -868,10 +867,9 @@
         // TODO 6: crear el listener change del select tipoAtencion.
         // Debe usar this.tipoAtencion.addEventListener("change", ...)
         // y limpiar el error del campo.
-         this.tipoAtencion.addEventListener("change", () => {
+        this.tipoAtencion.addEventListener("change", () => {
           this.limpiarError(this.tipoAtencion);
         });
-
 
         // TODO 7: crear el listener input del campo observaciones.
         // Debe usar this.observaciones.addEventListener("input", ...)
@@ -937,7 +935,6 @@
           telefono: this.telefono.value.trim(),
           tipoAtencion: this.tipoAtencion.value.trim(),
           observaciones: this.observaciones.value.trim()
-
         };
 
         // TODO 13: validar el formulario llamando a validarFormulario(datos)
@@ -949,11 +946,10 @@
         }
 
         // TODO 14: crear la persona llamando a crearPersona(datos)
-         const persona = this.crearPersona(datos);
+        const persona = this.crearPersona(datos);
 
         // TODO 15: encolar la nueva persona en this.cola
         this.cola.enqueue(persona);
-
 
         // TODO 16: resetear el formulario
         this.form.reset();
@@ -1029,7 +1025,7 @@
 
         // TODO 20: validar el teléfono siguiendo el mismo patrón anterior,
         // usando regexTelefono.test(...)
-         if (!datos.telefono) {
+        if (!datos.telefono) {
           this.ponerError(this.telefono, "El teléfono es obligatorio.");
           esValido = false;
           if (!primerCampoConError) primerCampoConError = this.telefono;
@@ -1042,7 +1038,7 @@
         // TODO 21: validar que tipoAtencion no esté vacío
         // Si falla, usar ponerError(), marcar esValido = false
         // y guardar este campo como primerCampoConError si procede
-         if (!datos.tipoAtencion) {
+        if (!datos.tipoAtencion) {
           this.ponerError(this.tipoAtencion, "Debes seleccionar un tipo de atención.");
           esValido = false;
           if (!primerCampoConError) primerCampoConError = this.tipoAtencion;
@@ -1052,7 +1048,7 @@
         // - si superan los 120 caracteres, usar ponerError()
         // - marcar esValido = false
         // - guardar observaciones como primerCampoConError si aún no existe
-         if (datos.observaciones.length > 120) {
+        if (datos.observaciones.length > 120) {
           this.ponerError(this.observaciones, "Las observaciones no pueden superar los 120 caracteres.");
           esValido = false;
           if (!primerCampoConError) primerCampoConError = this.observaciones;
@@ -1062,7 +1058,6 @@
         if (primerCampoConError) {
           primerCampoConError.focus();
         }
-
 
         return esValido;
       }
@@ -1126,7 +1121,7 @@
         }
 
         // TODO 25: obtener la primera persona pendiente usando dequeue()
-         const personaAtendida = this.cola.dequeue();
+        const personaAtendida = this.cola.dequeue();
 
         personaAtendida.fechaAtencion = new Date().toLocaleString("es-ES");
 
@@ -1183,7 +1178,7 @@
             : "—";
 
         // TODO 29: mostrar en pantalla cuántas personas hay en el historial usando size()
-        this.statAtendidas.textContent = this.historial.size();;
+        this.statAtendidas.textContent = this.historial.size();
       }
 
       /* =======================================================
