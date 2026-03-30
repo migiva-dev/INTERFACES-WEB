@@ -758,6 +758,7 @@
            ----------------------------------------------------- */
         this.cola = new Cola();
         // TODO 31: crear una pila para guardar el historial de personas atendidas
+        this.historial = new Cola();
         this.ultimoNumeroTurno = 0;
 
         /* -----------------------------------------------------
@@ -777,6 +778,7 @@
         this.alertZone = document.getElementById("alertZone");
         this.queueContainer = document.getElementById("queueContainer");
         // TODO 32: guardar en una propiedad la referencia al contenedor del historial
+        this.historyContainer = document.getElementById("historyContainer");
 
         /* -----------------------------------------------------
            REFERENCIAS AL DOM: ESTADÍSTICAS
@@ -785,6 +787,7 @@
         this.statSiguiente = document.getElementById("statSiguiente");
         this.statUltimoTurno = document.getElementById("statUltimoTurno");
         // TODO 33: guardar en una propiedad la referencia a la tarjeta de personas atendidas
+        this.statAtendidas = document.getElementById("statAtendidas");
 
         /* -----------------------------------------------------
            REFERENCIAS AL DOM: BOTONES
@@ -812,11 +815,16 @@
         // Debe usar window.addEventListener("load", ...) y:
         // - hacer focus en el campo nombre
         // - actualizar la interfaz inicial
+        window.addEventListener("load", () => {
+          this.nombre.focus();
+          this.actualizarUI();
+        });
         
 
         // TODO 2: crear el listener de submit del formulario.
         // Debe usar this.form.addEventListener("submit", ...)
         // y llamar a gestionarSubmit pasando el evento.
+        this.form.addEventListener("submit", (e) => this.gestionarSubmit(e));
 
         this.form.addEventListener("reset", () => {
           setTimeout(() => {
@@ -831,6 +839,10 @@
         // y:
         // - permitir solo letras, espacios, tildes y ñ
         // - limpiar el error de este campo
+        this.nombre.addEventListener("input", () => {
+          this.nombre.value = this.nombre.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]/g, "");
+          this.limpiarError(this.nombre);
+        });
 
         // TODO 4: crear el listener input del campo dni.
         // Debe usar this.dni.addEventListener("input", ...)
@@ -838,16 +850,28 @@
         // - convertir a mayúsculas
         // - permitir solo números y letras
         // - limpiar el error de este campo
+        this.dni.addEventListener("input", () => {
+          this.dni.value = this.dni.value.toUpperCase().replace(/[^0-9A-Z]/g, "");
+          this.limpiarError(this.dni);
+        });
 
         // TODO 5: crear el listener input del campo telefono.
         // Debe usar this.telefono.addEventListener("input", ...)
         // y:
         // - permitir solo dígitos
         // - limpiar el error de este campo
+         this.telefono.addEventListener("input", () => {
+          this.telefono.value = this.telefono.value.replace(/\D/g, "");
+          this.limpiarError(this.telefono);
+        });
 
         // TODO 6: crear el listener change del select tipoAtencion.
         // Debe usar this.tipoAtencion.addEventListener("change", ...)
         // y limpiar el error del campo.
+         this.tipoAtencion.addEventListener("change", () => {
+          this.limpiarError(this.tipoAtencion);
+        });
+
 
         // TODO 7: crear el listener input del campo observaciones.
         // Debe usar this.observaciones.addEventListener("input", ...)
@@ -855,14 +879,21 @@
         // - limitar a un máximo de 120 caracteres
         // - actualizar el contador de observaciones
         // - limpiar el error del campo
+        this.observaciones.addEventListener("input", () => {
+          this.observaciones.value = this.observaciones.value.slice(0, 120);
+          this.actualizarContadorObservaciones();
+          this.limpiarError(this.observaciones);
+        });
 
         // TODO 8: crear el listener click del botón Atender.
         // Debe usar this.btnAtender.addEventListener("click", ...)
         // y llamar al método atenderSiguiente().
+        this.btnAtender.addEventListener("click", () => this.atenderSiguiente());
 
         // TODO 9: crear el listener click del botón Ver siguiente turno.
         // Debe usar this.btnVerSiguiente.addEventListener("click", ...)
         // y llamar al método verSiguienteTurno().
+        this.btnVerSiguiente.addEventListener("click", () => this.verSiguienteTurno());
 
         this.inicializarPestanas();
         this.actualizarContadorObservaciones();
@@ -891,19 +922,26 @@
          ======================================================= */
       gestionarSubmit(e) {
         // TODO 10: evitar el envío por defecto del formulario
+        e.preventDefault();
 
         // TODO 11: limpiar todos los errores previos
+        this.limpiarTodosLosErrores();
 
         // TODO 12: crear un objeto datos con:
         // nombre, dni, telefono, tipoAtencion y observaciones
         // usando los valores actuales del formulario
         // recuerda usar trim() y pasar el DNI a mayúsculas
         const datos = {
+          nombre: this.nombre.value.trim(),
+          dni: this.dni.value.trim().toUpperCase(),
+          telefono: this.telefono.value.trim(),
+          tipoAtencion: this.tipoAtencion.value.trim(),
+          observaciones: this.observaciones.value.trim()
 
         };
 
         // TODO 13: validar el formulario llamando a validarFormulario(datos)
-        const valido = false;
+        const valido = this.validarFormulario(datos);
 
         if (!valido) {
           this.mostrarAlerta("Revisa los campos marcados antes de añadir a la cola.", "error");
@@ -911,10 +949,14 @@
         }
 
         // TODO 14: crear la persona llamando a crearPersona(datos)
+         const persona = this.crearPersona(datos);
 
         // TODO 15: encolar la nueva persona en this.cola
+        this.cola.enqueue(persona);
+
 
         // TODO 16: resetear el formulario
+        this.form.reset();
 
         this.actualizarContadorObservaciones();
         this.actualizarUI();
@@ -925,6 +967,7 @@
         );
 
         // TODO 17: devolver el foco al campo nombre
+        this.nombre.focus();
       }
 
       /* =======================================================
@@ -962,23 +1005,64 @@
         // - si no cumple la regex, usar ponerError() con regexNombre.test(...)
         // - en ambos casos, poner esValido a false
         // - guardar este campo como primerCampoConError si aún no existe
+        if (!datos.nombre) {
+          this.ponerError(this.nombre, "El nombre es obligatorio.");
+          esValido = false;
+          if (!primerCampoConError) primerCampoConError = this.nombre;
+        } else if (!regexNombre.test(datos.nombre)) {
+          this.ponerError(this.nombre, "El nombre debe tener al menos 3 letras y solo contener letras y espacios.");
+          esValido = false;
+          if (!primerCampoConError) primerCampoConError = this.nombre;
+        }
 
         // TODO 19: validar el DNI siguiendo el mismo patrón anterior,
         // usando regexDNI.test(...)
+        if (!datos.dni) {
+          this.ponerError(this.dni, "El DNI es obligatorio.");
+          esValido = false;
+          if (!primerCampoConError) primerCampoConError = this.dni;
+        } else if (!regexDNI.test(datos.dni)) {
+          this.ponerError(this.dni, "El formato del DNI no es válido.");
+          esValido = false;
+          if (!primerCampoConError) primerCampoConError = this.dni;
+        }
 
         // TODO 20: validar el teléfono siguiendo el mismo patrón anterior,
         // usando regexTelefono.test(...)
+         if (!datos.telefono) {
+          this.ponerError(this.telefono, "El teléfono es obligatorio.");
+          esValido = false;
+          if (!primerCampoConError) primerCampoConError = this.telefono;
+        } else if (!regexTelefono.test(datos.telefono)) {
+          this.ponerError(this.telefono, "El teléfono debe tener 9 cifras y empezar por 6, 7 o 9.");
+          esValido = false;
+          if (!primerCampoConError) primerCampoConError = this.telefono;
+        }
 
         // TODO 21: validar que tipoAtencion no esté vacío
         // Si falla, usar ponerError(), marcar esValido = false
         // y guardar este campo como primerCampoConError si procede
+         if (!datos.tipoAtencion) {
+          this.ponerError(this.tipoAtencion, "Debes seleccionar un tipo de atención.");
+          esValido = false;
+          if (!primerCampoConError) primerCampoConError = this.tipoAtencion;
+        }
 
         // TODO 22: validar las observaciones:
         // - si superan los 120 caracteres, usar ponerError()
         // - marcar esValido = false
         // - guardar observaciones como primerCampoConError si aún no existe
+         if (datos.observaciones.length > 120) {
+          this.ponerError(this.observaciones, "Las observaciones no pueden superar los 120 caracteres.");
+          esValido = false;
+          if (!primerCampoConError) primerCampoConError = this.observaciones;
+        }
 
         // TODO 23: si existe primerCampoConError, hacer focus() en él
+        if (primerCampoConError) {
+          primerCampoConError.focus();
+        }
+
 
         return esValido;
       }
@@ -1036,13 +1120,18 @@
         // Si está vacía:
         // - mostrar una alerta de tipo warning ("this.mostrarAlerta("No hay personas en cola para atender.", "warning");")
         // - salir de la función
+        if (this.cola.isEmpty()) {
+          this.mostrarAlerta("No hay personas en cola para atender.", "warning");
+          return;
+        }
 
         // TODO 25: obtener la primera persona pendiente usando dequeue()
-        const personaAtendida = null;
+         const personaAtendida = this.cola.dequeue();
 
         personaAtendida.fechaAtencion = new Date().toLocaleString("es-ES");
 
         // TODO 26: guardar la persona atendida en la pila del historial usando push()
+        this.historial.push(personaAtendida);
 
         this.actualizarUI();
 
@@ -1059,7 +1148,7 @@
          ======================================================= */
       verSiguienteTurno() {
         // TODO 27: obtener la siguiente persona pendiente usando front()
-        const siguiente = null;
+        const siguiente = this.cola.front();
 
         if (!siguiente) {
           this.mostrarAlerta("No hay ningún turno pendiente en este momento.", "warning");
@@ -1084,7 +1173,7 @@
          ======================================================= */
       actualizarEstadisticas() {
         // TODO 28: obtener la siguiente persona pendiente usando front()
-        const siguiente = null;
+        const siguiente = this.cola.front();
 
         this.statEnEspera.textContent = this.cola.size();
         this.statSiguiente.textContent = siguiente ? siguiente.turno : "—";
@@ -1094,7 +1183,7 @@
             : "—";
 
         // TODO 29: mostrar en pantalla cuántas personas hay en el historial usando size()
-        this.statAtendidas.textContent = "COMPLETAR";
+        this.statAtendidas.textContent = this.historial.size();;
       }
 
       /* =======================================================
@@ -1102,10 +1191,13 @@
          ======================================================= */
       actualizarBotones() {
         // TODO 30: comprobar si la cola está vacía y guardar el resultado en una variable llamada desactivar
+        const desactivar = this.cola.isEmpty();
 
         // TODO 31: activar o desactivar el botón btnAtender usando la variable desactivar
+        this.btnAtender.disabled = desactivar;
 
         // TODO 32: activar o desactivar el botón btnVerSiguiente usando la variable desactivar
+        this.btnVerSiguiente.disabled = desactivar;
       }
 
       /* =======================================================
