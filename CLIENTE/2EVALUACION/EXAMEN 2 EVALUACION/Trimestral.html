@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de turnos de atención - Examen</title>
+
+  <style>
+    /* =========================================================
+       VARIABLES GLOBALES
+       ========================================================= */
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --border: #d9e2ec;
+      --text: #243b53;
+      --muted: #6b7c93;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --success: #15803d;
+      --success-soft: #dcfce7;
+      --error: #b91c1c;
+      --error-soft: #fee2e2;
+      --warning: #b45309;
+      --warning-soft: #fef3c7;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 14px;
+    }
+
+    /* =========================================================
+       RESET BÁSICO
+       ========================================================= */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* =========================================================
+       ESTRUCTURA GENERAL
+       ========================================================= */
+    .container {
+      width: min(1100px, 92%);
+      margin: 30px auto;
+    }
+
+    .app-header {
+      margin-bottom: 20px;
+    }
+
+    .app-header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    .app-header p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    /* =========================================================
+       ALERTAS
+       ========================================================= */
+    .alert-zone {
+      min-height: 56px;
+      margin-bottom: 18px;
+    }
+
+    .alert {
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      border: 1px solid transparent;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .alert-success {
+      background: var(--success-soft);
+      color: var(--success);
+      border-color: #86efac;
+    }
+
+    .alert-error {
+      background: var(--error-soft);
+      color: var(--error);
+      border-color: #fca5a5;
+    }
+
+    .alert-warning {
+      background: var(--warning-soft);
+      color: var(--warning);
+      border-color: #fcd34d;
+    }
+
+    .alert button {
+      border: none;
+      background: transparent;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    /* =========================================================
+       TARJETAS DE ESTADÍSTICAS
+       ========================================================= */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card h3 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: normal;
+    }
+
+    .stat-card p {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    /* =========================================================
+       PESTAÑAS
+       ========================================================= */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .tab-btn {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: bold;
+      color: var(--text);
+      transition: 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .panel-title {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 1.25rem;
+    }
+
+    /* =========================================================
+       FORMULARIO
+       ========================================================= */
+    form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font: inherit;
+      color: var(--text);
+      background: white;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .field-help {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .char-counter {
+      text-align: right;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* =========================================================
+       ERRORES DE VALIDACIÓN
+       ========================================================= */
+    .error-field {
+      border-color: var(--error) !important;
+      background: #fff7f7;
+    }
+
+    .error-text {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    /* =========================================================
+       BOTONES Y ACCIONES
+       ========================================================= */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* =========================================================
+       LISTAS
+       ========================================================= */
+    .queue-list,
+    .history-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .turn-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .turn-card.first {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .turn-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .turn-number {
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: var(--primary);
+    }
+
+    .turn-name {
+      font-size: 1.08rem;
+      font-weight: bold;
+    }
+
+    .turn-meta {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .turn-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      background: #fafcff;
+    }
+
+    .highlight-next {
+      display: inline-block;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid #93c5fd;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .history-badge {
+      display: inline-block;
+      background: #ecfeff;
+      color: #0f766e;
+      border: 1px solid #99f6e4;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    /* =========================================================
+       MODAL
+       ========================================================= */
+    dialog {
+      border: none;
+      padding: 0;
+      border-radius: 16px;
+      width: min(560px, 92vw);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    dialog::backdrop {
+      background: rgba(15, 23, 42, 0.45);
+    }
+
+    .modal {
+      background: white;
+      padding: 22px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      font-size: 1.4rem;
+      cursor: pointer;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .detail-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .detail-item strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* =========================================================
+       ANIMACIONES
+       ========================================================= */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+    @media (max-width: 900px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .turn-top {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- =========================================================
+       CONTENEDOR PRINCIPAL
+       ========================================================= -->
+  <div class="container">
+
+    <!-- =======================================================
+         CABECERA
+         ======================================================= -->
+    <header class="app-header">
+      <h1>Gestor de turnos de atención</h1>
+      <p>Examen práctico de DAW 2 - Programación en entorno cliente</p>
+    </header>
+
+    <!-- =======================================================
+         ZONA DE ALERTAS
+         ======================================================= -->
+    <section id="alertZone" class="alert-zone"></section>
+
+    <!-- =======================================================
+         ESTADÍSTICAS
+         ======================================================= -->
+    <section class="stats">
+      <article class="stat-card">
+        <h3>Personas en espera</h3>
+        <p id="statEnEspera">0</p>
+      </article>
+
+      <article class="stat-card">
+        <h3>Siguiente turno</h3>
+        <p id="statSiguiente">—</p>
+      </article>
+
+      <article class="stat-card">
+        <h3>Último turno generado</h3>
+        <p id="statUltimoTurno">—</p>
+      </article>
+
+      <article class="stat-card">
+        <h3>Atendidas</h3>
+        <p id="statAtendidas">0</p>
+      </article>
+    </section>
+
+    <!-- =======================================================
+         BOTONES DE PESTAÑAS
+         ======================================================= -->
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="tab-alta">Nueva persona</button>
+      <button class="tab-btn" data-tab="tab-cola">Cola actual</button>
+      <button class="tab-btn" data-tab="tab-historial">Historial</button>
+    </nav>
+
+    <!-- =======================================================
+         PESTAÑA: NUEVA PERSONA
+         ======================================================= -->
+    <section id="tab-alta" class="tab-content active">
+      <h2 class="panel-title">Alta de persona en espera</h2>
+
+      <form id="turnoForm" novalidate>
+        <div class="field-group">
+          <label for="nombre">Nombre completo</label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            placeholder="Ej.: Ana Pérez López"
+            autocomplete="off"
+          />
+          <p class="field-help">Solo letras, espacios, tildes y ñ. Mínimo 3 caracteres.</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="dni">DNI</label>
+            <input
+              type="text"
+              id="dni"
+              name="dni"
+              placeholder="12345678A"
+              maxlength="9"
+              autocomplete="off"
+            />
+            <p class="field-help">Formato esperado: 8 números y una letra.</p>
+          </div>
+
+          <div class="field-group">
+            <label for="telefono">Teléfono</label>
+            <input
+              type="text"
+              id="telefono"
+              name="telefono"
+              placeholder="612345678"
+              maxlength="9"
+              autocomplete="off"
+            />
+            <p class="field-help">9 cifras. Debe empezar por 6, 7 o 9.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="tipoAtencion">Tipo de atención</label>
+          <select id="tipoAtencion" name="tipoAtencion">
+            <option value="">Seleccione una opción</option>
+            <option value="Información general">Información general</option>
+            <option value="Matrícula">Matrícula</option>
+            <option value="Becas">Becas</option>
+            <option value="Incidencias">Incidencias</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="observaciones">Observaciones</label>
+          <textarea
+            id="observaciones"
+            name="observaciones"
+            maxlength="120"
+            placeholder="Información adicional opcional"
+          ></textarea>
+          <div id="contadorObservaciones" class="char-counter">0 / 120</div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">Añadir a la cola</button>
+          <button type="reset" class="btn btn-secondary">Limpiar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- =======================================================
+         PESTAÑA: COLA ACTUAL
+         ======================================================= -->
+    <section id="tab-cola" class="tab-content">
+      <h2 class="panel-title">Cola actual</h2>
+
+      <div class="actions" style="margin-bottom: 14px;">
+        <button id="btnVerSiguiente" class="btn btn-secondary">Ver siguiente turno</button>
+        <button id="btnAtender" class="btn btn-success">Atender siguiente</button>
+      </div>
+
+      <div id="queueContainer"></div>
+    </section>
+
+    <!-- =======================================================
+         PESTAÑA: HISTORIAL
+         ======================================================= -->
+    <section id="tab-historial" class="tab-content">
+      <h2 class="panel-title">Historial de personas atendidas</h2>
+      <div id="historyContainer"></div>
+    </section>
+  </div>
+
+  <!-- =========================================================
+       MODAL Y TEMPLATE
+       ========================================================= -->
+  <dialog id="modalDetalle"></dialog>
+
+  <template id="templateModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"></h3>
+        <button class="modal-close" type="button" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body"></div>
+    </div>
+  </template>
+
+  <script>
+    /* =========================================================
+       CLASE COLA
+       ========================================================= */
+    class Cola {
+      #elementos;
+
+      constructor() {
+        this.#elementos = [];
+      }
+
+      enqueue(elemento) {
+        this.#elementos.push(elemento);
+      }
+
+      dequeue() {
+        if (this.isEmpty()) {
+          return null;
+        }
+        return this.#elementos.shift();
+      }
+
+      front() {
+        if (this.isEmpty()) {
+          return null;
+        }
+        return this.#elementos[0];
+      }
+
+      isEmpty() {
+        return this.#elementos.length === 0;
+      }
+
+      size() {
+        return this.#elementos.length;
+      }
+
+      toArray() {
+        return [...this.#elementos];
+      }
+    }
+
+    /* =========================================================
+       CLASE PILA
+       ========================================================= */
+    class Pila {
+      #elementos;
+
+      constructor() {
+        this.#elementos = [];
+      }
+
+      push(elemento) {
+        this.#elementos.push(elemento);
+      }
+
+      pop() {
+        if (this.isEmpty()) return "La pila está vacía";
+        return this.#elementos.pop();
+      }
+
+      peek() {
+        if (this.isEmpty()) return "La pila está vacía";
+        return this.#elementos[this.#elementos.length - 1];
+      }
+
+      isEmpty() {
+        return this.#elementos.length === 0;
+      }
+
+      size() {
+        return this.#elementos.length;
+      }
+
+      mostrar() {
+        if (this.isEmpty()) return "Pila vacía";
+
+        let resultado = "Contenido de la pila (cima → base):\n";
+
+        for (let i = this.#elementos.length - 1; i >= 0; i--) {
+          resultado += `[${i}] ${this.#elementos[i]}\n`;
+        }
+
+        return resultado;
+      }
+
+      toArray() {
+        return [...this.#elementos];
+      }
+    }
+
+    /* =========================================================
+       CLASE PRINCIPAL DE LA APLICACIÓN
+       ========================================================= */
+    class GestorTurnos {
+      constructor() {
+        /* -----------------------------------------------------
+           ESTRUCTURAS DE DATOS
+           ----------------------------------------------------- */
+        this.cola = new Cola();
+        // TODO 31: crear una pila para guardar el historial de personas atendidas
+        this.ultimoNumeroTurno = 0;
+
+        /* -----------------------------------------------------
+           REFERENCIAS AL DOM: FORMULARIO
+           ----------------------------------------------------- */
+        this.form = document.getElementById("turnoForm");
+        this.nombre = document.getElementById("nombre");
+        this.dni = document.getElementById("dni");
+        this.telefono = document.getElementById("telefono");
+        this.tipoAtencion = document.getElementById("tipoAtencion");
+        this.observaciones = document.getElementById("observaciones");
+        this.contadorObservaciones = document.getElementById("contadorObservaciones");
+
+        /* -----------------------------------------------------
+           REFERENCIAS AL DOM: CONTENEDORES
+           ----------------------------------------------------- */
+        this.alertZone = document.getElementById("alertZone");
+        this.queueContainer = document.getElementById("queueContainer");
+        // TODO 32: guardar en una propiedad la referencia al contenedor del historial
+
+        /* -----------------------------------------------------
+           REFERENCIAS AL DOM: ESTADÍSTICAS
+           ----------------------------------------------------- */
+        this.statEnEspera = document.getElementById("statEnEspera");
+        this.statSiguiente = document.getElementById("statSiguiente");
+        this.statUltimoTurno = document.getElementById("statUltimoTurno");
+        // TODO 33: guardar en una propiedad la referencia a la tarjeta de personas atendidas
+
+        /* -----------------------------------------------------
+           REFERENCIAS AL DOM: BOTONES
+           ----------------------------------------------------- */
+        this.btnAtender = document.getElementById("btnAtender");
+        this.btnVerSiguiente = document.getElementById("btnVerSiguiente");
+
+        /* -----------------------------------------------------
+           REFERENCIAS AL DOM: MODAL
+           ----------------------------------------------------- */
+        this.modal = document.getElementById("modalDetalle");
+        this.templateModal = document.getElementById("templateModal");
+
+        /* -----------------------------------------------------
+           INICIALIZACIÓN
+           ----------------------------------------------------- */
+        this.inicializar();
+      }
+
+      /* =======================================================
+         INICIALIZACIÓN GENERAL
+         ======================================================= */
+      inicializar() {
+        // TODO 1: crear el listener de carga de página.
+        // Debe usar window.addEventListener("load", ...) y:
+        // - hacer focus en el campo nombre
+        // - actualizar la interfaz inicial
+
+        // TODO 2: crear el listener de submit del formulario.
+        // Debe usar this.form.addEventListener("submit", ...)
+        // y llamar a gestionarSubmit pasando el evento.
+
+        this.form.addEventListener("reset", () => {
+          setTimeout(() => {
+            this.limpiarTodosLosErrores();
+            this.actualizarContadorObservaciones();
+            this.nombre.focus();
+          }, 0);
+        });
+
+        // TODO 3: crear el listener input del campo nombre.
+        // Debe usar this.nombre.addEventListener("input", ...)
+        // y:
+        // - permitir solo letras, espacios, tildes y ñ
+        // - limpiar el error de este campo
+
+        // TODO 4: crear el listener input del campo dni.
+        // Debe usar this.dni.addEventListener("input", ...)
+        // y:
+        // - convertir a mayúsculas
+        // - permitir solo números y letras
+        // - limpiar el error de este campo
+
+        // TODO 5: crear el listener input del campo telefono.
+        // Debe usar this.telefono.addEventListener("input", ...)
+        // y:
+        // - permitir solo dígitos
+        // - limpiar el error de este campo
+
+        // TODO 6: crear el listener change del select tipoAtencion.
+        // Debe usar this.tipoAtencion.addEventListener("change", ...)
+        // y limpiar el error del campo.
+
+        // TODO 7: crear el listener input del campo observaciones.
+        // Debe usar this.observaciones.addEventListener("input", ...)
+        // y:
+        // - limitar a un máximo de 120 caracteres
+        // - actualizar el contador de observaciones
+        // - limpiar el error del campo
+
+        // TODO 8: crear el listener click del botón Atender.
+        // Debe usar this.btnAtender.addEventListener("click", ...)
+        // y llamar al método atenderSiguiente().
+
+        // TODO 9: crear el listener click del botón Ver siguiente turno.
+        // Debe usar this.btnVerSiguiente.addEventListener("click", ...)
+        // y llamar al método verSiguienteTurno().
+
+        this.inicializarPestanas();
+        this.actualizarContadorObservaciones();
+      }
+
+      /* =======================================================
+         INICIALIZACIÓN DE PESTAÑAS
+         ======================================================= */
+      inicializarPestanas() {
+        const botones = document.querySelectorAll(".tab-btn");
+        const paneles = document.querySelectorAll(".tab-content");
+
+        botones.forEach((boton) => {
+          boton.addEventListener("click", () => {
+            botones.forEach((b) => b.classList.remove("active"));
+            paneles.forEach((p) => p.classList.remove("active"));
+
+            boton.classList.add("active");
+            document.getElementById(boton.dataset.tab).classList.add("active");
+          });
+        });
+      }
+
+      /* =======================================================
+         GESTIÓN DEL ENVÍO DEL FORMULARIO
+         ======================================================= */
+      gestionarSubmit(e) {
+        // TODO 10: evitar el envío por defecto del formulario
+
+        // TODO 11: limpiar todos los errores previos
+
+        // TODO 12: crear un objeto datos con:
+        // nombre, dni, telefono, tipoAtencion y observaciones
+        // usando los valores actuales del formulario
+        // recuerda usar trim() y pasar el DNI a mayúsculas
+        const datos = {
+
+        };
+
+        // TODO 13: validar el formulario llamando a validarFormulario(datos)
+        const valido = false;
+
+        if (!valido) {
+          this.mostrarAlerta("Revisa los campos marcados antes de añadir a la cola.", "error");
+          return;
+        }
+
+        // TODO 14: crear la persona llamando a crearPersona(datos)
+
+        // TODO 15: encolar la nueva persona en this.cola
+
+        // TODO 16: resetear el formulario
+
+        this.actualizarContadorObservaciones();
+        this.actualizarUI();
+
+        this.mostrarAlerta(
+          `Turno ${persona.turno} asignado correctamente a ${persona.nombre}.`,
+          "success"
+        );
+
+        // TODO 17: devolver el foco al campo nombre
+      }
+
+      /* =======================================================
+         CREACIÓN DE PERSONA / TURNO
+         ======================================================= */
+      crearPersona(datos) {
+        this.ultimoNumeroTurno++;
+        const turno = `T-${String(this.ultimoNumeroTurno).padStart(3, "0")}`;
+
+        return {
+          id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+          turno: turno,
+          nombre: datos.nombre,
+          dni: datos.dni,
+          telefono: datos.telefono,
+          tipoAtencion: datos.tipoAtencion,
+          observaciones: datos.observaciones || "Sin observaciones",
+          fechaAlta: new Date().toLocaleString("es-ES")
+        };
+      }
+
+      /* =======================================================
+         VALIDACIÓN DEL FORMULARIO
+         ======================================================= */
+      validarFormulario(datos) {
+        let esValido = true;
+        let primerCampoConError = null;
+
+        const regexNombre = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]{3,}$/;
+        const regexDNI = /^\d{8}[A-Z]$/;
+        const regexTelefono = /^[679]\d{8}$/;
+
+        // TODO 18: validar el nombre:
+        // - si está vacío, usar ponerError()
+        // - si no cumple la regex, usar ponerError() con regexNombre.test(...)
+        // - en ambos casos, poner esValido a false
+        // - guardar este campo como primerCampoConError si aún no existe
+
+        // TODO 19: validar el DNI siguiendo el mismo patrón anterior,
+        // usando regexDNI.test(...)
+
+        // TODO 20: validar el teléfono siguiendo el mismo patrón anterior,
+        // usando regexTelefono.test(...)
+
+        // TODO 21: validar que tipoAtencion no esté vacío
+        // Si falla, usar ponerError(), marcar esValido = false
+        // y guardar este campo como primerCampoConError si procede
+
+        // TODO 22: validar las observaciones:
+        // - si superan los 120 caracteres, usar ponerError()
+        // - marcar esValido = false
+        // - guardar observaciones como primerCampoConError si aún no existe
+
+        // TODO 23: si existe primerCampoConError, hacer focus() en él
+
+        return esValido;
+      }
+
+      /* =======================================================
+         GESTIÓN VISUAL DE ERRORES
+         ======================================================= */
+      ponerError(campo, mensaje) {
+        campo.classList.add("error-field");
+
+        const errorExistente = campo.parentElement.querySelector(".error-text");
+        if (errorExistente) {
+          errorExistente.textContent = mensaje;
+          return;
+        }
+
+        const p = document.createElement("p");
+        p.className = "error-text";
+        p.textContent = mensaje;
+        campo.parentElement.appendChild(p);
+      }
+
+      limpiarError(campo) {
+        campo.classList.remove("error-field");
+        const error = campo.parentElement.querySelector(".error-text");
+        if (error) {
+          error.remove();
+        }
+      }
+
+      limpiarTodosLosErrores() {
+        const campos = [
+          this.nombre,
+          this.dni,
+          this.telefono,
+          this.tipoAtencion,
+          this.observaciones
+        ];
+
+        campos.forEach((campo) => this.limpiarError(campo));
+      }
+
+      /* =======================================================
+         CONTADOR DE OBSERVACIONES
+         ======================================================= */
+      actualizarContadorObservaciones() {
+        this.contadorObservaciones.textContent = `${this.observaciones.value.length} / 120`;
+      }
+
+      /* =======================================================
+         ATENDER SIGUIENTE PERSONA
+         ======================================================= */
+      atenderSiguiente() {
+        // TODO 24: comprobar si la cola está vacía
+        // Si está vacía:
+        // - mostrar una alerta de tipo warning ("this.mostrarAlerta("No hay personas en cola para atender.", "warning");")
+        // - salir de la función
+
+        // TODO 25: obtener la primera persona pendiente usando dequeue()
+        const personaAtendida = null;
+
+        personaAtendida.fechaAtencion = new Date().toLocaleString("es-ES");
+
+        // TODO 26: guardar la persona atendida en la pila del historial usando push()
+
+        this.actualizarUI();
+
+        this.mostrarAlerta(
+          `Se ha atendido correctamente el turno ${personaAtendida.turno} de ${personaAtendida.nombre}.`,
+          "success"
+        );
+
+        this.mostrarDetallePersona(personaAtendida, "Persona atendida");
+      }
+
+      /* =======================================================
+         VER SIGUIENTE TURNO
+         ======================================================= */
+      verSiguienteTurno() {
+        // TODO 27: obtener la siguiente persona pendiente usando front()
+        const siguiente = null;
+
+        if (!siguiente) {
+          this.mostrarAlerta("No hay ningún turno pendiente en este momento.", "warning");
+          return;
+        }
+
+        this.mostrarDetallePersona(siguiente, "Siguiente turno");
+      }
+
+      /* =======================================================
+         ACTUALIZACIÓN GENERAL DE LA INTERFAZ
+         ======================================================= */
+      actualizarUI() {
+        this.renderCola();
+        this.renderHistorial();
+        this.actualizarEstadisticas();
+        this.actualizarBotones();
+      }
+
+      /* =======================================================
+         ESTADÍSTICAS
+         ======================================================= */
+      actualizarEstadisticas() {
+        // TODO 28: obtener la siguiente persona pendiente usando front()
+        const siguiente = null;
+
+        this.statEnEspera.textContent = this.cola.size();
+        this.statSiguiente.textContent = siguiente ? siguiente.turno : "—";
+        this.statUltimoTurno.textContent =
+          this.ultimoNumeroTurno > 0
+            ? `T-${String(this.ultimoNumeroTurno).padStart(3, "0")}`
+            : "—";
+
+        // TODO 29: mostrar en pantalla cuántas personas hay en el historial usando size()
+        this.statAtendidas.textContent = "COMPLETAR";
+      }
+
+      /* =======================================================
+         ESTADO DE BOTONES
+         ======================================================= */
+      actualizarBotones() {
+        // TODO 30: comprobar si la cola está vacía y guardar el resultado en una variable llamada desactivar
+
+        // TODO 31: activar o desactivar el botón btnAtender usando la variable desactivar
+
+        // TODO 32: activar o desactivar el botón btnVerSiguiente usando la variable desactivar
+      }
+
+      /* =======================================================
+         RENDERIZADO DE LA COLA
+         ======================================================= */
+      renderCola() {
+        const personas = this.cola.toArray();
+
+        if (personas.length === 0) {
+          this.queueContainer.innerHTML = `
+            <div class="empty-state">
+              <p>No hay personas en espera actualmente.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const lista = document.createElement("div");
+        lista.className = "queue-list";
+
+        personas.forEach((persona, indice) => {
+          const tarjeta = document.createElement("article");
+          tarjeta.className = `turn-card ${indice === 0 ? "first" : ""}`;
+
+          tarjeta.innerHTML = `
+            ${indice === 0 ? '<span class="highlight-next">Siguiente turno</span>' : ""}
+            <div class="turn-top">
+              <div>
+                <div class="turn-number">${persona.turno}</div>
+                <div class="turn-name">${persona.nombre}</div>
+                <div class="turn-meta">${persona.tipoAtencion} · ${persona.telefono}</div>
+              </div>
+              <div class="turn-actions">
+                <button class="btn btn-secondary btn-detalle" data-id="${persona.id}">Ver detalle</button>
+              </div>
+            </div>
+          `;
+
+          lista.appendChild(tarjeta);
+        });
+
+        this.queueContainer.innerHTML = "";
+        this.queueContainer.appendChild(lista);
+
+        this.queueContainer.querySelectorAll(".btn-detalle").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const persona = personas.find((p) => p.id === btn.dataset.id);
+            if (persona) {
+              this.mostrarDetallePersona(persona, "Detalle del turno");
+            }
+          });
+        });
+      }
+
+      /* =======================================================
+         RENDERIZADO DEL HISTORIAL
+         ======================================================= */
+      renderHistorial() {
+        const atendidas = this.historial.toArray();
+
+        if (atendidas.length === 0) {
+          this.historyContainer.innerHTML = `
+            <div class="empty-state">
+              <p>Todavía no se ha atendido a ninguna persona.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const lista = document.createElement("div");
+        lista.className = "history-list";
+
+        for (let i = atendidas.length - 1; i >= 0; i--) {
+          const persona = atendidas[i];
+          const tarjeta = document.createElement("article");
+          tarjeta.className = "turn-card";
+
+          tarjeta.innerHTML = `
+            ${i === atendidas.length - 1 ? '<span class="history-badge">Última atendida</span>' : ""}
+            <div class="turn-top">
+              <div>
+                <div class="turn-number">${persona.turno}</div>
+                <div class="turn-name">${persona.nombre}</div>
+                <div class="turn-meta">${persona.tipoAtencion} · ${persona.telefono}</div>
+                <div class="turn-meta">Atendida: ${persona.fechaAtencion}</div>
+              </div>
+              <div class="turn-actions">
+                <button class="btn btn-secondary btn-detalle-historial" data-id="${persona.id}">
+                  Ver detalle
+                </button>
+              </div>
+            </div>
+          `;
+
+          lista.appendChild(tarjeta);
+        }
+
+        this.historyContainer.innerHTML = "";
+        this.historyContainer.appendChild(lista);
+
+        this.historyContainer.querySelectorAll(".btn-detalle-historial").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const persona = atendidas.find((p) => p.id === btn.dataset.id);
+            if (persona) {
+              this.mostrarDetallePersona(persona, "Detalle de persona atendida");
+            }
+          });
+        });
+      }
+
+      /* =======================================================
+         MODAL DE DETALLE
+         ======================================================= */
+      mostrarDetallePersona(persona, titulo) {
+        this.modal.innerHTML = "";
+        const fragmento = this.templateModal.content.cloneNode(true);
+
+        fragmento.querySelector(".modal-title").textContent = titulo;
+
+        fragmento.querySelector(".modal-body").innerHTML = `
+          <div class="detail-grid">
+            <div class="detail-item">
+              <strong>Turno</strong>
+              <span>${persona.turno}</span>
+            </div>
+            <div class="detail-item">
+              <strong>Nombre</strong>
+              <span>${persona.nombre}</span>
+            </div>
+            <div class="detail-item">
+              <strong>DNI</strong>
+              <span>${persona.dni}</span>
+            </div>
+            <div class="detail-item">
+              <strong>Teléfono</strong>
+              <span>${persona.telefono}</span>
+            </div>
+            <div class="detail-item">
+              <strong>Tipo de atención</strong>
+              <span>${persona.tipoAtencion}</span>
+            </div>
+            <div class="detail-item">
+              <strong>Fecha de alta</strong>
+              <span>${persona.fechaAlta}</span>
+            </div>
+            <div class="detail-item" style="grid-column: 1 / -1;">
+              <strong>Observaciones</strong>
+              <span>${persona.observaciones}</span>
+            </div>
+          </div>
+        `;
+
+        this.modal.appendChild(fragmento);
+
+        const btnCerrar = this.modal.querySelector(".modal-close");
+        btnCerrar.addEventListener("click", () => this.modal.close());
+
+        this.modal.showModal();
+      }
+
+      /* =======================================================
+         ALERTAS
+         ======================================================= */
+      mostrarAlerta(mensaje, tipo = "success") {
+        const alerta = document.createElement("div");
+        alerta.className = `alert alert-${tipo}`;
+
+        alerta.innerHTML = `
+          <span>${mensaje}</span>
+          <button type="button" aria-label="Cerrar alerta">&times;</button>
+        `;
+
+        const botonCerrar = alerta.querySelector("button");
+        botonCerrar.addEventListener("click", () => alerta.remove());
+
+        this.alertZone.appendChild(alerta);
+
+        setTimeout(() => {
+          alerta.remove();
+        }, 4000);
+      }
+    }
+
+    /* =========================================================
+       ARRANQUE DE LA APLICACIÓN
+       ========================================================= */
+    new GestorTurnos();
+  </script>
+</body>
+</html>
