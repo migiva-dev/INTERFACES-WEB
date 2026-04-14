@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarjeta con imagen local, enlace y botón interno</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 950px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .tarjeta {
+      width: 340px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      transition: all 0.25s ease;
+      border: 3px solid transparent;
+      background-color: white;
+      color: #222;
+    }
+
+    .tarjeta img {
+      display: block;
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background-color: #e5e7eb;
+    }
+
+    .contenido {
+      padding: 20px;
+    }
+
+    .tarjeta h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .tarjeta p {
+      margin: 8px 0;
+    }
+
+    .estado {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .enlace-tarjeta {
+      display: inline-block;
+      margin-top: 14px;
+      color: #1d4ed8;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .enlace-tarjeta:hover {
+      text-decoration: underline;
+    }
+
+    .boton-interno {
+      display: block;
+      margin-top: 14px;
+      border: none;
+      background-color: #0f766e;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .boton-interno:hover:enabled {
+      background-color: #0d5f59;
+    }
+
+    .boton-interno:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .normal {
+      background-color: white;
+      color: #222;
+      border-color: #d1d5db;
+    }
+
+    .normal .estado {
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+
+    .destacada {
+      background-color: #dbeafe;
+      color: #0f172a;
+      border-color: #2563eb;
+      transform: scale(1.02);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+    }
+
+    .destacada .estado {
+      background-color: #2563eb;
+      color: white;
+    }
+
+    .premium {
+      background-color: #dcfce7;
+      color: #14532d;
+      border-color: #16a34a;
+      transform: scale(1.02);
+      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.18);
+    }
+
+    .premium .estado {
+      background-color: #16a34a;
+      color: white;
+    }
+
+    .botones {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .botones button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .botones button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .panel-info {
+      margin-top: 25px;
+      background-color: white;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      max-width: 560px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Atributos HTML</h1>
+    <article
+      id="tarjetaAlumno"
+      class="tarjeta normal"
+      title="Tarjeta de alumno estándar"
+      data-nivel="normal"
+    >
+      <img
+        id="fotoAlumno"
+        src="pablo.png"
+        alt="Imagen de Pablo José Peral"
+      >
+
+      <div class="contenido">
+        <h2 id="nombreAlumno">Pablo José Peral</h2>
+        <p id="cursoAlumno">DAW 2</p>
+        <p id="descripcionAlumno">Entrega las tareas correctamente y participa en clase.</p>
+        <span id="estadoAlumno" class="estado">Alumno estándar</span>
+
+        <a
+          id="enlaceAlumno"
+          class="enlace-tarjeta"
+          href="https://es.wikipedia.org/wiki/Desarrollo_web"
+          target="_blank"
+        >
+          Ver artículo sobre desarrollo web
+        </a>
+
+        <button id="btnInternoTarjeta" class="boton-interno">
+          Enviar mensaje
+        </button>
+      </div>
+    </article>
+
+    <div class="botones">
+      <button id="btnDestacar">Cambiar a destacado</button>
+      <button id="btnPremium">Cambiar a premium</button>
+      <button id="btnEliminarTitle">Eliminar atributo title</button>
+      <button id="btnToggleBotonInterno">Deshabilitar botón interno</button>
+      <button id="btnRestaurar">Restaurar</button>
+    </div>
+
+    <section class="panel-info">
+      <h2>Valores actuales</h2>
+      <p><strong>Nombre:</strong> <span id="infoNombre"></span></p>
+      <p><strong>Clase:</strong> <span id="infoClase"></span></p>
+      <p><strong>Title:</strong> <span id="infoTitle"></span></p>
+      <p><strong>data-nivel:</strong> <span id="infoNivel"></span></p>
+      <p><strong>Enlace href:</strong> <span id="infoHref"></span></p>
+      <p><strong>Imagen src:</strong> <span id="infoSrc"></span></p>
+      <p><strong>Botón interno:</strong> <span id="infoEstadoBoton"></span></p>
+    </section>
+  </div>
+
+  <script>
+    const tarjetaAlumno = document.getElementById("tarjetaAlumno");
+    const fotoAlumno = document.getElementById("fotoAlumno");
+    const nombreAlumno = document.getElementById("nombreAlumno");
+    const cursoAlumno = document.getElementById("cursoAlumno");
+    const descripcionAlumno = document.getElementById("descripcionAlumno");
+    const estadoAlumno = document.getElementById("estadoAlumno");
+    const enlaceAlumno = document.getElementById("enlaceAlumno");
+    const btnInternoTarjeta = document.getElementById("btnInternoTarjeta");
+
+    const infoNombre = document.getElementById("infoNombre");
+    const infoClase = document.getElementById("infoClase");
+    const infoTitle = document.getElementById("infoTitle");
+    const infoNivel = document.getElementById("infoNivel");
+    const infoHref = document.getElementById("infoHref");
+    const infoSrc = document.getElementById("infoSrc");
+    const infoEstadoBoton = document.getElementById("infoEstadoBoton");
+
+    const btnToggleBotonInterno = document.getElementById("btnToggleBotonInterno");
+
+    function actualizarPanelInfo() {
+      infoNombre.textContent = nombreAlumno.textContent;
+      infoClase.textContent = tarjetaAlumno.className;
+
+      // Texto que aparece al poner el cursor por encima
+      const valorTitle = tarjetaAlumno.getAttribute("title");
+      infoTitle.textContent = valorTitle !== null ? valorTitle : "(no existe)";
+
+      // Atributo personalizado
+      infoNivel.textContent = tarjetaAlumno.getAttribute("data-nivel");
+      // Dirección a enlace web
+      infoHref.textContent = enlaceAlumno.getAttribute("href");
+      // Dirección a recurso (la imagen)
+      infoSrc.textContent = fotoAlumno.getAttribute("src");
+      // Botón activo e inactivo
+      infoEstadoBoton.textContent = btnInternoTarjeta.disabled ? "deshabilitado" : "habilitado";
+
+      if (btnInternoTarjeta.disabled) {
+        btnToggleBotonInterno.textContent = "Habilitar botón interno";
+      } else {
+        btnToggleBotonInterno.textContent = "Deshabilitar botón interno";
+      }
+    }
+
+    function limpiarEstadosVisuales() {
+      tarjetaAlumno.classList.remove("normal", "destacada", "premium");
+    }
+
+    function restaurarTarjeta() {
+      fotoAlumno.src = "pablo.png";
+      fotoAlumno.alt = "Imagen de Pablo José Peral";
+
+      nombreAlumno.textContent = "Pablo José Peral";
+      cursoAlumno.textContent = "DAW 2";
+      descripcionAlumno.textContent = "Entrega las tareas correctamente y participa en clase.";
+      estadoAlumno.textContent = "Alumno estándar";
+
+      enlaceAlumno.textContent = "Ver artículo sobre desarrollo web";
+      enlaceAlumno.setAttribute("href", "https://es.wikipedia.org/wiki/Desarrollo_web");
+
+      btnInternoTarjeta.textContent = "Enviar mensaje";
+      btnInternoTarjeta.disabled = false;
+
+      limpiarEstadosVisuales();
+      tarjetaAlumno.classList.add("normal");
+
+      tarjetaAlumno.setAttribute("title", "Tarjeta de alumno estándar");
+      tarjetaAlumno.setAttribute("data-nivel", "normal");
+
+      actualizarPanelInfo();
+    }
+
+    function ponerDestacado() {
+      fotoAlumno.src = "hector.png";
+      fotoAlumno.alt = "Imagen de Héctor Bordes";
+
+      nombreAlumno.textContent = "Héctor Bordes";
+      cursoAlumno.textContent = "DAW 2 - Proyecto final";
+      descripcionAlumno.textContent = "Ha mejorado mucho en JavaScript y destaca en actividades prácticas.";
+      estadoAlumno.textContent = "Alumno destacado";
+
+      enlaceAlumno.textContent = "Ver artículo sobre JavaScript";
+      enlaceAlumno.setAttribute("href", "https://es.wikipedia.org/wiki/JavaScript");
+
+      btnInternoTarjeta.textContent = "Abrir evaluación";
+
+      limpiarEstadosVisuales();
+      tarjetaAlumno.classList.add("destacada");
+
+      tarjetaAlumno.setAttribute("title", "Tarjeta de alumno destacado");
+      tarjetaAlumno.setAttribute("data-nivel", "destacado");
+
+      actualizarPanelInfo();
+    }
+
+    function ponerPremium() {
+      fotoAlumno.src = "jose-vicente.png";
+      fotoAlumno.alt = "Imagen de José Vicente Carratalá";
+
+      nombreAlumno.textContent = "José Vicente Carratalá";
+      cursoAlumno.textContent = "DAW 2 - Nivel avanzado";
+      descripcionAlumno.textContent = "Domina el DOM, resuelve ejercicios complejos y ayuda a sus compañeros.";
+      estadoAlumno.textContent = "Alumno premium";
+
+      enlaceAlumno.textContent = "Ver artículo sobre DOM";
+      enlaceAlumno.setAttribute("href", "https://es.wikipedia.org/wiki/Modelo_de_objetos_del_documento");
+
+      btnInternoTarjeta.textContent = "Asignar tutoría";
+
+      limpiarEstadosVisuales();
+      tarjetaAlumno.classList.add("premium");
+
+      tarjetaAlumno.setAttribute("title", "Tarjeta de alumno premium");
+      tarjetaAlumno.setAttribute("data-nivel", "premium");
+
+      actualizarPanelInfo();
+    }
+
+    function eliminarTitle() {
+      tarjetaAlumno.removeAttribute("title");
+      actualizarPanelInfo();
+    }
+
+    function alternarEstadoBotonInterno() {
+      btnInternoTarjeta.disabled = !btnInternoTarjeta.disabled;
+      actualizarPanelInfo();
+    }
+
+    btnInternoTarjeta.addEventListener("click", function () {
+      alert("Botón interno pulsado");
+    });
+
+    document.getElementById("btnDestacar").addEventListener("click", ponerDestacado);
+    document.getElementById("btnPremium").addEventListener("click", ponerPremium);
+    document.getElementById("btnEliminarTitle").addEventListener("click", eliminarTitle);
+    document.getElementById("btnToggleBotonInterno").addEventListener("click", alternarEstadoBotonInterno);
+    document.getElementById("btnRestaurar").addEventListener("click", restaurarTarjeta);
+
+    restaurarTarjeta();
+  </script>
+</body>
+</html>
