@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspector de nodos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f4f6f8;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    .zona-demo {
+      border: 2px solid #d9e2ec;
+      border-radius: 10px;
+      padding: 20px;
+      background-color: #fafbfc;
+    }
+
+    .resaltado {
+      outline: 3px solid #2d7ff9;
+      background-color: #eaf2ff;
+      transition: 0.2s;
+    }
+
+    .botones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      border: none;
+      background-color: #2d7ff9;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #1f66d1;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      min-height: 280px;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .arbol {
+      background-color: #f8fafc;
+      border: 1px solid #dbe4ee;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 15px;
+      line-height: 1.8;
+    }
+
+    ul {
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <section class="panel">
+      <h1>Inspector de nodos</h1>
+      <p>
+        Pulsa los botones para inspeccionar distintos nodos del DOM y ver:
+        tipo de nodo, padre, hijos, hermanos y valor.
+      </p>
+
+      <div class="botones">
+        <button id="btnDocument">Inspeccionar document</button>
+        <button id="btnMain">Inspeccionar &lt;main&gt;</button>
+        <button id="btnTitulo">Inspeccionar &lt;h2&gt;</button>
+        <button id="btnParrafo">Inspeccionar &lt;p&gt;</button>
+        <button id="btnStrong">Inspeccionar &lt;strong&gt;</button>
+        <button id="btnTexto">Inspeccionar nodo de texto</button>
+      </div>
+
+      <div class="zona-demo">
+        <main id="zonaPrincipal">
+          <h2 id="titulo">Mi tienda</h2>
+          <p id="parrafo">
+            Bienvenido a la <strong id="palabraImportante">zona premium</strong> del sitio.
+          </p>
+          <ul id="lista">
+            <li>Producto A</li>
+            <li>Producto B</li>
+          </ul>
+        </main>
+      </div>
+
+      <div class="arbol">
+        <strong>Árbol simplificado de esta zona:</strong>
+        <ul>
+          <li>document
+            <ul>
+              <li>html
+                <ul>
+                  <li>body
+                    <ul>
+                      <li>main#zonaPrincipal
+                        <ul>
+                          <li>h2#titulo → texto "Mi tienda"</li>
+                          <li>p#parrafo
+                            <ul>
+                              <li>nodo de texto: "Bienvenido a la "</li>
+                              <li>strong#palabraImportante → texto "zona premium"</li>
+                              <li>nodo de texto: " del sitio."</li>
+                            </ul>
+                          </li>
+                          <li>ul#lista
+                            <ul>
+                              <li>li → texto "Producto A"</li>
+                              <li>li → texto "Producto B"</li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Resultado de la inspección</h2>
+      <pre id="salida">Pulsa un botón para inspeccionar un nodo</pre>
+    </section>
+  </div>
+
+  <script>
+    const salida = document.getElementById("salida");
+
+    const zonaPrincipal = document.getElementById("zonaPrincipal");
+    const titulo = document.getElementById("titulo");
+    const parrafo = document.getElementById("parrafo");
+    const palabraImportante = document.getElementById("palabraImportante");
+
+    // Primer nodo de texto dentro del párrafo:
+    // "Bienvenido a la "
+    const nodoTextoParrafo = parrafo.childNodes[0];
+
+    function limpiarResaltado() {
+      document.querySelectorAll(".resaltado").forEach(elemento => {
+        elemento.classList.remove("resaltado");
+      });
+    }
+
+    function tipoNodoTexto(nodeType) {
+    switch (nodeType) {
+        case Node.ELEMENT_NODE:
+        return "ELEMENT_NODE (1)";
+        case Node.TEXT_NODE:
+        return "TEXT_NODE (3)";
+        case Node.COMMENT_NODE:
+        return "COMMENT_NODE (8)";
+        case Node.DOCUMENT_NODE:
+        return "DOCUMENT_NODE (9)";
+        case Node.DOCUMENT_TYPE_NODE:
+        return "DOCUMENT_TYPE_NODE (10)";
+        default:
+        return "Otro tipo (" + nodeType + ")";
+    }
+    }
+
+    function describirNodo(nodo) {
+    if (!nodo) return "null";
+
+    if (nodo.nodeType === Node.TEXT_NODE) {
+        return `${nodo.nodeName} -> ${tipoNodoTexto(nodo.nodeType)} -> "${nodo.nodeValue}"`;
+    }
+
+    return `${nodo.nodeName} -> ${tipoNodoTexto(nodo.nodeType)}`;
+    }
+
+    function listarChildNodes(nodo) {
+      let texto = "";
+      for (let i = 0; i < nodo.childNodes.length; i++) {
+        texto += "  [" + i + "] " + describirNodo(nodo.childNodes[i]) + "\n";
+      }
+      return texto || "  No tiene childNodes.\n";
+    }
+
+    function listarChildren(nodo) {
+      if (!("children" in nodo)) {
+        return "  Este nodo no tiene propiedad children.\n";
+      }
+
+      let texto = "";
+      for (let i = 0; i < nodo.children.length; i++) {
+        texto += "  [" + i + "] " + nodo.children[i].nodeName.toLowerCase() + "\n";
+      }
+      return texto || "  No tiene children.\n";
+    }
+
+    function inspeccionar(nodo, nombre) {
+      limpiarResaltado();
+
+      if (nodo.nodeType === Node.ELEMENT_NODE) {
+        nodo.classList.add("resaltado");
+      }
+
+      let resultado = "";
+      resultado += "NODO INSPECCIONADO: " + nombre + "\n";
+      resultado += "----------------------------------------\n";
+      resultado += "nodeType: " + tipoNodoTexto(nodo.nodeType) + "\n";
+      resultado += "nodeName: " + nodo.nodeName + "\n";
+      resultado += "nodeValue: " + (nodo.nodeValue === null ? "null" : '"' + nodo.nodeValue + '"') + "\n";
+      resultado += "parentNode: " + describirNodo(nodo.parentNode) + "\n";
+      resultado += "firstChild: " + describirNodo(nodo.firstChild) + "\n";
+      resultado += "lastChild: " + describirNodo(nodo.lastChild) + "\n";
+      resultado += "previousSibling: " + describirNodo(nodo.previousSibling) + "\n";
+      resultado += "nextSibling: " + describirNodo(nodo.nextSibling) + "\n";
+      resultado += "childNodes.length: " + (nodo.childNodes ? nodo.childNodes.length : 0) + "\n";
+
+      if ("children" in nodo) {
+        resultado += "children.length: " + nodo.children.length + "\n";
+      } else {
+        resultado += "children.length: no disponible en este nodo\n";
+      }
+
+      if (nodo.childNodes) {
+        resultado += "\nListado de childNodes:\n";
+        resultado += listarChildNodes(nodo);
+      }
+
+      if ("children" in nodo) {
+        resultado += "\nListado de children:\n";
+        resultado += listarChildren(nodo);
+      }
+
+      salida.textContent = resultado;
+    }
+
+    document.getElementById("btnDocument").addEventListener("click", function () {
+      inspeccionar(document, "document");
+    });
+
+    document.getElementById("btnMain").addEventListener("click", function () {
+      inspeccionar(zonaPrincipal, "<main id='zonaPrincipal'>");
+    });
+
+    document.getElementById("btnTitulo").addEventListener("click", function () {
+      inspeccionar(titulo, "<h2 id='titulo'>");
+    });
+
+    document.getElementById("btnParrafo").addEventListener("click", function () {
+      inspeccionar(parrafo, "<p id='parrafo'>");
+    });
+
+    document.getElementById("btnStrong").addEventListener("click", function () {
+      inspeccionar(palabraImportante, "<strong id='palabraImportante'>");
+    });
+
+    document.getElementById("btnTexto").addEventListener("click", function () {
+      inspeccionar(nodoTextoParrafo, "Primer nodo de texto dentro del párrafo");
+    });
+  </script>
+</body>
+</html>
