@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recorrido por relaciones en el DOM</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .tarjeta {
+      background-color: white;
+      border: 2px solid #d1d5db;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      transition: 0.2s;
+    }
+
+    .tarjeta h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .tarjeta p {
+      margin: 8px 0;
+    }
+
+    .estado {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background-color: #e5e7eb;
+      color: #374151;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .tarjeta.destacada {
+      background-color: #dbeafe;
+      border-color: #2563eb;
+      transform: scale(1.02);
+    }
+
+    .tarjeta.destacada .estado {
+      background-color: #2563eb;
+      color: white;
+    }
+
+    .boton-tarjeta {
+      margin-top: 14px;
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .boton-tarjeta:hover {
+      background-color: #1d4ed8;
+    }
+
+    .panel {
+      margin-top: 25px;
+      background-color: white;
+      padding: 18px;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      min-height: 180px;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Ejemplo: recorrido por relaciones</h1>
+    <p>
+      Al pulsar el botón dentro de una tarjeta, el programa localiza el padre,
+      busca algunos hijos concretos dentro de esa tarjeta y modifica solamente esa.
+    </p>
+
+    <div class="grid">
+      <article class="tarjeta" data-id="1">
+        <h2 class="nombre">Ana López</h2>
+        <p class="curso">DAW 2</p>
+        <p>Veces destacada: <span class="contador">0</span></p>
+        <span class="estado">Normal</span>
+        <button class="boton-tarjeta">Destacar esta tarjeta</button>
+      </article>
+
+      <article class="tarjeta" data-id="2">
+        <h2 class="nombre">Héctor Bordes</h2>
+        <p class="curso">DAW 2</p>
+        <p>Veces destacada: <span class="contador">0</span></p>
+        <span class="estado">Normal</span>
+        <button class="boton-tarjeta">Destacar esta tarjeta</button>
+      </article>
+
+      <article class="tarjeta" data-id="3">
+        <h2 class="nombre">José Vicente Carratalá</h2>
+        <p class="curso">DAW 2</p>
+        <p>Veces destacada: <span class="contador">0</span></p>
+        <span class="estado">Normal</span>
+        <button class="boton-tarjeta">Destacar esta tarjeta</button>
+      </article>
+    </div>
+
+    <section class="panel">
+      <h2>Registro del proceso</h2>
+      <pre id="salida">Pulsa un botón de una tarjeta...</pre>
+    </section>
+  </div>
+
+  <script>
+    const botones = document.querySelectorAll(".boton-tarjeta");
+    const salida = document.getElementById("salida");
+
+    function cambiarTarjeta(evento) {
+      // 1. Botón pulsado
+      const botonPulsado = evento.currentTarget;
+
+      // 2. Subimos al padre: la tarjeta que contiene ese botón
+      const tarjeta = botonPulsado.parentElement;
+
+      // 3. Buscamos hijos concretos dentro de ESA tarjeta
+      const nombre = tarjeta.querySelector(".nombre");
+      const estado = tarjeta.querySelector(".estado");
+      const contador = tarjeta.querySelector(".contador");
+
+      // 4. Modificamos solo esa tarjeta
+      let veces = Number(contador.textContent);
+      veces++;
+      contador.textContent = veces;
+
+      tarjeta.classList.toggle("destacada");
+
+      if (tarjeta.classList.contains("destacada")) {
+        estado.textContent = "Destacada";
+        botonPulsado.textContent = "Quitar destaque";
+      } else {
+        estado.textContent = "Normal";
+        botonPulsado.textContent = "Destacar esta tarjeta";
+      }
+
+      salida.textContent =
+        "BOTÓN PULSADO\n" +
+        "-------------\n" +
+        "Se ha pulsado el botón de la tarjeta con data-id = " + tarjeta.getAttribute("data-id") + "\n\n" +
+
+        "RECORRIDO REALIZADO\n" +
+        "-------------------\n" +
+        "1. Se ha obtenido el botón pulsado con evento.currentTarget\n" +
+        "2. Se ha localizado su padre con botonPulsado.parentElement\n" +
+        "3. Dentro de esa tarjeta se han buscado hijos concretos con:\n" +
+        "   - tarjeta.querySelector('.nombre')\n" +
+        "   - tarjeta.querySelector('.estado')\n" +
+        "   - tarjeta.querySelector('.contador')\n\n" +
+
+        "CAMBIOS REALIZADOS\n" +
+        "------------------\n" +
+        "Nombre encontrado: " + nombre.textContent + "\n" +
+        "Nuevo contador: " + contador.textContent + "\n" +
+        "Nuevo estado: " + estado.textContent + "\n\n" +
+
+        "OBSERVACIÓN\n" +
+        "-----------\n" +
+        "Solo se ha modificado la tarjeta padre del botón pulsado.";
+    }
+
+    for (let i = 0; i < botones.length; i++) {
+      botones[i].addEventListener("click", cambiarTarjeta);
+    }
+  </script>
+</body>
+</html>

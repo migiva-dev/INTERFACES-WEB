@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear elementos dinámicamente</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .fila {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 250px;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .btn-eliminar {
+      background-color: #dc2626;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .btn-eliminar:hover {
+      background-color: #b91c1c;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    .tarea {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      background-color: #f8fafc;
+      border: 1px solid #dbe4ee;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+
+    .tarea strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .vacia {
+      color: #64748b;
+      font-style: italic;
+      margin-top: 15px;
+    }
+
+    .info {
+      margin-top: 15px;
+      padding: 12px;
+      background-color: #eef6ff;
+      border-left: 4px solid #2563eb;
+      border-radius: 6px;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <section class="panel">
+      <h1>Ejemplo: crear elementos dinámicamente</h1>
+      <p>
+        Escribe una tarea y pulsa el botón para añadirla a la lista.
+        Cada tarea nueva se crea con JavaScript usando <code>createElement()</code>
+        y se inserta en el DOM con <code>appendChild()</code>.
+      </p>
+
+      <div class="fila">
+        <input type="text" id="txtTarea" placeholder="Escribe una tarea">
+        <button id="btnAgregar">Añadir tarea</button>
+      </div>
+
+      <div class="info">
+        <strong>Total de tareas:</strong>
+        <span id="totalTareas">0</span>
+      </div>
+
+      <p id="mensajeListaVacia" class="vacia">Todavía no hay tareas en la lista.</p>
+
+      <ul id="listaTareas"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Qué hace el ejemplo</h2>
+      <pre id="salidaProceso">Aquí se mostrará el último proceso realizado...</pre>
+    </section>
+  </div>
+
+  <script>
+    const txtTarea = document.getElementById("txtTarea");
+    const btnAgregar = document.getElementById("btnAgregar");
+    const listaTareas = document.getElementById("listaTareas");
+    const totalTareas = document.getElementById("totalTareas");
+    const mensajeListaVacia = document.getElementById("mensajeListaVacia");
+    const salidaProceso = document.getElementById("salidaProceso");
+
+    let contadorTareas = 0;
+
+    function actualizarEstadoLista() {
+      totalTareas.textContent = listaTareas.children.length;
+
+      if (listaTareas.children.length === 0) {
+        mensajeListaVacia.style.display = "block";
+      } else {
+        mensajeListaVacia.style.display = "none";
+      }
+    }
+
+    function mostrarProceso(texto) {
+      salidaProceso.textContent = texto;
+    }
+
+    function crearTarea(textoTarea) {
+      contadorTareas++;
+
+      // 1. Crear el elemento principal de la tarea
+      const li = document.createElement("li");
+      li.classList.add("tarea");
+      li.setAttribute("data-id", contadorTareas);
+
+      // 2. Crear un contenedor para el texto
+      const divTexto = document.createElement("div");
+
+      const titulo = document.createElement("strong");
+      titulo.textContent = textoTarea;
+
+      const meta = document.createElement("span");
+      meta.classList.add("meta");
+      meta.textContent = "Tarea número " + contadorTareas;
+
+      divTexto.appendChild(titulo);
+      divTexto.appendChild(meta);
+
+      // 3. Crear botón de eliminar
+      const btnEliminar = document.createElement("button");
+      btnEliminar.textContent = "Eliminar";
+      btnEliminar.classList.add("btn-eliminar");
+      btnEliminar.setAttribute("title", "Eliminar esta tarea");
+
+      btnEliminar.addEventListener("click", function () {
+        listaTareas.removeChild(li);
+        actualizarEstadoLista();
+
+        mostrarProceso(
+          "Se ha eliminado la tarea con data-id = " + li.getAttribute("data-id") + "\n" +
+          "Texto de la tarea: " + titulo.textContent + "\n\n" +
+          "Se ha usado removeChild() sobre el elemento padre <ul>."
+        );
+      });
+
+      // 4. Montar la tarea
+      li.appendChild(divTexto);
+      li.appendChild(btnEliminar);
+
+      // 5. Insertarla en la lista
+      listaTareas.appendChild(li);
+
+      mostrarProceso(
+        "Se ha creado una nueva tarea dinámicamente.\n\n" +
+        "Pasos realizados:\n" +
+        "1. createElement('li')\n" +
+        "2. createElement('div')\n" +
+        "3. createElement('strong')\n" +
+        "4. createElement('span')\n" +
+        "5. createElement('button')\n" +
+        "6. appendChild() para montar la estructura\n" +
+        "7. appendChild() para insertar la tarea dentro del <ul>\n\n" +
+        "Texto insertado: " + textoTarea + "\n" +
+        "data-id asignado: " + li.getAttribute("data-id")
+      );
+    }
+
+    function agregarTarea() {
+      const texto = txtTarea.value.trim();
+
+      if (texto === "") {
+        alert("Debes escribir una tarea.");
+        txtTarea.focus();
+        return;
+      }
+
+      crearTarea(texto);
+      txtTarea.value = "";
+      txtTarea.focus();
+      actualizarEstadoLista();
+    }
+
+    btnAgregar.addEventListener("click", agregarTarea);
+
+    txtTarea.addEventListener("keydown", function (evento) {
+      if (evento.key === "Enter") {
+        agregarTarea();
+      }
+    });
+
+    actualizarEstadoLista();
+  </script>
+</body>
+</html>

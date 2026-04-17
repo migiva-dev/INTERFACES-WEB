@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eliminar y reemplazar nodos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .botones {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    ul {
+      margin-top: 15px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .caja-texto {
+      border: 1px solid #dbe4ee;
+      border-radius: 8px;
+      padding: 14px;
+      background-color: #f8fafc;
+      margin-top: 15px;
+    }
+
+    .zona-tarjeta {
+      margin-top: 15px;
+    }
+
+    .tarjeta {
+      width: 320px;
+      border-radius: 12px;
+      padding: 18px;
+      border: 2px solid #cbd5e1;
+      background-color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .tarjeta h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .tarjeta p {
+      margin: 8px 0;
+    }
+
+    .tarjeta-a {
+      background-color: #eef6ff;
+      border-color: #93c5fd;
+    }
+
+    .tarjeta-b {
+      background-color: #ecfdf5;
+      border-color: #86efac;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      min-height: 340px;
+      overflow-x: auto;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Ejemplo: eliminar y reemplazar nodos</h1>
+    <p>
+      Este ejemplo muestra tres operaciones muy habituales sobre el DOM:
+      eliminar nodos y reemplazar un nodo por otro.
+    </p>
+
+    <div class="grid">
+      <div>
+        <section class="panel">
+          <h2>1. Borrar el último elemento de una lista</h2>
+          <p>
+            Pulsa el botón para eliminar el último <code>&lt;li&gt;</code> de la lista.
+          </p>
+
+          <ul id="listaTareas">
+            <li>Preparar práctica de DOM</li>
+            <li>Corregir ejercicios</li>
+            <li>Subir materiales</li>
+            <li>Revisar dudas del alumnado</li>
+          </ul>
+
+          <div class="botones">
+            <button id="btnBorrarUltimo">Borrar último elemento</button>
+            <button id="btnRestaurarLista">Restaurar lista</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>2. Reemplazar un &lt;p&gt; por un &lt;strong&gt;</h2>
+          <p>
+            Aquí hay un párrafo que puede ser sustituido por otro nodo distinto.
+          </p>
+
+          <div class="caja-texto" id="cajaTexto">
+            <p id="parrafoAviso">Este es un mensaje informativo normal.</p>
+          </div>
+
+          <div class="botones">
+            <button id="btnReemplazarTexto">Reemplazar por &lt;strong&gt;</button>
+            <button id="btnRestaurarTexto">Restaurar &lt;p&gt;</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>3. Cambiar una tarjeta por otra</h2>
+          <p>
+            El contenedor mantiene una única tarjeta. El botón sustituye la actual por otra nueva.
+          </p>
+
+          <div class="zona-tarjeta" id="contenedorTarjeta">
+            <article class="tarjeta tarjeta-a" id="tarjetaActual">
+              <h3>Tarjeta A</h3>
+              <p><strong>Nombre:</strong> Producto básico</p>
+              <p><strong>Estado:</strong> Disponible</p>
+              <p><strong>Color:</strong> Azul</p>
+            </article>
+          </div>
+
+          <div class="botones">
+            <button id="btnCambiarTarjeta">Cambiar tarjeta</button>
+            <button id="btnRestaurarTarjeta">Restaurar tarjeta inicial</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <h2>Registro de acciones</h2>
+        <pre id="salida">Aquí aparecerá la explicación de cada operación...</pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const salida = document.getElementById("salida");
+
+    const listaTareas = document.getElementById("listaTareas");
+    const cajaTexto = document.getElementById("cajaTexto");
+    const contenedorTarjeta = document.getElementById("contenedorTarjeta");
+
+    function mostrarProceso(texto) {
+      salida.textContent = texto;
+    }
+
+    function restaurarLista() {
+      listaTareas.innerHTML = `
+        <li>Preparar práctica de DOM</li>
+        <li>Corregir ejercicios</li>
+        <li>Subir materiales</li>
+        <li>Revisar dudas del alumnado</li>
+      `;
+
+      mostrarProceso(
+        "Se ha restaurado la lista original.\n\n" +
+        "Ahora vuelve a tener 4 elementos <li>."
+      );
+    }
+
+    function borrarUltimoElemento() {
+      if (listaTareas.children.length === 0) {
+        mostrarProceso(
+          "No se puede borrar el último elemento porque la lista ya está vacía."
+        );
+        return;
+      }
+
+      const ultimoElemento = listaTareas.lastElementChild;
+      const textoEliminado = ultimoElemento.textContent;
+
+      listaTareas.removeChild(ultimoElemento);
+
+      mostrarProceso(
+        "OPERACIÓN: eliminar nodo\n\n" +
+        "Se ha localizado el último elemento con:\n" +
+        "listaTareas.lastElementChild\n\n" +
+        "Después se ha eliminado con:\n" +
+        "listaTareas.removeChild(ultimoElemento)\n\n" +
+        "Texto eliminado: " + textoEliminado + "\n" +
+        "Elementos restantes: " + listaTareas.children.length
+      );
+    }
+
+    function restaurarTexto() {
+      cajaTexto.innerHTML = `<p id="parrafoAviso">Este es un mensaje informativo normal.</p>`;
+
+      mostrarProceso(
+        "Se ha restaurado el nodo original.\n\n" +
+        "Dentro de la caja vuelve a existir un <p>."
+      );
+    }
+
+    function reemplazarParrafoPorStrong() {
+      const parrafoActual = cajaTexto.firstElementChild;
+
+      if (!parrafoActual) {
+        mostrarProceso("No hay ningún nodo dentro de la caja para reemplazar.");
+        return;
+      }
+
+      if (parrafoActual.tagName.toLowerCase() === "strong") {
+        mostrarProceso(
+          "El nodo actual ya es un <strong>. Pulsa 'Restaurar <p>' para volver al estado inicial."
+        );
+        return;
+      }
+
+      const nuevoStrong = document.createElement("strong");
+      nuevoStrong.textContent = "ATENCIÓN: este mensaje ha sido reemplazado por un nodo <strong>.";
+
+      cajaTexto.replaceChild(nuevoStrong, parrafoActual);
+
+      mostrarProceso(
+        "OPERACIÓN: reemplazar nodo\n\n" +
+        "Se ha creado un nuevo nodo con:\n" +
+        "document.createElement('strong')\n\n" +
+        "Luego se ha sustituido el <p> original con:\n" +
+        "cajaTexto.replaceChild(nuevoStrong, parrafoActual)\n\n" +
+        "Resultado: donde antes había un <p>, ahora hay un <strong>."
+      );
+    }
+
+    function crearTarjetaA() {
+      const tarjeta = document.createElement("article");
+      tarjeta.classList.add("tarjeta", "tarjeta-a");
+      tarjeta.id = "tarjetaActual";
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = "Tarjeta A";
+
+      const p1 = document.createElement("p");
+      p1.innerHTML = "<strong>Nombre:</strong> Producto básico";
+
+      const p2 = document.createElement("p");
+      p2.innerHTML = "<strong>Estado:</strong> Disponible";
+
+      const p3 = document.createElement("p");
+      p3.innerHTML = "<strong>Color:</strong> Azul";
+
+      tarjeta.appendChild(titulo);
+      tarjeta.appendChild(p1);
+      tarjeta.appendChild(p2);
+      tarjeta.appendChild(p3);
+
+      return tarjeta;
+    }
+
+    function crearTarjetaB() {
+      const tarjeta = document.createElement("article");
+      tarjeta.classList.add("tarjeta", "tarjeta-b");
+      tarjeta.id = "tarjetaActual";
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = "Tarjeta B";
+
+      const p1 = document.createElement("p");
+      p1.innerHTML = "<strong>Nombre:</strong> Producto avanzado";
+
+      const p2 = document.createElement("p");
+      p2.innerHTML = "<strong>Estado:</strong> Reservado";
+
+      const p3 = document.createElement("p");
+      p3.innerHTML = "<strong>Color:</strong> Verde";
+
+      tarjeta.appendChild(titulo);
+      tarjeta.appendChild(p1);
+      tarjeta.appendChild(p2);
+      tarjeta.appendChild(p3);
+
+      return tarjeta;
+    }
+
+    function cambiarTarjeta() {
+      const tarjetaActual = contenedorTarjeta.firstElementChild;
+
+      if (!tarjetaActual) {
+        mostrarProceso("No hay ninguna tarjeta actual en el contenedor.");
+        return;
+      }
+
+      let nuevaTarjeta;
+
+      if (tarjetaActual.classList.contains("tarjeta-a")) {
+        nuevaTarjeta = crearTarjetaB();
+      } else {
+        nuevaTarjeta = crearTarjetaA();
+      }
+
+      contenedorTarjeta.replaceChild(nuevaTarjeta, tarjetaActual);
+
+      mostrarProceso(
+        "OPERACIÓN: reemplazar una tarjeta completa por otra\n\n" +
+        "Se ha detectado cuál era la tarjeta actual.\n" +
+        "Después se ha creado otra nueva con createElement().\n" +
+        "Finalmente se ha sustituido la tarjeta antigua con:\n" +
+        "contenedorTarjeta.replaceChild(nuevaTarjeta, tarjetaActual)\n\n" +
+        "Ahora el contenedor sigue teniendo una sola tarjeta, pero ya es distinta."
+      );
+    }
+
+    function restaurarTarjetaInicial() {
+      contenedorTarjeta.innerHTML = "";
+
+      const tarjetaInicial = crearTarjetaA();
+      contenedorTarjeta.appendChild(tarjetaInicial);
+
+      mostrarProceso(
+        "Se ha restaurado la tarjeta inicial.\n\n" +
+        "El contenedor vuelve a mostrar la Tarjeta A."
+      );
+    }
+
+    document.getElementById("btnBorrarUltimo").addEventListener("click", borrarUltimoElemento);
+    document.getElementById("btnRestaurarLista").addEventListener("click", restaurarLista);
+
+    document.getElementById("btnReemplazarTexto").addEventListener("click", reemplazarParrafoPorStrong);
+    document.getElementById("btnRestaurarTexto").addEventListener("click", restaurarTexto);
+
+    document.getElementById("btnCambiarTarjeta").addEventListener("click", cambiarTarjeta);
+    document.getElementById("btnRestaurarTarjeta").addEventListener("click", restaurarTarjetaInicial);
+  </script>
+</body>
+</html>
