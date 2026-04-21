@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de tareas DOM</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .fila {
+      display: grid;
+      grid-template-columns: 2fr 2fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    input[type="text"],
+    input[type="url"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .acciones-superiores {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-ordenar {
+      background-color: #7c3aed;
+    }
+
+    .btn-ordenar:hover {
+      background-color: #6d28d9;
+    }
+
+    .btn-eliminar {
+      background-color: #dc2626;
+    }
+
+    .btn-eliminar:hover {
+      background-color: #b91c1c;
+    }
+
+    .btn-editar {
+      background-color: #f59e0b;
+    }
+
+    .btn-editar:hover {
+      background-color: #d97706;
+    }
+
+    .btn-estado {
+      background-color: #059669;
+    }
+
+    .btn-estado:hover {
+      background-color: #047857;
+    }
+
+    .btn-prioridad {
+      background-color: #0f766e;
+    }
+
+    .btn-prioridad:hover {
+      background-color: #115e59;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    .tarea {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 2px solid #dbe4ee;
+      background-color: #f8fafc;
+    }
+
+    .tarea[data-estado="pendiente"] {
+      border-color: #f59e0b;
+      background-color: #fff7ed;
+    }
+
+    .tarea[data-estado="completada"] {
+      border-color: #22c55e;
+      background-color: #ecfdf5;
+      opacity: 0.92;
+    }
+
+    .tarea[data-estado="completada"] .titulo-tarea {
+      text-decoration: line-through;
+      color: #166534;
+    }
+
+    .contenido-tarea {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .contenido-tarea img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      flex-shrink: 0;
+    }
+
+    .texto-tarea {
+      min-width: 0;
+    }
+
+    .texto-tarea strong,
+    .texto-tarea a {
+      display: block;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: #64748b;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .estado-texto {
+      font-weight: bold;
+    }
+
+    .acciones-tarea {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .vacia {
+      color: #64748b;
+      font-style: italic;
+      margin-top: 15px;
+    }
+
+    .info {
+      margin-top: 15px;
+      padding: 12px;
+      background-color: #eef6ff;
+      border-left: 4px solid #2563eb;
+      border-radius: 6px;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 800px) {
+      .fila {
+        grid-template-columns: 1fr;
+      }
+
+      .tarea {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .acciones-tarea {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <section class="panel">
+      <h1>Ejercicio resuelto: gestor de tareas</h1>
+      <p>
+        Este ejemplo parte de la creación dinámica de elementos y añade cambio de estado,
+        edición, prioridad, enlace, imagen y reorganización por prioridad.
+      </p>
+
+      <div class="fila">
+        <input type="text" id="txtTarea" placeholder="Escribe una tarea">
+        <input type="url" id="txtEnlace" placeholder="Escribe una URL (https://...)" value="https://example.com">
+        <button id="btnAgregar" title="Añadir una nueva tarea a la lista">Añadir tarea</button>
+      </div>
+
+      <div class="acciones-superiores">
+        <button id="btnOrdenar" class="btn-ordenar" title="Reorganizar automáticamente las tareas por prioridad">
+          Ordenar por prioridad
+        </button>
+      </div>
+
+      <div class="info">
+        <strong>Total de tareas:</strong>
+        <span id="totalTareas">0</span>
+      </div>
+
+      <p id="mensajeListaVacia" class="vacia">Todavía no hay tareas en la lista.</p>
+
+      <ul id="listaTareas"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Último proceso realizado</h2>
+      <pre id="salidaProceso">Aquí se mostrará el último proceso realizado...</pre>
+    </section>
+  </div>
+
+  <script>
+    const txtTarea = document.getElementById("txtTarea");
+    const txtEnlace = document.getElementById("txtEnlace");
+    const btnAgregar = document.getElementById("btnAgregar");
+    const btnOrdenar = document.getElementById("btnOrdenar");
+    const listaTareas = document.getElementById("listaTareas");
+    const totalTareas = document.getElementById("totalTareas");
+    const mensajeListaVacia = document.getElementById("mensajeListaVacia");
+    const salidaProceso = document.getElementById("salidaProceso");
+
+    let contadorTareas = 0;
+    const prioridades = ["baja", "media", "alta"];
+    const pesosPrioridad = {
+      alta: 3,
+      media: 2,
+      baja: 1
+    };
+
+    function actualizarEstadoLista() {
+      totalTareas.textContent = listaTareas.children.length;
+      mensajeListaVacia.style.display = listaTareas.children.length === 0 ? "block" : "none";
+    }
+
+    function mostrarProceso(texto) {
+      salidaProceso.textContent = texto;
+    }
+
+    function obtenerImagenSegunEstado(estado) {
+      if (estado === "completada") {
+        return "https://cdn-icons-png.flaticon.com/512/190/190411.png";
+      }
+      return "https://cdn-icons-png.flaticon.com/512/1828/1828919.png";
+    }
+
+    function obtenerTextoEstado(estado) {
+      return estado === "completada" ? "Completada" : "Pendiente";
+    }
+
+    function actualizarVistaTarea(li) {
+      const estado = li.getAttribute("data-estado");
+      const prioridad = li.getAttribute("data-prioridad");
+      const url = li.getAttribute("data-url");
+
+      const estadoTexto = li.querySelector(".estado-texto");
+      const prioridadTexto = li.querySelector(".prioridad-texto");
+      const imagen = li.querySelector("img");
+      const enlace = li.querySelector("a");
+      const btnEstado = li.querySelector(".btn-estado");
+
+      estadoTexto.textContent = obtenerTextoEstado(estado);
+      prioridadTexto.textContent = prioridad;
+      imagen.src = obtenerImagenSegunEstado(estado);
+      imagen.alt = "Icono de tarea " + estado;
+      enlace.href = url;
+      enlace.textContent = url;
+      btnEstado.textContent = estado === "pendiente" ? "Completar" : "Marcar pendiente";
+    }
+
+    function crearBoton(texto, clase, title) {
+      const boton = document.createElement("button");
+      boton.textContent = texto;
+      boton.classList.add(clase);
+      boton.setAttribute("title", title);
+      return boton;
+    }
+
+    function crearTarea(textoTarea, urlTarea) {
+      contadorTareas++;
+
+      const li = document.createElement("li");
+      li.classList.add("tarea");
+      li.setAttribute("data-id", contadorTareas);
+      li.setAttribute("data-estado", "pendiente");
+      li.setAttribute("data-prioridad", "baja");
+      li.setAttribute("data-url", urlTarea);
+
+      const contenido = document.createElement("div");
+      contenido.classList.add("contenido-tarea");
+
+      const imagen = document.createElement("img");
+      imagen.src = obtenerImagenSegunEstado("pendiente");
+      imagen.alt = "Icono de tarea pendiente";
+
+      const texto = document.createElement("div");
+      texto.classList.add("texto-tarea");
+
+      const titulo = document.createElement("strong");
+      titulo.classList.add("titulo-tarea");
+      titulo.textContent = textoTarea;
+
+      const enlace = document.createElement("a");
+      enlace.target = "_blank";
+      enlace.rel = "noopener noreferrer";
+      enlace.href = urlTarea;
+      enlace.textContent = urlTarea;
+
+      const meta = document.createElement("span");
+      meta.classList.add("meta");
+      meta.innerHTML =
+        "ID: <span class='id-texto'>" + contadorTareas + "</span> | " +
+        "Estado: <span class='estado-texto'>Pendiente</span> | " +
+        "Prioridad: <span class='prioridad-texto'>baja</span>";
+
+      texto.appendChild(titulo);
+      texto.appendChild(enlace);
+      texto.appendChild(meta);
+
+      contenido.appendChild(imagen);
+      contenido.appendChild(texto);
+
+      const acciones = document.createElement("div");
+      acciones.classList.add("acciones-tarea");
+
+      const btnEstado = crearBoton("Completar", "btn-estado", "Cambiar el estado de la tarea");
+      const btnEditar = crearBoton("Editar", "btn-editar", "Editar el texto de la tarea");
+      const btnPrioridad = crearBoton("Cambiar prioridad", "btn-prioridad", "Asignar una prioridad a la tarea");
+      const btnEliminar = crearBoton("Eliminar", "btn-eliminar", "Eliminar esta tarea");
+
+      btnEstado.addEventListener("click", function () {
+        const estadoActual = li.getAttribute("data-estado");
+        const nuevoEstado = estadoActual === "pendiente" ? "completada" : "pendiente";
+        li.setAttribute("data-estado", nuevoEstado);
+        actualizarVistaTarea(li);
+
+        mostrarProceso(
+          "Se ha cambiado el estado de la tarea con data-id = " + li.getAttribute("data-id") + "\n" +
+          "Nuevo data-estado: " + li.getAttribute("data-estado") + "\n" +
+          "Se ha actualizado el texto del estado, la imagen y el CSS de la tarea."
+        );
+      });
+
+      btnEditar.addEventListener("click", function () {
+        const nuevoTexto = prompt("Edita el texto de la tarea:", titulo.textContent);
+
+        if (nuevoTexto === null) {
+          return;
+        }
+
+        const textoLimpio = nuevoTexto.trim();
+        if (textoLimpio === "") {
+          alert("El texto no puede estar vacío.");
+          return;
+        }
+
+        titulo.textContent = textoLimpio;
+
+        mostrarProceso(
+          "Se ha editado la tarea con data-id = " + li.getAttribute("data-id") + "\n" +
+          "Nuevo texto: " + titulo.textContent
+        );
+      });
+
+      btnPrioridad.addEventListener("click", function () {
+        const prioridadActual = li.getAttribute("data-prioridad");
+        const indiceActual = prioridades.indexOf(prioridadActual);
+        const nuevoIndice = (indiceActual + 1) % prioridades.length;
+        const nuevaPrioridad = prioridades[nuevoIndice];
+
+        li.setAttribute("data-prioridad", nuevaPrioridad);
+        actualizarVistaTarea(li);
+
+        mostrarProceso(
+          "Se ha cambiado la prioridad de la tarea con data-id = " + li.getAttribute("data-id") + "\n" +
+          "Nueva prioridad: " + nuevaPrioridad
+        );
+      });
+
+      btnEliminar.addEventListener("click", function () {
+        listaTareas.removeChild(li);
+        actualizarEstadoLista();
+
+        mostrarProceso(
+          "Se ha eliminado la tarea con data-id = " + li.getAttribute("data-id") + "\n" +
+          "Texto eliminado: " + titulo.textContent + "\n\n" +
+          "Se ha usado removeChild() sobre el elemento padre <ul>."
+        );
+      });
+
+      acciones.appendChild(btnEstado);
+      acciones.appendChild(btnEditar);
+      acciones.appendChild(btnPrioridad);
+      acciones.appendChild(btnEliminar);
+
+      li.appendChild(contenido);
+      li.appendChild(acciones);
+
+      listaTareas.appendChild(li);
+      actualizarVistaTarea(li);
+
+      mostrarProceso(
+        "Se ha creado una nueva tarea dinámicamente.\n\n" +
+        "Pasos realizados:\n" +
+        "1. createElement('li')\n" +
+        "2. Se han añadido atributos data-id, data-estado, data-prioridad y data-url\n" +
+        "3. Se han creado imagen, texto, enlace, metadatos y botones\n" +
+        "4. appendChild() para montar toda la estructura\n" +
+        "5. appendChild() para insertar la tarea dentro del <ul>\n\n" +
+        "Texto insertado: " + textoTarea + "\n" +
+        "URL guardada: " + urlTarea + "\n" +
+        "Estado inicial: pendiente\n" +
+        "Prioridad inicial: baja"
+      );
+    }
+
+    function agregarTarea() {
+      const texto = txtTarea.value.trim();
+      const url = txtEnlace.value.trim();
+
+      if (texto === "") {
+        alert("Debes escribir una tarea.");
+        txtTarea.focus();
+        return;
+      }
+
+      if (url === "") {
+        alert("Debes escribir una URL.");
+        txtEnlace.focus();
+        return;
+      }
+
+      crearTarea(texto, url);
+      txtTarea.value = "";
+      txtTarea.focus();
+      actualizarEstadoLista();
+    }
+
+    function ordenarPorPrioridad() {
+      const tareas = Array.from(listaTareas.children);
+
+      if (tareas.length < 2) {
+        mostrarProceso("No hay suficientes tareas para reorganizar por prioridad.");
+        return;
+      }
+
+      tareas.sort(function (a, b) {
+        return pesosPrioridad[b.getAttribute("data-prioridad")] - pesosPrioridad[a.getAttribute("data-prioridad")];
+      });
+
+      for (let i = 0; i < tareas.length; i++) {
+        listaTareas.appendChild(tareas[i]);
+      }
+
+      mostrarProceso(
+        "Se han reorganizado las tareas por prioridad.\n\n" +
+        "Orden aplicado: alta > media > baja\n" +
+        "La reorganización se ha hecho sustituyendo su posición en pantalla al volver a insertarlas en el <ul>."
+      );
+    }
+
+    btnAgregar.addEventListener("click", agregarTarea);
+    btnOrdenar.addEventListener("click", ordenarPorPrioridad);
+
+    txtTarea.addEventListener("keydown", function (evento) {
+      if (evento.key === "Enter") {
+        agregarTarea();
+      }
+    });
+
+    actualizarEstadoLista();
+  </script>
+</body>
+</html>
