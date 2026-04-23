@@ -2,7 +2,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-$wsdl = "http://localhost/TU_CARPETA/servicio-biblioteca.wsdl";
+$wsdl = "http://localhost/biblioteca/servicio-biblioteca.wsdl";
 
 /*
 |--------------------------------------------------------------------------

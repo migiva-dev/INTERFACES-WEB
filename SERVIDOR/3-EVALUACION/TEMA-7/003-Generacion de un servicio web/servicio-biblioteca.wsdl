@@ -63,7 +63,7 @@
 
     <service name="ServicioBibliotecaService">
         <port name="ServicioBibliotecaPort" binding="tns:ServicioBibliotecaBinding">
-            <soap:address location="http://localhost/TU_CARPETA/servicio-biblioteca.php"/>
+            <soap:address location="http://localhost/biblioteca/servicio-biblioteca.php"/>
         </port>
     </service>
 
