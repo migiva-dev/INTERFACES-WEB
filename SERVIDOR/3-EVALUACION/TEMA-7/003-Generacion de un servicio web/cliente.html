@@ -3,23 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <title>Cliente Biblioteca</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+        form{
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        label{
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+        input{
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button{
+            margin-top: 20px;
+            padding: 10px 16px;
+        }
+    </style>
 </head>
 <body>
 
-    <h2>Consultar préstamo</h2>
+    <h1>Consulta de préstamo</h1>
 
-    <form action="cliente.php" method="POST">
+    <form action="servicio-biblioteca.php" method="post">
+        <label for="dni">DNI</label>
+        <input type="text" name="dni" id="dni" required>
 
-        DNI:
-        <input type="text" name="dni" required>
-        <br><br>
+        <label for="codigoLibro">Código del libro</label>
+        <input type="text" name="codigoLibro" id="codigoLibro" required>
 
-        Código libro:
-        <input type="text" name="codigoLibro" required>
-        <br><br>
-
-        <input type="submit" value="Consultar">
-
+        <button type="submit">Consultar</button>
     </form>
 
 </body>
