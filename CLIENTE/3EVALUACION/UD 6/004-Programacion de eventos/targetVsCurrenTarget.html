@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>target vs currentTarget</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .tarjeta {
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 20px;
+      background-color: #ffffff;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .tarjeta:hover {
+      border-color: #2563eb;
+      background-color: #f8fbff;
+    }
+
+    .tarjeta h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .tarjeta p {
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+
+    .tarjeta button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .tarjeta button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .resaltado-target {
+      outline: 3px solid #f97316;
+      background-color: #fff7ed;
+    }
+
+    .resaltado-current {
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+    }
+
+    .leyenda {
+      margin-top: 18px;
+      padding: 12px;
+      border-left: 4px solid #2563eb;
+      background-color: #eef6ff;
+      border-radius: 6px;
+      line-height: 1.6;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      min-height: 260px;
+      overflow-x: auto;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .botones {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .botones button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .botones button:hover {
+      background-color: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Ejemplo: <code>event.target</code> vs <code>event.currentTarget</code></h1>
+    <p>
+      El listener está puesto solo en la tarjeta. Haz click en distintas zonas:
+      el título, el párrafo, el botón o el fondo de la propia tarjeta.
+    </p>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Zona de prueba</h2>
+
+        <article id="tarjeta" class="tarjeta">
+          <h2 id="tituloTarjeta">Tarjeta de ejemplo</h2>
+          <p id="parrafoTarjeta">
+            Este párrafo está dentro de la tarjeta. Si haces click aquí,
+            el evento se origina en el párrafo, pero el listener sigue estando en la tarjeta.
+          </p>
+          <button id="btnTarjeta">Botón interior</button>
+        </article>
+
+        <div class="leyenda">
+          <strong>Naranja</strong>: elemento real pulsado (<code>target</code>)<br>
+          <strong>Azul</strong>: elemento que tiene el listener (<code>currentTarget</code>)
+        </div>
+
+        <div class="botones">
+          <button id="btnLimpiar">Limpiar resaltado</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Resultado</h2>
+        <pre id="salida">Haz click dentro de la tarjeta...</pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const tarjeta = document.getElementById("tarjeta");
+    const salida = document.getElementById("salida");
+    const btnLimpiar = document.getElementById("btnLimpiar");
+
+    function limpiarResaltados() {
+      document.querySelectorAll(".resaltado-target").forEach(function (el) {
+        el.classList.remove("resaltado-target");
+      });
+
+      document.querySelectorAll(".resaltado-current").forEach(function (el) {
+        el.classList.remove("resaltado-current");
+      });
+    }
+
+    function describirElemento(elemento) {
+      if (!elemento) {
+        return "null";
+      }
+
+      let descripcion = elemento.tagName.toLowerCase();
+
+      if (elemento.id) {
+        descripcion += "#" + elemento.id;
+      }
+
+      return descripcion;
+    }
+
+    tarjeta.addEventListener("click", function (event) {
+      limpiarResaltados();
+
+      const target = event.target;
+      const currentTarget = event.currentTarget;
+
+      target.classList.add("resaltado-target");
+      currentTarget.classList.add("resaltado-current");
+
+      salida.textContent =
+        "LISTENER EJECUTADO\n" +
+        "------------------\n" +
+        "El listener está asociado a la tarjeta.\n\n" +
+
+        "event.target\n" +
+        "------------\n" +
+        describirElemento(target) + "\n" +
+        "Es el elemento donde realmente se ha originado el click.\n\n" +
+
+        "event.currentTarget\n" +
+        "-------------------\n" +
+        describirElemento(currentTarget) + "\n" +
+        "Es el elemento que está ejecutando el listener en este momento.\n\n" +
+
+        "CONCLUSIÓN\n" +
+        "----------\n" +
+        "Puedes hacer click en un hijo de la tarjeta y entonces:\n" +
+        "- target cambia según el elemento pulsado\n" +
+        "- currentTarget sigue siendo la tarjeta, porque ahí está el listener";
+    });
+
+    btnLimpiar.addEventListener("click", function () {
+      limpiarResaltados();
+      salida.textContent = "Haz click dentro de la tarjeta...";
+    });
+  </script>
+</body>
+</html>

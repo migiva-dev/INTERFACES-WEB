@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Propagación de eventos: captura y burbujeo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .zona-demo {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #f8fafc;
+      border: 1px solid #dbe4ee;
+      border-radius: 10px;
+    }
+
+    .caja {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-weight: bold;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #cajaExterior {
+      background-color: #dbeafe;
+      border: 3px solid #2563eb;
+      min-height: 320px;
+    }
+
+    #cajaMedia {
+      background-color: #dcfce7;
+      border: 3px solid #16a34a;
+      width: 70%;
+      min-height: 220px;
+    }
+
+    #btnInterior {
+      border: none;
+      background-color: #f97316;
+      color: white;
+      padding: 14px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    #btnInterior:hover {
+      background-color: #ea580c;
+    }
+
+    .botones-control {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .botones-control button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .botones-control button:hover {
+      background-color: #1d4ed8;
+    }
+
+    #log {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 420px;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      font-family: Consolas, monospace;
+      font-size: 14px;
+    }
+
+    .leyenda {
+      margin-top: 20px;
+      padding: 12px;
+      border-left: 4px solid #2563eb;
+      background-color: #eef6ff;
+      border-radius: 6px;
+      line-height: 1.6;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Ejemplo: propagación básica con cajas anidadas</h1>
+    <p>
+      Al pulsar el botón interior se ejecutan listeners en fase de <strong>captura</strong>
+      y en fase de <strong>burbujeo</strong>. Observa el orden en el registro.
+    </p>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Zona de prueba</h2>
+
+        <div class="zona-demo">
+          <div id="cajaExterior" class="caja">
+            Caja exterior
+            <div id="cajaMedia" class="caja">
+              Caja media
+              <button id="btnInterior">Botón interior</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="botones-control">
+          <button id="btnLimpiar">Limpiar registro</button>
+        </div>
+
+        <div class="leyenda">
+          <strong>Qué observar:</strong><br>
+          1. En <code>captura</code>, el evento baja desde fuera hacia dentro.<br>
+          2. En <code>target</code>, llega al botón pulsado.<br>
+          3. En <code>burbujeo</code>, sube desde dentro hacia fuera.
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Registro de ejecución</h2>
+        <div id="log">Pulsa el botón interior para ver el recorrido del evento.</div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const cajaExterior = document.getElementById("cajaExterior");
+    const cajaMedia = document.getElementById("cajaMedia");
+    const btnInterior = document.getElementById("btnInterior");
+    const log = document.getElementById("log");
+    const btnLimpiar = document.getElementById("btnLimpiar");
+
+    let contador = 0;
+
+    function nombreFase(event) {
+      switch (event.eventPhase) {
+        case Event.CAPTURING_PHASE:
+          return "CAPTURA";
+        case Event.AT_TARGET:
+          return "TARGET";
+        case Event.BUBBLING_PHASE:
+          return "BURBUJEO";
+        default:
+          return "DESCONOCIDA";
+      }
+    }
+
+    function escribirLinea(texto) {
+      if (contador === 0) {
+        log.textContent = "";
+      }
+
+      contador++;
+      log.textContent += contador + ". " + texto + "\n";
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function crearListener(nombreElemento, tipoListener) {
+      return function (event) {
+        escribirLinea(
+          "Listener en " + nombreElemento +
+          " | listener configurado en: " + tipoListener +
+          " | fase actual: " + nombreFase(event) +
+          " | target: " + event.target.id +
+          " | currentTarget: " + event.currentTarget.id
+        );
+      };
+    }
+
+    // LISTENERS EN CAPTURA
+    cajaExterior.addEventListener("click", crearListener("cajaExterior", "captura"), true);
+    cajaMedia.addEventListener("click", crearListener("cajaMedia", "captura"), true);
+    btnInterior.addEventListener("click", crearListener("btnInterior", "captura"), true);
+
+    // LISTENERS EN BURBUJEO
+    cajaExterior.addEventListener("click", crearListener("cajaExterior", "burbujeo"), false);
+    cajaMedia.addEventListener("click", crearListener("cajaMedia", "burbujeo"), false);
+    btnInterior.addEventListener("click", crearListener("btnInterior", "burbujeo"), false);
+
+    btnLimpiar.addEventListener("click", function () {
+      contador = 0;
+      log.textContent = "Pulsa el botón interior para ver el recorrido del evento.";
+    });
+  </script>
+</body>
+</html>

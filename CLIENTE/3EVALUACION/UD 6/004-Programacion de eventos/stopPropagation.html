@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejemplo de stopPropagation()</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .controles {
+      margin-bottom: 20px;
+      padding: 14px;
+      background-color: #eef6ff;
+      border-left: 4px solid #2563eb;
+      border-radius: 6px;
+      line-height: 1.7;
+    }
+
+    .estado-modo {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      background-color: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .tarjeta {
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 20px;
+      background-color: white;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .tarjeta.seleccionada {
+      background-color: #dbeafe;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    }
+
+    .tarjeta h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .tarjeta p {
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+
+    .zona-botones {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .btn-interno {
+      background-color: #dc2626;
+    }
+
+    .btn-interno:hover {
+      background-color: #b91c1c;
+    }
+
+    .btn-secundario {
+      background-color: #475569;
+    }
+
+    .btn-secundario:hover {
+      background-color: #334155;
+    }
+
+    .resultado {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #f8fafc;
+      border: 1px solid #dbe4ee;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 8px;
+      min-height: 280px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .contador {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background-color: #e5e7eb;
+      color: #374151;
+      font-size: 13px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Ejemplo: <code>stopPropagation()</code> con tarjeta y botón interno</h1>
+    <p>
+      La tarjeta completa reacciona al click, pero dentro tiene un botón.
+      Cambia el modo para comprobar qué ocurre al pulsar el botón interior.
+    </p>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="controles">
+          <strong>Modo actual:</strong><br>
+          <span id="modoActual" class="estado-modo">SIN stopPropagation()</span>
+
+          <div class="zona-botones">
+            <button id="btnCambiarModo">Cambiar modo</button>
+            <button id="btnReiniciar" class="btn-secundario">Reiniciar estado</button>
+          </div>
+
+          <p>
+            <strong>Qué debes probar:</strong><br>
+            1. Haz click en la tarjeta.<br>
+            2. Haz click en el botón interior.<br>
+            3. Observa el registro y compara ambos modos.
+          </p>
+        </div>
+
+        <article id="tarjeta" class="tarjeta">
+          <h2 id="tituloTarjeta">Tarjeta de producto</h2>
+          <p id="descripcionTarjeta">
+            Esta tarjeta representa un producto editable. La tarjeta completa
+            tiene un listener de click, y el botón interior también.
+          </p>
+
+          <span class="contador">Clicks en la tarjeta: <span id="contadorTarjeta">0</span></span>
+          <br>
+          <span class="contador">Clicks en el botón: <span id="contadorBoton">0</span></span>
+
+          <div class="zona-botones">
+            <button id="btnEditar" class="btn-interno">Editar</button>
+          </div>
+        </article>
+
+        <div class="resultado">
+          <strong>Interpretación esperada:</strong>
+          <ul>
+            <li>Sin <code>stopPropagation()</code>, el click del botón también llega a la tarjeta.</li>
+            <li>Con <code>stopPropagation()</code>, el click se detiene en el botón.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Registro de acciones</h2>
+        <pre id="salida">Prueba haciendo click en la tarjeta y en el botón interior...</pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const tarjeta = document.getElementById("tarjeta");
+    const btnEditar = document.getElementById("btnEditar");
+    const salida = document.getElementById("salida");
+    const modoActual = document.getElementById("modoActual");
+    const btnCambiarModo = document.getElementById("btnCambiarModo");
+    const btnReiniciar = document.getElementById("btnReiniciar");
+    const contadorTarjeta = document.getElementById("contadorTarjeta");
+    const contadorBoton = document.getElementById("contadorBoton");
+
+    let usarStopPropagation = false;
+    let clicksTarjeta = 0;
+    let clicksBoton = 0;
+    let numeroLinea = 0;
+
+    function escribirLog(texto) {
+      if (numeroLinea === 0) {
+        salida.textContent = "";
+      }
+
+      numeroLinea++;
+      salida.textContent += numeroLinea + ". " + texto + "\n";
+      salida.scrollTop = salida.scrollHeight;
+    }
+
+    function actualizarModoVisual() {
+      if (usarStopPropagation) {
+        modoActual.textContent = "CON stopPropagation()";
+      } else {
+        modoActual.textContent = "SIN stopPropagation()";
+      }
+    }
+
+    function actualizarContadores() {
+      contadorTarjeta.textContent = clicksTarjeta;
+      contadorBoton.textContent = clicksBoton;
+    }
+
+    tarjeta.addEventListener("click", function () {
+      clicksTarjeta++;
+      actualizarContadores();
+
+      tarjeta.classList.toggle("seleccionada");
+
+      escribirLog(
+        "Listener de la TARJETA ejecutado. " +
+        "La tarjeta ha reaccionado al click."
+      );
+    });
+
+    btnEditar.addEventListener("click", function (event) {
+      clicksBoton++;
+      actualizarContadores();
+
+      escribirLog(
+        "Listener del BOTÓN ejecutado. " +
+        "Se ha pulsado el botón interior."
+      );
+
+      if (usarStopPropagation) {
+        event.stopPropagation();
+
+        escribirLog(
+          "Se ha ejecutado event.stopPropagation(). " +
+          "El evento NO seguirá propagándose hacia la tarjeta."
+        );
+      } else {
+        escribirLog(
+          "NO se ha usado stopPropagation(). " +
+          "El evento seguirá propagándose y llegará a la tarjeta."
+        );
+      }
+    });
+
+    btnCambiarModo.addEventListener("click", function () {
+      usarStopPropagation = !usarStopPropagation;
+      actualizarModoVisual();
+
+      numeroLinea = 0;
+      salida.textContent = "Modo cambiado. Haz pruebas otra vez.\n";
+
+      if (usarStopPropagation) {
+        escribirLog("Ahora el botón interior sí detendrá la propagación.");
+      } else {
+        escribirLog("Ahora el botón interior no detendrá la propagación.");
+      }
+    });
+
+    btnReiniciar.addEventListener("click", function () {
+      clicksTarjeta = 0;
+      clicksBoton = 0;
+      numeroLinea = 0;
+
+      tarjeta.classList.remove("seleccionada");
+      actualizarContadores();
+      salida.textContent = "Estado reiniciado. Vuelve a probar.\n";
+    });
+
+    actualizarModoVisual();
+    actualizarContadores();
+  </script>
+</body>
+</html>

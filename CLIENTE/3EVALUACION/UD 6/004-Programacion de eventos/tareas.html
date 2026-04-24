@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delegación de eventos en una lista de tareas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .fila {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 260px;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .tarea {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      padding: 14px;
+      border: 1px solid #dbe4ee;
+      border-radius: 10px;
+      background-color: #f8fafc;
+      margin-bottom: 10px;
+    }
+
+    .tarea.completada {
+      background-color: #ecfdf5;
+      border-color: #86efac;
+    }
+
+    .tarea.completada .texto-tarea {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    .bloque-texto {
+      flex: 1;
+    }
+
+    .texto-tarea {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .acciones {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-completar {
+      background-color: #0f766e;
+    }
+
+    .btn-completar:hover {
+      background-color: #0d5f59;
+    }
+
+    .btn-eliminar {
+      background-color: #dc2626;
+    }
+
+    .btn-eliminar:hover {
+      background-color: #b91c1c;
+    }
+
+    .resumen {
+      margin-top: 18px;
+      padding: 12px;
+      border-left: 4px solid #2563eb;
+      background-color: #eef6ff;
+      border-radius: 6px;
+      line-height: 1.7;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 8px;
+      min-height: 340px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .contador {
+      display: inline-block;
+      margin-top: 10px;
+      margin-right: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background-color: #e5e7eb;
+      color: #374151;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .vacio {
+      color: #64748b;
+      font-style: italic;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Ejemplo: delegación de eventos en una lista de tareas</h1>
+    <p>
+      Todos los botones de completar y eliminar se gestionan desde
+      un único listener colocado en el <code>&lt;ul&gt;</code>.
+    </p>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Lista de tareas</h2>
+
+        <div class="fila">
+          <input type="text" id="txtNuevaTarea" placeholder="Escribe una nueva tarea">
+          <button id="btnAgregar">Añadir tarea</button>
+        </div>
+
+        <div>
+          <span class="contador">Total: <span id="totalTareas">0</span></span>
+          <span class="contador">Completadas: <span id="totalCompletadas">0</span></span>
+        </div>
+
+        <p id="mensajeVacio" class="vacio">No hay tareas en la lista.</p>
+
+        <ul id="listaTareas">
+          <li class="tarea" data-id="1">
+            <div class="bloque-texto">
+              <span class="texto-tarea">Preparar práctica de DOM</span>
+              <span class="meta">Tarea inicial 1</span>
+            </div>
+            <div class="acciones">
+              <button class="btn-completar" data-accion="completar">Completar</button>
+              <button class="btn-eliminar" data-accion="eliminar">Eliminar</button>
+            </div>
+          </li>
+
+          <li class="tarea" data-id="2">
+            <div class="bloque-texto">
+              <span class="texto-tarea">Corregir ejercicios</span>
+              <span class="meta">Tarea inicial 2</span>
+            </div>
+            <div class="acciones">
+              <button class="btn-completar" data-accion="completar">Completar</button>
+              <button class="btn-eliminar" data-accion="eliminar">Eliminar</button>
+            </div>
+          </li>
+
+          <li class="tarea" data-id="3">
+            <div class="bloque-texto">
+              <span class="texto-tarea">Subir materiales a la plataforma</span>
+              <span class="meta">Tarea inicial 3</span>
+            </div>
+            <div class="acciones">
+              <button class="btn-completar" data-accion="completar">Completar</button>
+              <button class="btn-eliminar" data-accion="eliminar">Eliminar</button>
+            </div>
+          </li>
+        </ul>
+
+        <div class="resumen">
+          <strong>Idea clave:</strong><br>
+          El listener no está en cada botón individual. Está en el
+          <code>&lt;ul&gt;</code>. Cuando se pulsa un botón, se usa
+          <code>event.target</code> para saber qué botón fue y luego se localiza
+          la tarea correspondiente.
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Registro del proceso</h2>
+        <pre id="salida">Prueba los botones de las tareas o añade una nueva...</pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const listaTareas = document.getElementById("listaTareas");
+    const txtNuevaTarea = document.getElementById("txtNuevaTarea");
+    const btnAgregar = document.getElementById("btnAgregar");
+    const salida = document.getElementById("salida");
+    const totalTareas = document.getElementById("totalTareas");
+    const totalCompletadas = document.getElementById("totalCompletadas");
+    const mensajeVacio = document.getElementById("mensajeVacio");
+
+    let siguienteId = 4;
+    let numeroLinea = 0;
+
+    function escribirLog(texto) {
+      if (numeroLinea === 0) {
+        salida.textContent = "";
+      }
+
+      numeroLinea++;
+      salida.textContent += numeroLinea + ". " + texto + "\n";
+      salida.scrollTop = salida.scrollHeight;
+    }
+
+    function actualizarResumen() {
+      const tareas = listaTareas.querySelectorAll(".tarea");
+      const completadas = listaTareas.querySelectorAll(".tarea.completada");
+
+      totalTareas.textContent = tareas.length;
+      totalCompletadas.textContent = completadas.length;
+
+      if (tareas.length === 0) {
+        mensajeVacio.style.display = "block";
+      } else {
+        mensajeVacio.style.display = "none";
+      }
+    }
+
+    function crearTarea(texto) {
+      const li = document.createElement("li");
+      li.classList.add("tarea");
+      li.setAttribute("data-id", siguienteId);
+
+      const bloqueTexto = document.createElement("div");
+      bloqueTexto.classList.add("bloque-texto");
+
+      const spanTexto = document.createElement("span");
+      spanTexto.classList.add("texto-tarea");
+      spanTexto.textContent = texto;
+
+      const spanMeta = document.createElement("span");
+      spanMeta.classList.add("meta");
+      spanMeta.textContent = "Tarea añadida dinámicamente";
+
+      bloqueTexto.appendChild(spanTexto);
+      bloqueTexto.appendChild(spanMeta);
+
+      const acciones = document.createElement("div");
+      acciones.classList.add("acciones");
+
+      const btnCompletar = document.createElement("button");
+      btnCompletar.classList.add("btn-completar");
+      btnCompletar.setAttribute("data-accion", "completar");
+      btnCompletar.textContent = "Completar";
+
+      const btnEliminar = document.createElement("button");
+      btnEliminar.classList.add("btn-eliminar");
+      btnEliminar.setAttribute("data-accion", "eliminar");
+      btnEliminar.textContent = "Eliminar";
+
+      acciones.appendChild(btnCompletar);
+      acciones.appendChild(btnEliminar);
+
+      li.appendChild(bloqueTexto);
+      li.appendChild(acciones);
+
+      siguienteId++;
+      return li;
+    }
+
+    function agregarTarea() {
+      const texto = txtNuevaTarea.value.trim();
+
+      if (texto === "") {
+        alert("Debes escribir una tarea.");
+        txtNuevaTarea.focus();
+        return;
+      }
+
+      const nuevaTarea = crearTarea(texto);
+      listaTareas.appendChild(nuevaTarea);
+
+      escribirLog(
+        "Se ha añadido una tarea nueva con createElement() y appendChild(). " +
+        "No se ha añadido ningún listener a sus botones, porque la lista usa delegación de eventos."
+      );
+
+      txtNuevaTarea.value = "";
+      txtNuevaTarea.focus();
+      actualizarResumen();
+    }
+
+    listaTareas.addEventListener("click", function (event) {
+      const botonPulsado = event.target;
+
+      if (!botonPulsado.matches("button[data-accion]")) {
+        escribirLog(
+          "Se ha hecho click dentro del <ul>, pero no sobre un botón de acción. " +
+          "No se realiza ninguna operación."
+        );
+        return;
+      }
+
+      const accion = botonPulsado.getAttribute("data-accion");
+      const tarea = botonPulsado.closest(".tarea");
+      const textoTarea = tarea.querySelector(".texto-tarea");
+
+      escribirLog(
+        "El listener único del <ul> ha recibido el evento.\n" +
+        "event.target = " + botonPulsado.tagName.toLowerCase() + "\n" +
+        "Acción detectada = " + accion + "\n" +
+        "Tarea afectada = " + textoTarea.textContent
+      );
+
+      if (accion === "completar") {
+        tarea.classList.toggle("completada");
+
+        if (tarea.classList.contains("completada")) {
+          botonPulsado.textContent = "Desmarcar";
+          escribirLog(
+            "Se ha marcado la tarea como completada. " +
+            "La clase 'completada' se ha añadido al <li> correspondiente."
+          );
+        } else {
+          botonPulsado.textContent = "Completar";
+          escribirLog(
+            "Se ha quitado el estado de completada. " +
+            "La clase 'completada' se ha eliminado del <li> correspondiente."
+          );
+        }
+      }
+
+      if (accion === "eliminar") {
+        listaTareas.removeChild(tarea);
+
+        escribirLog(
+          "Se ha eliminado la tarea desde el listener del <ul>. " +
+          "Se ha usado removeChild() sobre la lista."
+        );
+      }
+
+      actualizarResumen();
+    });
+
+    btnAgregar.addEventListener("click", agregarTarea);
+
+    txtNuevaTarea.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        agregarTarea();
+      }
+    });
+
+    actualizarResumen();
+  </script>
+</body>
+</html>
