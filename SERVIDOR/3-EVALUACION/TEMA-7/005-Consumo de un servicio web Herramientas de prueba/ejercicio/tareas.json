@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "titulo": "Estudiar PHP",
+        "descripcion": "Repasar creación de APIs REST con PHP y JSON.",
+        "completada": false,
+        "prioridad": "alta",
+        "fechaCreacion": "2026-04-27 09:00:00"
+    },
+    {
+        "id": 2,
+        "titulo": "Hacer ejercicios",
+        "descripcion": "Completar los ejercicios de servicios web.",
+        "completada": true,
+        "prioridad": "media",
+        "fechaCreacion": "2026-04-27 10:30:00"
+    },
+    {
+        "id": 3,
+        "titulo": "Revisar documentación",
+        "descripcion": "Leer la especificación OpenAPI del servicio.",
+        "completada": false,
+        "prioridad": "baja",
+        "fechaCreacion": "2026-04-27 12:00:00"
+    }
+]

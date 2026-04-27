@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cliente REST Tareas</title>
+</head>
+<body>
+
+<h1>Cliente REST - Tareas</h1>
+
+<h2>1. Listar tareas</h2>
+<button id="btnListar">GET /tareas</button>
+
+<hr>
+
+<h2>2. Consultar tarea por ID</h2>
+<label>ID:</label><br>
+<input type="number" id="idConsultar" value="1"><br><br>
+<button id="btnConsultar">GET /tareas/{id}</button>
+
+<hr>
+
+<h2>3. Crear tarea</h2>
+<label>Título:</label><br>
+<input type="text" id="tituloCrear" value="Nueva tarea"><br><br>
+
+<label>Descripción:</label><br>
+<textarea id="descripcionCrear">Descripción de prueba</textarea><br><br>
+
+<label>Prioridad:</label><br>
+<select id="prioridadCrear">
+    <option value="baja">Baja</option>
+    <option value="media" selected>Media</option>
+    <option value="alta">Alta</option>
+</select><br><br>
+
+<label>
+    <input type="checkbox" id="completadaCrear">
+    Completada
+</label><br><br>
+
+<button id="btnCrear">POST /tareas</button>
+
+<hr>
+
+<h2>4. Actualizar tarea</h2>
+<label>ID:</label><br>
+<input type="number" id="idPatch" value="1"><br><br>
+
+<label>Título:</label><br>
+<input type="text" id="tituloPatch" value="Tarea actualizada"><br><br>
+
+<label>Descripción:</label><br>
+<textarea id="descripcionPatch">Descripción actualizada</textarea><br><br>
+
+<label>Prioridad:</label><br>
+<select id="prioridadPatch">
+    <option value="baja">Baja</option>
+    <option value="media">Media</option>
+    <option value="alta" selected>Alta</option>
+</select><br><br>
+
+<label>
+    <input type="checkbox" id="completadaPatch">
+    Completada
+</label><br><br>
+
+<button id="btnPatch">PATCH /tareas/{id}</button>
+
+<hr>
+
+<h2>5. Eliminar tarea</h2>
+<label>ID:</label><br>
+<input type="number" id="idEliminar" value="1"><br><br>
+<button id="btnEliminar">DELETE /tareas/{id}</button>
+
+<hr>
+
+<h2>Petición realizada</h2>
+<pre id="peticion"></pre>
+
+<h2>Respuesta del servidor</h2>
+<pre id="respuesta"></pre>
+
+<script>
+const baseUrl = "apiRestTareas.php";
+
+const peticion = document.getElementById("peticion");
+const respuesta = document.getElementById("respuesta");
+
+function mostrarPeticion(metodo, url, body = null) {
+    let texto = metodo + " " + url;
+
+    if (body !== null) {
+        texto += "\n\nBody:\n" + JSON.stringify(body, null, 2);
+    }
+
+    peticion.innerText = texto;
+}
+
+async function mostrarRespuesta(resp) {
+    const texto = await resp.text();
+
+    respuesta.innerText =
+        "Código HTTP: " + resp.status + "\n\n" +
+        (texto || "Sin cuerpo de respuesta");
+}
+
+// ----------------------------------------------------
+// GET /tareas
+// ----------------------------------------------------
+document.getElementById("btnListar").addEventListener("click", async () => {
+    const url = baseUrl + "/tareas";
+
+    mostrarPeticion("GET", url);
+
+    const resp = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json"
+        }
+    });
+
+    await mostrarRespuesta(resp);
+});
+
+// ----------------------------------------------------
+// GET /tareas/{id}
+// ----------------------------------------------------
+document.getElementById("btnConsultar").addEventListener("click", async () => {
+    const id = document.getElementById("idConsultar").value;
+    const url = baseUrl + "/tareas/" + encodeURIComponent(id);
+
+    mostrarPeticion("GET", url);
+
+    const resp = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json"
+        }
+    });
+
+    await mostrarRespuesta(resp);
+});
+
+// ----------------------------------------------------
+// POST /tareas
+// ----------------------------------------------------
+document.getElementById("btnCrear").addEventListener("click", async () => {
+    const url = baseUrl + "/tareas";
+
+    const body = {
+        titulo: document.getElementById("tituloCrear").value,
+        descripcion: document.getElementById("descripcionCrear").value,
+        completada: document.getElementById("completadaCrear").checked,
+        prioridad: document.getElementById("prioridadCrear").value
+    };
+
+    mostrarPeticion("POST", url, body);
+
+    const resp = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    await mostrarRespuesta(resp);
+});
+
+// ----------------------------------------------------
+// PATCH /tareas/{id}
+// ----------------------------------------------------
+document.getElementById("btnPatch").addEventListener("click", async () => {
+    const id = document.getElementById("idPatch").value;
+    const url = baseUrl + "/tareas/" + encodeURIComponent(id);
+
+    const body = {
+        titulo: document.getElementById("tituloPatch").value,
+        descripcion: document.getElementById("descripcionPatch").value,
+        completada: document.getElementById("completadaPatch").checked,
+        prioridad: document.getElementById("prioridadPatch").value
+    };
+
+    mostrarPeticion("PATCH", url, body);
+
+    const resp = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    await mostrarRespuesta(resp);
+});
+
+// ----------------------------------------------------
+// DELETE /tareas/{id}
+// ----------------------------------------------------
+document.getElementById("btnEliminar").addEventListener("click", async () => {
+    const id = document.getElementById("idEliminar").value;
+    const url = baseUrl + "/tareas/" + encodeURIComponent(id);
+
+    mostrarPeticion("DELETE", url);
+
+    const resp = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            "Accept": "application/json"
+        }
+    });
+
+    await mostrarRespuesta(resp);
+});
+</script>
+
+</body>
+</html>

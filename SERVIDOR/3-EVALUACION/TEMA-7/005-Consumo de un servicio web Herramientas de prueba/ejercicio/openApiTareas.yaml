@@ -1,0 +1,213 @@
+openapi: 3.0.3
+
+info:
+  title: API REST Tareas
+  version: 1.0.0
+  description: API REST sencilla para consultar, crear, modificar y eliminar tareas.
+
+servers:
+  - url: http://localhost/daw2servidor/apiRestTareas.php
+    description: Servidor local XAMPP
+
+paths:
+  /tareas:
+    get:
+      summary: Listar tareas
+      description: Devuelve todas las tareas disponibles en el sistema.
+      operationId: listarTareas
+      responses:
+        "200":
+          description: Listado de tareas obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 3
+                  tareas:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Tarea"
+
+    post:
+      summary: Crear tarea
+      description: Crea una nueva tarea.
+      operationId: crearTarea
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TareaEntrada"
+      responses:
+        "201":
+          description: Tarea creada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tarea"
+        "400":
+          description: Datos incorrectos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tareas/{id}:
+    get:
+      summary: Consultar tarea por ID
+      description: Devuelve una tarea concreta a partir de su identificador.
+      operationId: consultarTarea
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador de la tarea
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Tarea encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tarea"
+        "404":
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      summary: Actualizar parcialmente una tarea
+      description: Permite modificar uno o varios campos de una tarea.
+      operationId: actualizarTareaParcial
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador de la tarea
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TareaParcial"
+      responses:
+        "200":
+          description: Tarea actualizada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tarea"
+        "400":
+          description: Datos incorrectos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      summary: Eliminar tarea
+      description: Elimina una tarea por su identificador.
+      operationId: eliminarTarea
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador de la tarea
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "204":
+          description: Tarea eliminada correctamente
+        "404":
+          description: Tarea no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Tarea:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        titulo:
+          type: string
+          example: Estudiar PHP
+        descripcion:
+          type: string
+          example: Repasar creación de APIs REST con PHP y JSON.
+        completada:
+          type: boolean
+          example: false
+        prioridad:
+          type: string
+          enum: [baja, media, alta]
+          example: alta
+        fechaCreacion:
+          type: string
+          format: date-time
+          example: "2026-04-27 09:00:00"
+
+    TareaEntrada:
+      type: object
+      required:
+        - titulo
+        - descripcion
+      properties:
+        titulo:
+          type: string
+          example: Estudiar PHP
+        descripcion:
+          type: string
+          example: Repasar creación de APIs REST con PHP y JSON.
+        completada:
+          type: boolean
+          example: false
+        prioridad:
+          type: string
+          enum: [baja, media, alta]
+          example: alta
+
+    TareaParcial:
+      type: object
+      properties:
+        titulo:
+          type: string
+          example: Tarea actualizada
+        descripcion:
+          type: string
+          example: Nueva descripción de la tarea.
+        completada:
+          type: boolean
+          example: true
+        prioridad:
+          type: string
+          enum: [baja, media, alta]
+          example: media
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Tarea no encontrada
