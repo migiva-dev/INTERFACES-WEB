@@ -1,0 +1,12 @@
+{
+  "name": "calculadora-precios-jsdoc",
+  "version": "1.0.0",
+  "description": "Ejemplo didáctico de documentación de código JavaScript con JSDoc.",
+  "private": true,
+  "scripts": {
+    "generar-docs": "jsdoc ./js/app.js ./js/precios.js -d ./docs/api -P package.json"
+  },
+  "devDependencies": {
+    "jsdoc": "^4.0.0"
+  }
+}
