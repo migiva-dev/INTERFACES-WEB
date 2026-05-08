@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de pedidos de cafetería</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 30px;
+      background-color: #f4f6f8;
+      color: #222;
+    }
+
+    .contenedor {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    .grid-principal {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    button {
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .btn-secundario {
+      background-color: #475569;
+    }
+
+    .btn-secundario:hover {
+      background-color: #334155;
+    }
+
+    .btn-preparar {
+      background-color: #0f766e;
+    }
+
+    .btn-preparar:hover {
+      background-color: #0d5f59;
+    }
+
+    .btn-cancelar,
+    .btn-eliminar {
+      background-color: #dc2626;
+    }
+
+    .btn-cancelar:hover,
+    .btn-eliminar:hover {
+      background-color: #b91c1c;
+    }
+
+    .btn-editar {
+      background-color: #9333ea;
+    }
+
+    .btn-editar:hover {
+      background-color: #7e22ce;
+    }
+
+    .resumen {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .dato-resumen {
+      background-color: #f8fafc;
+      border: 1px solid #dbe4ee;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .dato-resumen strong {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+
+    .zona-pedidos {
+      display: grid;
+      gap: 14px;
+    }
+
+    .pedido {
+      border: 2px solid #d1d5db;
+      border-radius: 14px;
+      padding: 16px;
+      background-color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .pedido:hover {
+      border-color: #2563eb;
+    }
+
+    .pedido.seleccionado {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16);
+    }
+
+    .pedido-preparando {
+      background-color: #fff7ed;
+      border-color: #fb923c;
+    }
+
+    .pedido-preparado {
+      background-color: #ecfdf5;
+      border-color: #22c55e;
+    }
+
+    .pedido-cancelado {
+      background-color: #fef2f2;
+      border-color: #ef4444;
+      opacity: 0.85;
+    }
+
+    .cabecera-pedido {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .cabecera-pedido h3 {
+      margin-bottom: 4px;
+    }
+
+    .etiquetas {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .etiqueta {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+
+    .etiqueta.estado-pendiente {
+      background-color: #e0f2fe;
+      color: #075985;
+    }
+
+    .etiqueta.estado-preparando {
+      background-color: #ffedd5;
+      color: #9a3412;
+    }
+
+    .etiqueta.estado-preparado {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .etiqueta.estado-cancelado {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .prioridad-alta {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .prioridad-media {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .prioridad-baja {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .acciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .acciones button {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .linea-info {
+      margin: 6px 0;
+    }
+
+    .muted {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .fila-botones {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    code {
+      background-color: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>Gestor de pedidos de cafetería</h1>
+
+    <div class="grid-principal">
+      <div>
+        <section class="panel">
+          <h2>Nuevo pedido</h2>
+
+          <form id="formPedido" autocomplete="off">
+            <label>
+              Cliente
+              <input id="inpCliente" type="text" placeholder="Ej: Ana" required>
+            </label>
+
+            <label>
+              Producto
+              <select id="selProducto" required>
+                <option value="Café" data-precio="1.30">Café - 1.30 €</option>
+                <option value="Cortado" data-precio="1.40">Cortado - 1.40 €</option>
+                <option value="Tostada" data-precio="2.20">Tostada - 2.20 €</option>
+                <option value="Bocadillo" data-precio="4.50">Bocadillo - 4.50 €</option>
+                <option value="Zumo" data-precio="2.10">Zumo - 2.10 €</option>
+              </select>
+            </label>
+
+            <label>
+              Cantidad
+              <input id="inpCantidad" type="number" min="1" max="20" value="1" required>
+            </label>
+
+            <label>
+              Prioridad
+              <select id="selPrioridad" required>
+                <option value="baja">Baja</option>
+                <option value="media" selected>Media</option>
+                <option value="alta">Alta</option>
+              </select>
+            </label>
+
+            <label>
+              Observaciones
+              <textarea id="txtObservaciones" placeholder="Ej: sin azúcar, para llevar..."></textarea>
+            </label>
+
+            <button type="submit">Añadir pedido</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Resumen</h2>
+
+          <div class="resumen">
+            <div class="dato-resumen">
+              <strong id="totalPedidos">0</strong>
+              Total pedidos
+            </div>
+            <div class="dato-resumen">
+              <strong id="totalPreparados">0</strong>
+              Preparados
+            </div>
+            <div class="dato-resumen">
+              <strong id="totalPendientes">0</strong>
+              Pendientes
+            </div>
+            <div class="dato-resumen">
+              <strong id="importeTotal">0.00 €</strong>
+              Importe activo
+            </div>
+          </div>
+
+          <div class="fila-botones">
+            <button id="btnLimpiarPreparados" type="button" class="btn-secundario">Eliminar preparados/cancelados</button>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel">
+          <h2>Pedidos</h2>
+          <p class="muted" id="mensajeVacio">Todavía no hay pedidos registrados.</p>
+          <div id="listaPedidos" class="zona-pedidos"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    // Clase Pedido
+    // =====================================================
+    class Pedido {
+      #id;
+      #cliente;
+      #producto;
+      #precioUnitario;
+      #cantidad;
+      #prioridad;
+      #observaciones;
+      #estado;
+
+      constructor(id, cliente, producto, precioUnitario, cantidad, prioridad, observaciones) {
+        this.#id = id;
+        this.setCliente(cliente);
+        this.setProducto(producto);
+        this.setPrecioUnitario(precioUnitario);
+        this.setCantidad(cantidad);
+        this.setPrioridad(prioridad);
+        this.setObservaciones(observaciones);
+        this.#estado = "pendiente";
+      }
+
+      getId() { return this.#id; }
+      getCliente() { return this.#cliente; }
+      getProducto() { return this.#producto; }
+      getPrecioUnitario() { return this.#precioUnitario; }
+      getCantidad() { return this.#cantidad; }
+      getPrioridad() { return this.#prioridad; }
+      getObservaciones() { return this.#observaciones; }
+      getEstado() { return this.#estado; }
+
+      setCliente(cliente) {
+        this.#cliente = cliente.trim();
+      }
+
+      setProducto(producto) {
+        this.#producto = producto;
+      }
+
+      setPrecioUnitario(precioUnitario) {
+        this.#precioUnitario = Number(precioUnitario);
+      }
+
+      setCantidad(cantidad) {
+        this.#cantidad = Number(cantidad);
+      }
+
+      setPrioridad(prioridad) {
+        this.#prioridad = prioridad;
+      }
+
+      setObservaciones(observaciones) {
+        const texto = observaciones.trim();
+        this.#observaciones = texto === "" ? "Sin observaciones" : texto;
+      }
+
+      setEstado(estado) {
+        this.#estado = estado;
+      }
+
+      getImporte() {
+        return this.#precioUnitario * this.#cantidad;
+      }
+    }
+
+    // =====================================================
+    // Referencias al DOM
+    // =====================================================
+    const formPedido = document.getElementById("formPedido");
+    const inpCliente = document.getElementById("inpCliente");
+    const selProducto = document.getElementById("selProducto");
+    const inpCantidad = document.getElementById("inpCantidad");
+    const selPrioridad = document.getElementById("selPrioridad");
+    const txtObservaciones = document.getElementById("txtObservaciones");
+
+    const listaPedidos = document.getElementById("listaPedidos");
+    const mensajeVacio = document.getElementById("mensajeVacio");
+
+    const totalPedidos = document.getElementById("totalPedidos");
+    const totalPreparados = document.getElementById("totalPreparados");
+    const totalPendientes = document.getElementById("totalPendientes");
+    const importeTotal = document.getElementById("importeTotal");
+
+    const btnLimpiarPreparados = document.getElementById("btnLimpiarPreparados");
+
+    // =====================================================
+    // Estado de la aplicación
+    // =====================================================
+    let siguienteId = 1;
+
+    // =====================================================
+    // Funciones auxiliares
+    // =====================================================
+
+    function formatearEuros(numero) {
+      return Number(numero).toFixed(2) + " €";
+    }
+
+    // TODO 1:
+    // Implementa la función obtenerPrecioSeleccionado().
+    // Debe obtener la opción actualmente seleccionada del select de productos,
+    // leer su atributo data-precio y devolverlo como número.z
+    function obtenerPrecioSeleccionado() {
+
+    }
+
+    function nombreEstado(estado) {
+      if (estado === "pendiente") return "Pendiente";
+      if (estado === "preparando") return "Preparando";
+      if (estado === "preparado") return "Preparado";
+      if (estado === "cancelado") return "Cancelado";
+      return estado;
+    }
+
+    function siguienteEstado(estadoActual) {
+      if (estadoActual === "pendiente") return "preparando";
+      if (estadoActual === "preparando") return "preparado";
+      if (estadoActual === "preparado") return "pendiente";
+      return "pendiente";
+    }
+
+
+    // =====================================================
+    // Creación dinámica de tarjetas
+    // =====================================================
+    function crearTarjetaPedido(pedido) {
+      // TODO 2:
+      // Crea el elemento principal de la tarjeta con createElement("article").
+      // Añádele la clase "pedido".
+      // Guarda en atributos data-* los datos del pedido:
+      // id, cliente, producto, precio, cantidad, prioridad, estado y observaciones.
+
+      // TODO 3:
+      // Crea el título de la tarjeta con un h3.
+      // Debe mostrar el número de pedido y el nombre del cliente.
+      // Crea también un párrafo con la cantidad y el producto.
+
+      // TODO 4:
+      // Crea dos etiquetas span:
+      // - una para el estado del pedido
+      // - otra para la prioridad
+      // Ambas deben tener clases CSS adecuadas para que cambie su apariencia.
+
+      // TODO 5:
+      // Crea los botones internos de la tarjeta.
+      // Cada botón debe tener una clase CSS, un atributo data-accion,
+      // un atributo title y un texto visible.
+      // Acciones necesarias: cambiar-estado, editar, cancelar y eliminar.
+
+      // TODO 6:
+      // Inserta dentro de la tarjeta todos los bloques creados:
+      // cabecera, etiquetas, observaciones y acciones.
+      // Aplica la clase visual correspondiente al estado del pedido.
+      // Devuelve la tarjeta creada.
+    }
+
+    // =====================================================
+    // Actualización visual de una tarjeta
+    // =====================================================
+    // TODO 7:
+    // Implementa aplicarClaseEstado(tarjeta).
+    // Debe eliminar primero las clases visuales de estado.
+    // Después debe leer el atributo data-estado.
+    // Según su valor, añadirá una clase:
+    // - preparando -> pedido-preparando
+    // - preparado -> pedido-preparado
+    // - cancelado -> pedido-cancelado
+    function aplicarClaseEstado(tarjeta) {
+
+    }
+
+    // TODO 8:
+    // Actualiza visualmente una tarjeta después de modificar sus atributos.
+    // Debes:
+    // - leer data-estado, data-cantidad, data-producto, data-precio y data-observaciones
+    // - actualizar la etiqueta de estado
+    // - actualizar el texto del producto
+    // - actualizar el importe (utiliza formatearEuros())
+    // - actualizar las observaciones
+    // - volver a aplicar la clase visual del estado
+    function actualizarTarjetaTrasCambio(tarjeta) {
+
+    }
+
+    // =====================================================
+    // Resumen y detalle
+    // =====================================================
+    // TODO 9:
+    // Implementa actualizarResumen().
+    // Debe calcular:
+    // - número total de pedidos
+    // - número de pedidos preparados
+    // - número de pedidos pendientes o preparando
+    // - importe total de los pedidos que no estén cancelados
+    // Además, debe mostrar u ocultar el mensaje de lista vacía.
+    function actualizarResumen() {
+
+    }
+
+    // TODO 10:
+    // Implementa la selección de un pedido.
+    // Solo puede haber un pedido seleccionado a la vez.
+    // Primero elimina la clase "seleccionado" de todos los pedidos.
+    // Después añade esa clase a la tarjeta recibida.
+    function seleccionarPedido(tarjeta) {
+
+    }
+
+    // =====================================================
+    // Acciones sobre pedidos
+    // =====================================================
+    // TODO 11:
+    // Implementa el cambio de estado de un pedido.
+    // Si el pedido está cancelado, no debe cambiarse.
+    // En caso contrario:
+    // - lee el estado actual desde data-estado
+    // - calcula el nuevo estado llamando a siguienteEstado()
+    // - guarda el nuevo estado en data-estado
+    // - actualiza la tarjeta visualmente
+    // - actualiza el resumen
+    function cambiarEstadoPedido(tarjeta) {
+
+    }
+
+    // TODO 12:
+    // Implementa la edición de observaciones.
+    // Debes leer las observaciones actuales desde data-observaciones,
+    // pedir el nuevo texto con prompt() y guardar el resultado.
+    // Si el usuario cancela, no se debe modificar nada.
+    // Si el texto queda vacío, se guardará "Sin observaciones".
+    function editarObservacionesPedido(tarjeta) {
+
+    }
+
+    // TODO 13:
+    // Implementa la cancelación de un pedido.
+    // Debe cambiar su data-estado a "cancelado",
+    // actualizar la tarjeta visualmente y actualizar el resumen.
+    function cancelarPedido(tarjeta) {
+
+    }
+
+    // TODO 14:
+    // Elimina la tarjeta del pedido
+    // sobre su contenedor padre.
+    // Después actualiza el resumen.
+    function eliminarPedido(tarjeta) {
+
+    }
+
+    // =====================================================
+    // Formulario: añadir pedido
+    // =====================================================
+    formPedido.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      // TODO 15:
+      // Recoge los datos introducidos en el formulario:
+      // cliente, producto, precio, cantidad, prioridad y observaciones.
+      // El precio debe obtenerse llamando a obtenerPrecioSeleccionado().
+
+      // TODO 16:
+      // Crea un nuevo objeto Pedido usando los datos recogidos
+      // y el valor actual de siguienteId.
+
+      // TODO 17:
+      // Crea la tarjeta HTML del pedido
+      // e insértala dentro del contenedor listaPedidos.
+
+      // TODO 18:
+      // Después de añadir el pedido:
+      // - incrementa siguienteId
+      // - limpia el formulario
+      // - vuelve a dejar la cantidad a 1
+      // - vuelve a dejar la prioridad en "media"
+      // - coloca el foco en el campo cliente
+      // - actualiza el resumen
+    });
+
+    // =====================================================
+    // Delegación de eventos en el contenedor de pedidos
+    // =====================================================
+    // TODO 19:
+    // Implementa la delegación de eventos del contenedor listaPedidos.
+    //
+    // El listener debe:
+    // 1. Obtener el elemento real pulsado
+    // 2. Localizar la tarjeta de pedido más cercana
+    // 3. Si no se ha pulsado dentro de un pedido, salir.
+    // 4. Si se ha pulsado un botón con data-accion:
+    //    - detener la propagación
+    //    - leer la acción del botón
+    //    - ejecutar la función correspondiente:
+    //      cambiar-estado, editar, cancelar o eliminar
+    //    - salir de la función
+    // 5. Si no se ha pulsado un botón interno,
+    //    seleccionar la tarjeta del pedido.
+    listaPedidos.addEventListener("click", function (event) {
+
+    });
+
+    // =====================================================
+    // Ordenar y limpiar pedidos
+    // =====================================================
+    // TODO 20:
+    // Implementa el botón de limpiar pedidos finalizados.
+    // Debe localizar todos los pedidos con estado "preparado" o "cancelado"
+    // y eliminarlos del contenedor.
+    // Después debe actualizar el resumen.
+    btnLimpiarPreparados.addEventListener("click", function () {
+
+    });
+
+    // =====================================================
+    // Estado inicial
+    // =====================================================
+    actualizarResumen();
+  </script>
+</body>
+</html>
