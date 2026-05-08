@@ -539,6 +539,7 @@
       // Cada botón debe tener una clase CSS, un atributo data-accion,
       // un atributo title y un texto visible.
       // Acciones necesarias: cambiar-estado, editar, cancelar y eliminar.
+    
       const contenedorAcciones = document.createElement("div");
       contenedorAcciones.classList.add("acciones");
       const btnCambiarEstado = document.createElement("button");
@@ -547,14 +548,24 @@
       btnCambiarEstado.dataset.accion = "cambiar-estado";
       btnCambiarEstado.title = "Cambiar el estado del pedido";
       contenedorAcciones.appendChild(btnCambiarEstado);
-      
+    
+
 
       // TODO 6:
       // Inserta dentro de la tarjeta todos los bloques creados:
       // cabecera, etiquetas, observaciones y acciones.
       // Aplica la clase visual correspondiente al estado del pedido.
       // Devuelve la tarjeta creada.
+      const btnEditar = document.createElement("button");
+
+      btnEditar.textContent = "Editar observaciones";
+      btnEditar.classList.add("btn-editar");
+      btnEditar.dataset.accion = "editar";
+      btnEditar.title = "Editar las observaciones del pedido";
+      contenedorAcciones.appendChild(btnEditar);
+      
     }
+
 
     // =====================================================
     // Actualización visual de una tarjeta
