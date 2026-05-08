@@ -723,6 +723,17 @@
     // Si el usuario cancela, no se debe modificar nada.
     // Si el texto queda vacío, se guardará "Sin observaciones".
     function editarObservacionesPedido(tarjeta) {
+      const observacionesActuales = tarjeta.dataset.observaciones;
+      const nuevasObservaciones = prompt("Editar observaciones:", observacionesActuales);
+
+      if (nuevasObservaciones === null) {
+        return;
+      }
+
+      const textoFinal = nuevasObservaciones.trim() === "" ? "Sin observaciones" : nuevasObservaciones.trim();
+      tarjeta.dataset.observaciones = textoFinal;
+
+      actualizarTarjetaTrasCambio(tarjeta);
 
     }
 
@@ -731,6 +742,9 @@
     // Debe cambiar su data-estado a "cancelado",
     // actualizar la tarjeta visualmente y actualizar el resumen.
     function cancelarPedido(tarjeta) {
+      tarjeta.dataset.estado = "cancelado";
+      actualizarTarjetaTrasCambio(tarjeta);
+      actualizarResumen();
 
     }
 
