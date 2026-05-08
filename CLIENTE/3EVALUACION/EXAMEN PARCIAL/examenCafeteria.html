@@ -339,7 +339,9 @@
           </div>
 
           <div class="fila-botones">
-            <button id="btnLimpiarPreparados" type="button" class="btn-secundario">Eliminar preparados/cancelados</button>
+            <button id="btnLimpiarPreparados" type="button" class="btn-secundario">
+              Eliminar preparados/cancelados
+            </button>
           </div>
         </section>
       </div>
@@ -458,7 +460,7 @@
     // TODO 1:
     // Implementa la función obtenerPrecioSeleccionado().
     // Debe obtener la opción actualmente seleccionada del select de productos,
-    // leer su atributo data-precio y devolverlo como número.z
+    // leer su atributo data-precio y devolverlo como número.
     function obtenerPrecioSeleccionado() {
       const opcionSeleccionada = selProducto.options[selProducto.selectedIndex];
       const precio = opcionSeleccionada.dataset.precio;
@@ -480,7 +482,6 @@
       return "pendiente";
     }
 
-
     // =====================================================
     // Creación dinámica de tarjetas
     // =====================================================
@@ -490,6 +491,7 @@
       // Añádele la clase "pedido".
       // Guarda en atributos data-* los datos del pedido:
       // id, cliente, producto, precio, cantidad, prioridad, estado y observaciones.
+
       const tarjeta = document.createElement("article");
 
       tarjeta.classList.add("pedido");
@@ -502,22 +504,32 @@
       tarjeta.dataset.estado = pedido.getEstado();
       tarjeta.dataset.observaciones = pedido.getObservaciones();
 
-
-
-
       // TODO 3:
       // Crea el título de la tarjeta con un h3.
       // Debe mostrar el número de pedido y el nombre del cliente.
       // Crea también un párrafo con la cantidad y el producto.
 
+      const cabecera = document.createElement("div");
+      cabecera.classList.add("cabecera-pedido");
+
+      const bloqueInfo = document.createElement("div");
+
       const titulo = document.createElement("h3");
       titulo.textContent = `Pedido #${pedido.getId()} - ${pedido.getCliente()}`;
-      tarjeta.appendChild(titulo);
 
-      const parrafo = document.createElement("p");
-      parrafo.textContent = `${pedido.getCantidad()} x ${pedido.getProducto()}`;
-      tarjeta.appendChild(parrafo);
+      const parrafoProducto = document.createElement("p");
+      parrafoProducto.classList.add("linea-info", "producto-pedido");
+      parrafoProducto.textContent = `${pedido.getCantidad()} x ${pedido.getProducto()}`;
 
+      bloqueInfo.appendChild(titulo);
+      bloqueInfo.appendChild(parrafoProducto);
+
+      const importe = document.createElement("strong");
+      importe.classList.add("importe-pedido");
+      importe.textContent = formatearEuros(pedido.getImporte());
+
+      cabecera.appendChild(bloqueInfo);
+      cabecera.appendChild(importe);
 
       // TODO 4:
       // Crea dos etiquetas span:
@@ -525,52 +537,89 @@
       // - otra para la prioridad
       // Ambas deben tener clases CSS adecuadas para que cambie su apariencia.
 
+      const contenedorEtiquetas = document.createElement("div");
+      contenedorEtiquetas.classList.add("etiquetas");
+
       const etiquetaEstado = document.createElement("span");
       etiquetaEstado.textContent = nombreEstado(pedido.getEstado());
-      etiquetaEstado.classList.add("etiqueta", `estado-${pedido.getEstado()}`);
-      tarjeta.appendChild(etiquetaEstado);
+      etiquetaEstado.classList.add(
+        "etiqueta",
+        "etiqueta-estado",
+        `estado-${pedido.getEstado()}`
+      );
 
       const etiquetaPrioridad = document.createElement("span");
       etiquetaPrioridad.textContent = `Prioridad: ${pedido.getPrioridad()}`;
-      etiquetaPrioridad.classList.add("etiqueta", `prioridad-${pedido.getPrioridad()}`);
-      tarjeta.appendChild(etiquetaPrioridad);
+      etiquetaPrioridad.classList.add(
+        "etiqueta",
+        `prioridad-${pedido.getPrioridad()}`
+      );
+
+      contenedorEtiquetas.appendChild(etiquetaEstado);
+      contenedorEtiquetas.appendChild(etiquetaPrioridad);
+
+      const observaciones = document.createElement("p");
+      observaciones.classList.add("linea-info", "observaciones-pedido");
+      observaciones.textContent = `Observaciones: ${pedido.getObservaciones()}`;
 
       // TODO 5:
       // Crea los botones internos de la tarjeta.
       // Cada botón debe tener una clase CSS, un atributo data-accion,
       // un atributo title y un texto visible.
       // Acciones necesarias: cambiar-estado, editar, cancelar y eliminar.
-    
+
       const contenedorAcciones = document.createElement("div");
       contenedorAcciones.classList.add("acciones");
+
       const btnCambiarEstado = document.createElement("button");
       btnCambiarEstado.textContent = "Cambiar estado";
       btnCambiarEstado.classList.add("btn-preparar");
       btnCambiarEstado.dataset.accion = "cambiar-estado";
       btnCambiarEstado.title = "Cambiar el estado del pedido";
-      contenedorAcciones.appendChild(btnCambiarEstado);
-    
 
+      const btnEditar = document.createElement("button");
+      btnEditar.textContent = "Editar";
+      btnEditar.classList.add("btn-editar");
+      btnEditar.dataset.accion = "editar";
+      btnEditar.title = "Editar las observaciones del pedido";
+
+      const btnCancelar = document.createElement("button");
+      btnCancelar.textContent = "Cancelar";
+      btnCancelar.classList.add("btn-cancelar");
+      btnCancelar.dataset.accion = "cancelar";
+      btnCancelar.title = "Cancelar el pedido";
+
+      const btnEliminar = document.createElement("button");
+      btnEliminar.textContent = "Eliminar";
+      btnEliminar.classList.add("btn-eliminar");
+      btnEliminar.dataset.accion = "eliminar";
+      btnEliminar.title = "Eliminar el pedido";
+
+      contenedorAcciones.appendChild(btnCambiarEstado);
+      contenedorAcciones.appendChild(btnEditar);
+      contenedorAcciones.appendChild(btnCancelar);
+      contenedorAcciones.appendChild(btnEliminar);
 
       // TODO 6:
       // Inserta dentro de la tarjeta todos los bloques creados:
       // cabecera, etiquetas, observaciones y acciones.
       // Aplica la clase visual correspondiente al estado del pedido.
       // Devuelve la tarjeta creada.
-      const btnEditar = document.createElement("button");
 
-      btnEditar.textContent = "Editar observaciones";
-      btnEditar.classList.add("btn-editar");
-      btnEditar.dataset.accion = "editar";
-      btnEditar.title = "Editar las observaciones del pedido";
-      contenedorAcciones.appendChild(btnEditar);
+      tarjeta.appendChild(cabecera);
+      tarjeta.appendChild(contenedorEtiquetas);
+      tarjeta.appendChild(observaciones);
+      tarjeta.appendChild(contenedorAcciones);
 
+      aplicarClaseEstado(tarjeta);
+
+      return tarjeta;
     }
-
 
     // =====================================================
     // Actualización visual de una tarjeta
     // =====================================================
+
     // TODO 7:
     // Implementa aplicarClaseEstado(tarjeta).
     // Debe eliminar primero las clases visuales de estado.
@@ -579,8 +628,13 @@
     // - preparando -> pedido-preparando
     // - preparado -> pedido-preparado
     // - cancelado -> pedido-cancelado
+
     function aplicarClaseEstado(tarjeta) {
-      tarjeta.classList.remove("pedido-preparando", "pedido-preparado", "pedido-cancelado");
+      tarjeta.classList.remove(
+        "pedido-preparando",
+        "pedido-preparado",
+        "pedido-cancelado"
+      );
 
       const estado = tarjeta.dataset.estado;
 
@@ -591,8 +645,6 @@
       } else if (estado === "cancelado") {
         tarjeta.classList.add("pedido-cancelado");
       }
-
-
     }
 
     // TODO 8:
@@ -604,36 +656,34 @@
     // - actualizar el importe (utiliza formatearEuros())
     // - actualizar las observaciones
     // - volver a aplicar la clase visual del estado
+
     function actualizarTarjetaTrasCambio(tarjeta) {
       const estado = tarjeta.dataset.estado;
-      const cantidad = tarjeta.dataset.cantidad;
+      const cantidad = Number(tarjeta.dataset.cantidad);
       const producto = tarjeta.dataset.producto;
-      const precio = tarjeta.dataset.precio;
+      const precio = Number(tarjeta.dataset.precio);
       const observaciones = tarjeta.dataset.observaciones;
 
-      const etiquetaEstado = tarjeta.querySelector(".etiqueta.estado-pendiente, .etiqueta.estado-preparando, .etiqueta.estado-preparado, .etiqueta.estado-cancelado");
+      const etiquetaEstado = tarjeta.querySelector(".etiqueta-estado");
       etiquetaEstado.textContent = nombreEstado(estado);
-      etiquetaEstado.className = `etiqueta estado-${estado}`;
+      etiquetaEstado.className = `etiqueta etiqueta-estado estado-${estado}`;
 
-      const parrafoProducto = tarjeta.querySelector("p");
+      const parrafoProducto = tarjeta.querySelector(".producto-pedido");
       parrafoProducto.textContent = `${cantidad} x ${producto}`;
 
-      let etiquetaObservaciones = tarjeta.querySelector(".linea-info .muted");
-      if (!etiquetaObservaciones) {
-        etiquetaObservaciones = document.createElement("p");
-        etiquetaObservaciones.classList.add("linea-info", "muted");
-        tarjeta.appendChild(etiquetaObservaciones);
-      }
-      etiquetaObservaciones.textContent = `Observaciones: ${observaciones}`;
+      const importePedido = tarjeta.querySelector(".importe-pedido");
+      importePedido.textContent = formatearEuros(precio * cantidad);
+
+      const parrafoObservaciones = tarjeta.querySelector(".observaciones-pedido");
+      parrafoObservaciones.textContent = `Observaciones: ${observaciones}`;
 
       aplicarClaseEstado(tarjeta);
-
-
     }
 
     // =====================================================
     // Resumen y detalle
     // =====================================================
+
     // TODO 9:
     // Implementa actualizarResumen().
     // Debe calcular:
@@ -642,39 +692,38 @@
     // - número de pedidos pendientes o preparando
     // - importe total de los pedidos que no estén cancelados
     // Además, debe mostrar u ocultar el mensaje de lista vacía.
+
     function actualizarResumen() {
-
       const tarjetas = listaPedidos.querySelectorAll(".pedido");
-        const total = tarjetas.length;
-        let preparados = 0;
-        let pendientes = 0;
-        let importe = 0;
-  
-        tarjetas.forEach(tarjeta => {
-          const estado = tarjeta.dataset.estado;
-          const precio = Number(tarjeta.dataset.precio);
-          const cantidad = Number(tarjeta.dataset.cantidad);
-  
-          if (estado === "preparado") {
-            preparados++;
-          }
-  
-          if (estado === "pendiente" || estado === "preparando") {
-            pendientes++;
-          }
-  
-          if (estado !== "cancelado") {
-            importe += precio * cantidad;
-          }
-        });
-  
-        totalPedidos.textContent = total;
-        totalPreparados.textContent = preparados;
-        totalPendientes.textContent = pendientes;
-        importeTotal.textContent = formatearEuros(importe);
-  
-        mensajeVacio.style.display = total === 0 ? "block" : "none";
 
+      let preparados = 0;
+      let pendientes = 0;
+      let importe = 0;
+
+      tarjetas.forEach(function (tarjeta) {
+        const estado = tarjeta.dataset.estado;
+        const precio = Number(tarjeta.dataset.precio);
+        const cantidad = Number(tarjeta.dataset.cantidad);
+
+        if (estado === "preparado") {
+          preparados++;
+        }
+
+        if (estado === "pendiente" || estado === "preparando") {
+          pendientes++;
+        }
+
+        if (estado !== "cancelado") {
+          importe += precio * cantidad;
+        }
+      });
+
+      totalPedidos.textContent = tarjetas.length;
+      totalPreparados.textContent = preparados;
+      totalPendientes.textContent = pendientes;
+      importeTotal.textContent = formatearEuros(importe);
+
+      mensajeVacio.style.display = tarjetas.length === 0 ? "block" : "none";
     }
 
     // TODO 10:
@@ -682,17 +731,21 @@
     // Solo puede haber un pedido seleccionado a la vez.
     // Primero elimina la clase "seleccionado" de todos los pedidos.
     // Después añade esa clase a la tarjeta recibida.
+
     function seleccionarPedido(tarjeta) {
       const tarjetas = listaPedidos.querySelectorAll(".pedido");
-      tarjetas.forEach(t => t.classList.remove("seleccionado"));
+
+      tarjetas.forEach(function (tarjetaPedido) {
+        tarjetaPedido.classList.remove("seleccionado");
+      });
+
       tarjeta.classList.add("seleccionado");
-
-
     }
 
     // =====================================================
     // Acciones sobre pedidos
     // =====================================================
+
     // TODO 11:
     // Implementa el cambio de estado de un pedido.
     // Si el pedido está cancelado, no debe cambiarse.
@@ -702,6 +755,7 @@
     // - guarda el nuevo estado en data-estado
     // - actualiza la tarjeta visualmente
     // - actualiza el resumen
+
     function cambiarEstadoPedido(tarjeta) {
       const estadoActual = tarjeta.dataset.estado;
 
@@ -714,7 +768,6 @@
 
       actualizarTarjetaTrasCambio(tarjeta);
       actualizarResumen();
-
     }
 
     // TODO 12:
@@ -723,6 +776,7 @@
     // pedir el nuevo texto con prompt() y guardar el resultado.
     // Si el usuario cancela, no se debe modificar nada.
     // Si el texto queda vacío, se guardará "Sin observaciones".
+
     function editarObservacionesPedido(tarjeta) {
       const observacionesActuales = tarjeta.dataset.observaciones;
       const nuevasObservaciones = prompt("Editar observaciones:", observacionesActuales);
@@ -731,37 +785,41 @@
         return;
       }
 
-      const textoFinal = nuevasObservaciones.trim() === "" ? "Sin observaciones" : nuevasObservaciones.trim();
+      const textoFinal = nuevasObservaciones.trim() === ""
+        ? "Sin observaciones"
+        : nuevasObservaciones.trim();
+
       tarjeta.dataset.observaciones = textoFinal;
 
       actualizarTarjetaTrasCambio(tarjeta);
-
     }
 
     // TODO 13:
     // Implementa la cancelación de un pedido.
     // Debe cambiar su data-estado a "cancelado",
     // actualizar la tarjeta visualmente y actualizar el resumen.
+
     function cancelarPedido(tarjeta) {
       tarjeta.dataset.estado = "cancelado";
+
       actualizarTarjetaTrasCambio(tarjeta);
       actualizarResumen();
-
     }
 
     // TODO 14:
     // Elimina la tarjeta del pedido
     // sobre su contenedor padre.
     // Después actualiza el resumen.
+
     function eliminarPedido(tarjeta) {
       tarjeta.remove();
       actualizarResumen();
-
     }
 
     // =====================================================
     // Formulario: añadir pedido
     // =====================================================
+
     formPedido.addEventListener("submit", function (event) {
       event.preventDefault();
 
@@ -769,26 +827,34 @@
       // Recoge los datos introducidos en el formulario:
       // cliente, producto, precio, cantidad, prioridad y observaciones.
       // El precio debe obtenerse llamando a obtenerPrecioSeleccionado().
+
       const cliente = inpCliente.value;
       const producto = selProducto.value;
       const precio = obtenerPrecioSeleccionado();
       const cantidad = inpCantidad.value;
       const prioridad = selPrioridad.value;
       const observaciones = txtObservaciones.value;
-      
 
       // TODO 16:
       // Crea un nuevo objeto Pedido usando los datos recogidos
       // y el valor actual de siguienteId.
-      const pedido = new Pedido(siguienteId, cliente, producto, precio, cantidad, prioridad, observaciones);
 
+      const pedido = new Pedido(
+        siguienteId,
+        cliente,
+        producto,
+        precio,
+        cantidad,
+        prioridad,
+        observaciones
+      );
 
       // TODO 17:
       // Crea la tarjeta HTML del pedido
       // e insértala dentro del contenedor listaPedidos.
+
       const tarjeta = crearTarjetaPedido(pedido);
-        
-      
+      listaPedidos.appendChild(tarjeta);
 
       // TODO 18:
       // Después de añadir el pedido:
@@ -798,17 +864,21 @@
       // - vuelve a dejar la prioridad en "media"
       // - coloca el foco en el campo cliente
       // - actualiza el resumen
+
+      siguienteId++;
+
       formPedido.reset();
       inpCantidad.value = "1";
       selPrioridad.value = "media";
       inpCliente.focus();
-      actualizarResumen();
 
+      actualizarResumen();
     });
 
     // =====================================================
     // Delegación de eventos en el contenedor de pedidos
     // =====================================================
+
     // TODO 19:
     // Implementa la delegación de eventos del contenedor listaPedidos.
     //
@@ -824,6 +894,7 @@
     //    - salir de la función
     // 5. Si no se ha pulsado un botón interno,
     //    seleccionar la tarjeta del pedido.
+
     listaPedidos.addEventListener("click", function (event) {
       const elementoPulsado = event.target;
       const tarjeta = elementoPulsado.closest(".pedido");
@@ -836,6 +907,7 @@
 
       if (botonAccion) {
         event.stopPropagation();
+
         const accion = botonAccion.dataset.accion;
 
         if (accion === "cambiar-estado") {
@@ -854,27 +926,28 @@
       seleccionarPedido(tarjeta);
     });
 
-   
-
     // =====================================================
     // Ordenar y limpiar pedidos
     // =====================================================
+
     // TODO 20:
     // Implementa el botón de limpiar pedidos finalizados.
     // Debe localizar todos los pedidos con estado "preparado" o "cancelado"
     // y eliminarlos del contenedor.
     // Después debe actualizar el resumen.
+
     btnLimpiarPreparados.addEventListener("click", function () {
       const tarjetas = listaPedidos.querySelectorAll(".pedido");
-      tarjetas.forEach(tarjeta => {
+
+      tarjetas.forEach(function (tarjeta) {
         const estado = tarjeta.dataset.estado;
+
         if (estado === "preparado" || estado === "cancelado") {
           tarjeta.remove();
         }
       });
 
       actualizarResumen();
-
     });
 
     // =====================================================
