@@ -686,6 +686,7 @@
       tarjetas.forEach(t => t.classList.remove("seleccionado"));
       tarjeta.classList.add("seleccionado");
 
+
     }
 
     // =====================================================
@@ -701,6 +702,17 @@
     // - actualiza la tarjeta visualmente
     // - actualiza el resumen
     function cambiarEstadoPedido(tarjeta) {
+      const estadoActual = tarjeta.dataset.estado;
+
+      if (estadoActual === "cancelado") {
+        return;
+      }
+
+      const nuevoEstado = siguienteEstado(estadoActual);
+      tarjeta.dataset.estado = nuevoEstado;
+
+      actualizarTarjetaTrasCambio(tarjeta);
+      actualizarResumen();
 
     }
 
