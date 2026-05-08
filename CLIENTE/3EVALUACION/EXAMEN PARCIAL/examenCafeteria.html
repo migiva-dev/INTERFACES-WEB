@@ -508,6 +508,7 @@
       // Crea el título de la tarjeta con un h3.
       // Debe mostrar el número de pedido y el nombre del cliente.
       // Crea también un párrafo con la cantidad y el producto.
+      
       const titulo = document.createElement("h3");
       titulo.textContent = `Pedido #${pedido.getId()} - ${pedido.getCliente()}`;
       tarjeta.appendChild(titulo);
@@ -515,13 +516,23 @@
       const parrafo = document.createElement("p");
       parrafo.textContent = `${pedido.getCantidad()} x ${pedido.getProducto()}`;
       tarjeta.appendChild(parrafo);
-      
+
 
       // TODO 4:
       // Crea dos etiquetas span:
       // - una para el estado del pedido
       // - otra para la prioridad
       // Ambas deben tener clases CSS adecuadas para que cambie su apariencia.
+
+      const etiquetaEstado = document.createElement("span");
+      etiquetaEstado.textContent = nombreEstado(pedido.getEstado());
+      etiquetaEstado.classList.add("etiqueta", `estado-${pedido.getEstado()}`);
+      tarjeta.appendChild(etiquetaEstado);
+
+      const etiquetaPrioridad = document.createElement("span");
+      etiquetaPrioridad.textContent = `Prioridad: ${pedido.getPrioridad()}`;
+      etiquetaPrioridad.classList.add("etiqueta", `prioridad-${pedido.getPrioridad()}`);
+      tarjeta.appendChild(etiquetaPrioridad);
 
       // TODO 5:
       // Crea los botones internos de la tarjeta.
