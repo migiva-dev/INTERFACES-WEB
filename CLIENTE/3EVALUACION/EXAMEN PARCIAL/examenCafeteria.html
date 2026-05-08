@@ -824,18 +824,18 @@
     //    - salir de la función
     // 5. Si no se ha pulsado un botón interno,
     //    seleccionar la tarjeta del pedido.
-
     listaPedidos.addEventListener("click", function (event) {
       const elementoPulsado = event.target;
       const tarjeta = elementoPulsado.closest(".pedido");
 
-      if (!tarjeta) return;
+      if (!tarjeta) {
+        return;
+      }
 
       const botonAccion = elementoPulsado.closest("button[data-accion]");
 
       if (botonAccion) {
         event.stopPropagation();
-
         const accion = botonAccion.dataset.accion;
 
         if (accion === "cambiar-estado") {
@@ -853,6 +853,8 @@
 
       seleccionarPedido(tarjeta);
     });
+
+   
 
     // =====================================================
     // Ordenar y limpiar pedidos
