@@ -780,11 +780,14 @@
       // Crea un nuevo objeto Pedido usando los datos recogidos
       // y el valor actual de siguienteId.
       const pedido = new Pedido(siguienteId, cliente, producto, precio, cantidad, prioridad, observaciones);
-      
+
 
       // TODO 17:
       // Crea la tarjeta HTML del pedido
       // e insértala dentro del contenedor listaPedidos.
+      const tarjeta = crearTarjetaPedido(pedido);
+      listaPedidos.appendChild(tarjeta);
+      siguienteId++;
 
       // TODO 18:
       // Después de añadir el pedido:
@@ -794,6 +797,12 @@
       // - vuelve a dejar la prioridad en "media"
       // - coloca el foco en el campo cliente
       // - actualiza el resumen
+      formPedido.reset();
+      inpCantidad.value = "1";
+      selPrioridad.value = "media";
+      inpCliente.focus();
+      actualizarResumen();
+
     });
 
     // =====================================================
@@ -853,6 +862,15 @@
     // y eliminarlos del contenedor.
     // Después debe actualizar el resumen.
     btnLimpiarPreparados.addEventListener("click", function () {
+      const tarjetas = listaPedidos.querySelectorAll(".pedido");
+      tarjetas.forEach(tarjeta => {
+        const estado = tarjeta.dataset.estado;
+        if (estado === "preparado" || estado === "cancelado") {
+          tarjeta.remove();
+        }
+      });
+
+      actualizarResumen();
 
     });
 
