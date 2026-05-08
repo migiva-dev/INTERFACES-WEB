@@ -753,6 +753,8 @@
     // sobre su contenedor padre.
     // Después actualiza el resumen.
     function eliminarPedido(tarjeta) {
+      tarjeta.remove();
+      actualizarResumen();
 
     }
 
@@ -766,6 +768,13 @@
       // Recoge los datos introducidos en el formulario:
       // cliente, producto, precio, cantidad, prioridad y observaciones.
       // El precio debe obtenerse llamando a obtenerPrecioSeleccionado().
+      const cliente = inpCliente.value;
+      const producto = selProducto.value;
+      const precio = obtenerPrecioSeleccionado();
+      const cantidad = inpCantidad.value;
+      const prioridad = selPrioridad.value;
+      const observaciones = txtObservaciones.value;
+      
 
       // TODO 16:
       // Crea un nuevo objeto Pedido usando los datos recogidos
