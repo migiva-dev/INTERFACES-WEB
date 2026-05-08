@@ -508,7 +508,7 @@
       // Crea el título de la tarjeta con un h3.
       // Debe mostrar el número de pedido y el nombre del cliente.
       // Crea también un párrafo con la cantidad y el producto.
-      
+
       const titulo = document.createElement("h3");
       titulo.textContent = `Pedido #${pedido.getId()} - ${pedido.getCliente()}`;
       tarjeta.appendChild(titulo);
@@ -539,6 +539,15 @@
       // Cada botón debe tener una clase CSS, un atributo data-accion,
       // un atributo title y un texto visible.
       // Acciones necesarias: cambiar-estado, editar, cancelar y eliminar.
+      const contenedorAcciones = document.createElement("div");
+      contenedorAcciones.classList.add("acciones");
+      const btnCambiarEstado = document.createElement("button");
+      btnCambiarEstado.textContent = "Cambiar estado";
+      btnCambiarEstado.classList.add("btn-preparar");
+      btnCambiarEstado.dataset.accion = "cambiar-estado";
+      btnCambiarEstado.title = "Cambiar el estado del pedido";
+      contenedorAcciones.appendChild(btnCambiarEstado);
+      
 
       // TODO 6:
       // Inserta dentro de la tarjeta todos los bloques creados:
