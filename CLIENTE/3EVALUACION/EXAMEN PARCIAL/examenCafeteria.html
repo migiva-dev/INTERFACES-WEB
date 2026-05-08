@@ -673,7 +673,7 @@
         importeTotal.textContent = formatearEuros(importe);
   
         mensajeVacio.style.display = total === 0 ? "block" : "none";
-        
+
     }
 
     // TODO 10:
@@ -682,6 +682,9 @@
     // Primero elimina la clase "seleccionado" de todos los pedidos.
     // Después añade esa clase a la tarjeta recibida.
     function seleccionarPedido(tarjeta) {
+      const tarjetas = listaPedidos.querySelectorAll(".pedido");
+      tarjetas.forEach(t => t.classList.remove("seleccionado"));
+      tarjeta.classList.add("seleccionado");
 
     }
 
