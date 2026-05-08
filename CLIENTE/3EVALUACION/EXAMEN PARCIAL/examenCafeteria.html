@@ -563,7 +563,7 @@
       btnEditar.dataset.accion = "editar";
       btnEditar.title = "Editar las observaciones del pedido";
       contenedorAcciones.appendChild(btnEditar);
-      
+
     }
 
 
@@ -579,6 +579,18 @@
     // - preparado -> pedido-preparado
     // - cancelado -> pedido-cancelado
     function aplicarClaseEstado(tarjeta) {
+      tarjeta.classList.remove("pedido-preparando", "pedido-preparado", "pedido-cancelado");
+
+      const estado = tarjeta.dataset.estado;
+
+      if (estado === "preparando") {
+        tarjeta.classList.add("pedido-preparando");
+      } else if (estado === "preparado") {
+        tarjeta.classList.add("pedido-preparado");
+      } else if (estado === "cancelado") {
+        tarjeta.classList.add("pedido-cancelado");
+      }
+
 
     }
 
@@ -592,6 +604,29 @@
     // - actualizar las observaciones
     // - volver a aplicar la clase visual del estado
     function actualizarTarjetaTrasCambio(tarjeta) {
+      const estado = tarjeta.dataset.estado;
+      const cantidad = tarjeta.dataset.cantidad;
+      const producto = tarjeta.dataset.producto;
+      const precio = tarjeta.dataset.precio;
+      const observaciones = tarjeta.dataset.observaciones;
+
+      const etiquetaEstado = tarjeta.querySelector(".etiqueta.estado-pendiente, .etiqueta.estado-preparando, .etiqueta.estado-preparado, .etiqueta.estado-cancelado");
+      etiquetaEstado.textContent = nombreEstado(estado);
+      etiquetaEstado.className = `etiqueta estado-${estado}`;
+
+      const parrafoProducto = tarjeta.querySelector("p");
+      parrafoProducto.textContent = `${cantidad} x ${producto}`;
+
+      let etiquetaObservaciones = tarjeta.querySelector(".linea-info .muted");
+      if (!etiquetaObservaciones) {
+        etiquetaObservaciones = document.createElement("p");
+        etiquetaObservaciones.classList.add("linea-info", "muted");
+        tarjeta.appendChild(etiquetaObservaciones);
+      }
+      etiquetaObservaciones.textContent = `Observaciones: ${observaciones}`;
+
+      aplicarClaseEstado(tarjeta);
+      
 
     }
 
@@ -693,6 +728,21 @@
     // =====================================================
     // Delegación de eventos en el contenedor de pedidos
     // =====================================================
+    // TODO 19:
+    // Implementa la delegación de eventos del contenedor listaPedidos.
+    //
+    // El listener debe:
+    // 1. Obtener el elemento real pulsado
+    // 2. Localizar la tarjeta de pedido más cercana
+    // 3. Si no se ha pulsado dentro de un pedido, salir.
+    // 4. Si se ha pulsado un botón con data-accion:
+    //    - detener la propagación
+    //    - leer la acción del botón
+    //    - ejecutar la función correspondiente:
+    //      cambiar-estado, editar, cancelar o eliminar
+    //    - salir de la función
+    // 5. Si no se ha pulsado un botón interno,
+    //    seleccionar la tarjeta del pedido.
     listaPedidos.addEventListener("click", function (event) {
       const elementoPulsado = event.target;
       const tarjeta = elementoPulsado.closest(".pedido");
