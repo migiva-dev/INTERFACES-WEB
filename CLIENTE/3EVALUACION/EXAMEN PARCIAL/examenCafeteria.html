@@ -460,7 +460,9 @@
     // Debe obtener la opción actualmente seleccionada del select de productos,
     // leer su atributo data-precio y devolverlo como número.z
     function obtenerPrecioSeleccionado() {
-
+      const opcionSeleccionada = selProducto.options[selProducto.selectedIndex];
+      const precio = opcionSeleccionada.dataset.precio;
+      return Number(precio);
     }
 
     function nombreEstado(estado) {
@@ -639,23 +641,33 @@
     // =====================================================
     // Delegación de eventos en el contenedor de pedidos
     // =====================================================
-    // TODO 19:
-    // Implementa la delegación de eventos del contenedor listaPedidos.
-    //
-    // El listener debe:
-    // 1. Obtener el elemento real pulsado
-    // 2. Localizar la tarjeta de pedido más cercana
-    // 3. Si no se ha pulsado dentro de un pedido, salir.
-    // 4. Si se ha pulsado un botón con data-accion:
-    //    - detener la propagación
-    //    - leer la acción del botón
-    //    - ejecutar la función correspondiente:
-    //      cambiar-estado, editar, cancelar o eliminar
-    //    - salir de la función
-    // 5. Si no se ha pulsado un botón interno,
-    //    seleccionar la tarjeta del pedido.
     listaPedidos.addEventListener("click", function (event) {
+      const elementoPulsado = event.target;
+      const tarjeta = elementoPulsado.closest(".pedido");
 
+      if (!tarjeta) return;
+
+      const botonAccion = elementoPulsado.closest("button[data-accion]");
+
+      if (botonAccion) {
+        event.stopPropagation();
+
+        const accion = botonAccion.dataset.accion;
+
+        if (accion === "cambiar-estado") {
+          cambiarEstadoPedido(tarjeta);
+        } else if (accion === "editar") {
+          editarObservacionesPedido(tarjeta);
+        } else if (accion === "cancelar") {
+          cancelarPedido(tarjeta);
+        } else if (accion === "eliminar") {
+          eliminarPedido(tarjeta);
+        }
+
+        return;
+      }
+
+      seleccionarPedido(tarjeta);
     });
 
     // =====================================================
