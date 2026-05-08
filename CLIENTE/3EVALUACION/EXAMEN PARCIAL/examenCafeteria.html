@@ -626,7 +626,7 @@
       etiquetaObservaciones.textContent = `Observaciones: ${observaciones}`;
 
       aplicarClaseEstado(tarjeta);
-      
+
 
     }
 
@@ -643,6 +643,37 @@
     // Además, debe mostrar u ocultar el mensaje de lista vacía.
     function actualizarResumen() {
 
+      const tarjetas = listaPedidos.querySelectorAll(".pedido");
+        const total = tarjetas.length;
+        let preparados = 0;
+        let pendientes = 0;
+        let importe = 0;
+  
+        tarjetas.forEach(tarjeta => {
+          const estado = tarjeta.dataset.estado;
+          const precio = Number(tarjeta.dataset.precio);
+          const cantidad = Number(tarjeta.dataset.cantidad);
+  
+          if (estado === "preparado") {
+            preparados++;
+          }
+  
+          if (estado === "pendiente" || estado === "preparando") {
+            pendientes++;
+          }
+  
+          if (estado !== "cancelado") {
+            importe += precio * cantidad;
+          }
+        });
+  
+        totalPedidos.textContent = total;
+        totalPreparados.textContent = preparados;
+        totalPendientes.textContent = pendientes;
+        importeTotal.textContent = formatearEuros(importe);
+  
+        mensajeVacio.style.display = total === 0 ? "block" : "none";
+        
     }
 
     // TODO 10:
@@ -743,6 +774,7 @@
     //    - salir de la función
     // 5. Si no se ha pulsado un botón interno,
     //    seleccionar la tarjeta del pedido.
+
     listaPedidos.addEventListener("click", function (event) {
       const elementoPulsado = event.target;
       const tarjeta = elementoPulsado.closest(".pedido");
