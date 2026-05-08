@@ -490,6 +490,19 @@
       // Añádele la clase "pedido".
       // Guarda en atributos data-* los datos del pedido:
       // id, cliente, producto, precio, cantidad, prioridad, estado y observaciones.
+      const tarjeta = document.createElement("article");
+      
+      tarjeta.classList.add("pedido");
+      tarjeta.dataset.id = pedido.getId();
+      tarjeta.dataset.cliente = pedido.getCliente();
+      tarjeta.dataset.producto = pedido.getProducto();
+      tarjeta.dataset.precio = pedido.getPrecioUnitario();
+      tarjeta.dataset.cantidad = pedido.getCantidad();
+      tarjeta.dataset.prioridad = pedido.getPrioridad();
+      tarjeta.dataset.estado = pedido.getEstado();
+      tarjeta.dataset.observaciones = pedido.getObservaciones();
+
+
 
       // TODO 3:
       // Crea el título de la tarjeta con un h3.
