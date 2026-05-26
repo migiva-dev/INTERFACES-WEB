@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda Online DOM</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      color: #222;
+    }
+
+    .contenedor-principal {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .tienda {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 25px;
+    }
+
+    .bloque-productos,
+    .bloque-carrito {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    .productos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .producto {
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      padding: 15px;
+      background-color: #fafafa;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .producto:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .producto.seleccionado {
+      border-color: #007bff;
+      background-color: #eaf3ff;
+    }
+
+    .producto img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .producto h3 {
+      margin: 10px 0 5px;
+    }
+
+    .producto p {
+      margin: 5px 0;
+    }
+
+    .precio {
+      font-weight: bold;
+      color: #007bff;
+      font-size: 18px;
+    }
+
+    button {
+      border: none;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .btn-anadir {
+      width: 100%;
+      margin-top: 10px;
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-anadir:hover {
+      background-color: #0056b3;
+    }
+
+    .carrito {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .item-carrito {
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 12px;
+      background-color: #fafafa;
+      cursor: pointer;
+    }
+
+    .item-carrito.seleccionado {
+      border-color: #28a745;
+      background-color: #eaffef;
+    }
+
+    .item-carrito h4 {
+      margin: 0 0 8px;
+    }
+
+    .controles {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-mas {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-menos {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .cantidad {
+      font-weight: bold;
+      min-width: 25px;
+      text-align: center;
+    }
+
+    .total {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 2px solid #ddd;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .vacio {
+      color: #777;
+      font-style: italic;
+    }
+
+    @media (max-width: 800px) {
+      .tienda {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="contenedor-principal">
+
+    <h1>Tienda Online - Uso completo del DOM</h1>
+
+    <!-- Contenedor exterior que representa el bloque general de la tienda -->
+    <div class="tienda">
+
+      <!-- Contenedor grande de productos -->
+      <section class="bloque-productos">
+        <h2>Productos</h2>
+
+        <div class="productos" id="contenedorProductos">
+
+          <article class="producto">
+            <img src="https://picsum.photos/300/200?random=1" alt="Camiseta">
+            <h3 class="nombre-producto">Camiseta</h3>
+            <p>Producto cómodo para el día a día.</p>
+            <p class="precio-producto">15.99</p>
+            <button class="btn-anadir" data-accion="anadir">Añadir al carrito</button>
+          </article>
+
+          <article class="producto">
+            <img src="https://picsum.photos/300/200?random=2" alt="Pantalón">
+            <h3 class="nombre-producto">Pantalón</h3>
+            <p>Pantalón moderno y resistente.</p>
+            <p class="precio-producto">29.99</p>
+            <button class="btn-anadir" data-accion="anadir">Añadir al carrito</button>
+          </article>
+
+          <article class="producto">
+            <img src="https://picsum.photos/300/200?random=3" alt="Sudadera">
+            <h3 class="nombre-producto">Sudadera</h3>
+            <p>Sudadera perfecta para invierno.</p>
+            <p class="precio-producto">24.50</p>
+            <button class="btn-anadir" data-accion="anadir">Añadir al carrito</button>
+          </article>
+
+          <article class="producto">
+            <img src="https://picsum.photos/300/200?random=4" alt="Zapatillas">
+            <h3 class="nombre-producto">Zapatillas</h3>
+            <p>Zapatillas deportivas cómodas.</p>
+            <p class="precio-producto">49.99</p>
+            <button class="btn-anadir" data-accion="anadir">Añadir al carrito</button>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Contenedor grande del carrito -->
+      <aside class="bloque-carrito">
+        <h2>Carrito</h2>
+
+        <div class="carrito" id="contenedorCarrito">
+          <p class="vacio">El carrito está vacío.</p>
+        </div>
+
+        <div class="total">
+          Total: <span id="totalCarrito">0.00</span> €
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <script>
+    // Seleccionamos los contenedores grandes
+    const contenedorProductos = document.getElementById("contenedorProductos");
+    const contenedorCarrito = document.getElementById("contenedorCarrito");
+    const totalCarrito = document.getElementById("totalCarrito");
+
+    /*
+      Listener del contenedor de productos.
+
+      No ponemos listeners individuales en cada tarjeta ni en cada botón.
+      Usamos delegación de eventos desde el contenedor grande.
+    */
+    contenedorProductos.addEventListener("click", function(evento) {
+      const elementoClicado = evento.target;
+
+      /*
+        Buscamos la tarjeta de producto más cercana.
+        Esto permite detectar si hemos hecho clic en la imagen,
+        en el título, en el precio o en el botón.
+      */
+      const tarjetaProducto = elementoClicado.closest(".producto");
+
+      if (!tarjetaProducto) {
+        return;
+      }
+
+      // Resaltamos el producto seleccionado
+      seleccionarProducto(tarjetaProducto);
+
+      /*
+        Los botones se identifican con una propiedad específica:
+        data-accion="anadir"
+      */
+      if (elementoClicado.dataset.accion === "anadir") {
+        agregarProductoAlCarrito(tarjetaProducto);
+      }
+    });
+
+    /*
+      Listener del contenedor del carrito.
+
+      Todos los botones de incrementar y disminuir se controlan
+      desde este único listener.
+    */
+    contenedorCarrito.addEventListener("click", function(evento) {
+      const elementoClicado = evento.target;
+
+      const itemCarrito = elementoClicado.closest(".item-carrito");
+
+      if (!itemCarrito) {
+        return;
+      }
+
+      // Permite seleccionar y resaltar un objeto del carrito
+      seleccionarItemCarrito(itemCarrito);
+
+      if (elementoClicado.dataset.accion === "sumar") {
+        incrementarCantidad(itemCarrito);
+      }
+
+      if (elementoClicado.dataset.accion === "restar") {
+        disminuirCantidad(itemCarrito);
+      }
+
+      calcularTotal();
+    });
+
+    /*
+      Función para resaltar una tarjeta de producto.
+    */
+    function seleccionarProducto(tarjetaSeleccionada) {
+      const productos = contenedorProductos.querySelectorAll(".producto");
+
+      productos.forEach(function(producto) {
+        producto.classList.remove("seleccionado");
+      });
+
+      tarjetaSeleccionada.classList.add("seleccionado");
+    }
+
+    /*
+      Función para resaltar un item del carrito.
+    */
+    function seleccionarItemCarrito(itemSeleccionado) {
+      const items = contenedorCarrito.querySelectorAll(".item-carrito");
+
+      items.forEach(function(item) {
+        item.classList.remove("seleccionado");
+      });
+
+      itemSeleccionado.classList.add("seleccionado");
+    }
+
+    /*
+      Función para añadir un producto al carrito.
+
+      Importante:
+      Para obtener los datos del producto navegamos dentro del DOM,
+      partiendo desde la tarjeta que se ha clicado.
+    */
+    function agregarProductoAlCarrito(tarjetaProducto) {
+      const nombre = tarjetaProducto.querySelector(".nombre-producto").textContent;
+      const precio = parseFloat(tarjetaProducto.querySelector(".precio-producto").textContent);
+
+      const productoExistente = buscarProductoEnCarrito(nombre);
+
+      if (productoExistente) {
+        incrementarCantidad(productoExistente);
+      } else {
+        crearItemCarrito(nombre, precio);
+      }
+
+      calcularTotal();
+    }
+
+    /*
+      Busca si un producto ya existe dentro del carrito.
+    */
+    function buscarProductoEnCarrito(nombreProducto) {
+      const itemsCarrito = contenedorCarrito.querySelectorAll(".item-carrito");
+
+      for (let item of itemsCarrito) {
+        const nombreItem = item.querySelector(".nombre-carrito").textContent;
+
+        if (nombreItem === nombreProducto) {
+          return item;
+        }
+      }
+
+      return null;
+    }
+
+    /*
+      Crea desde cero un objeto del carrito usando createElement.
+    */
+    function crearItemCarrito(nombre, precio) {
+      eliminarMensajeCarritoVacio();
+
+      const item = document.createElement("div");
+      item.classList.add("item-carrito");
+
+      const titulo = document.createElement("h4");
+      titulo.classList.add("nombre-carrito");
+      titulo.textContent = nombre;
+
+      const parrafoPrecio = document.createElement("p");
+      parrafoPrecio.innerHTML = `Precio: <span class="precio-carrito">${precio.toFixed(2)}</span> €`;
+
+      const controles = document.createElement("div");
+      controles.classList.add("controles");
+
+      const botonMenos = document.createElement("button");
+      botonMenos.classList.add("btn-menos");
+      botonMenos.dataset.accion = "restar";
+      botonMenos.textContent = "-";
+
+      const cantidad = document.createElement("span");
+      cantidad.classList.add("cantidad");
+      cantidad.textContent = "1";
+
+      const botonMas = document.createElement("button");
+      botonMas.classList.add("btn-mas");
+      botonMas.dataset.accion = "sumar";
+      botonMas.textContent = "+";
+
+      controles.appendChild(botonMenos);
+      controles.appendChild(cantidad);
+      controles.appendChild(botonMas);
+
+      item.appendChild(titulo);
+      item.appendChild(parrafoPrecio);
+      item.appendChild(controles);
+
+      contenedorCarrito.appendChild(item);
+    }
+
+    /*
+      Incrementa la cantidad de un producto del carrito.
+    */
+    function incrementarCantidad(itemCarrito) {
+      const cantidad = itemCarrito.querySelector(".cantidad");
+      let cantidadActual = parseInt(cantidad.textContent);
+
+      cantidadActual++;
+      cantidad.textContent = cantidadActual;
+    }
+
+    /*
+      Disminuye la cantidad de un producto del carrito.
+
+      Si la cantidad llega a 0, se elimina el producto.
+    */
+    function disminuirCantidad(itemCarrito) {
+      const cantidad = itemCarrito.querySelector(".cantidad");
+      let cantidadActual = parseInt(cantidad.textContent);
+
+      cantidadActual--;
+
+      if (cantidadActual <= 0) {
+        itemCarrito.remove();
+        comprobarCarritoVacio();
+      } else {
+        cantidad.textContent = cantidadActual;
+      }
+    }
+
+    /*
+      Calcula de nuevo el total del carrito.
+    */
+    function calcularTotal() {
+      const itemsCarrito = contenedorCarrito.querySelectorAll(".item-carrito");
+
+      let total = 0;
+
+      itemsCarrito.forEach(function(item) {
+        const precio = parseFloat(item.querySelector(".precio-carrito").textContent);
+        const cantidad = parseInt(item.querySelector(".cantidad").textContent);
+
+        total += precio * cantidad;
+      });
+
+      totalCarrito.textContent = total.toFixed(2);
+    }
+
+    /*
+      Elimina el mensaje inicial de carrito vacío.
+    */
+    function eliminarMensajeCarritoVacio() {
+      const mensajeVacio = contenedorCarrito.querySelector(".vacio");
+
+      if (mensajeVacio) {
+        mensajeVacio.remove();
+      }
+    }
+
+    /*
+      Comprueba si el carrito se ha quedado vacío.
+    */
+    function comprobarCarritoVacio() {
+      const itemsCarrito = contenedorCarrito.querySelectorAll(".item-carrito");
+
+      if (itemsCarrito.length === 0) {
+        const mensaje = document.createElement("p");
+        mensaje.classList.add("vacio");
+        mensaje.textContent = "El carrito está vacío.";
+        contenedorCarrito.appendChild(mensaje);
+      }
+    }
+  </script>
+
+</body>
+</html>
