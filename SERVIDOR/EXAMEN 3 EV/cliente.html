@@ -390,8 +390,24 @@
         // y construir la petición XML SOAP correspondiente.
         // La petición debe contener el Envelope, el Body, la operación
         // definida en el WSDL y los datos introducidos en el formulario.
-        
+
+    
         // const xmlSoap 
+         
+        const xmlSoap =
+            '<?xml version="1.0" encoding="UTF-8"?>' +
+            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' +
+                'xmlns:ent="http://example.com/entradas">' +
+                '<soapenv:Header/>' +
+                '<soapenv:Body>' +
+                    '<ent:calcularPrecio>' +
+                        '<ent:cantidad>' + cantidad + '</ent:cantidad>' +
+                        '<ent:tipo>' + tipo + '</ent:tipo>' +
+                    '</ent:calcularPrecio>' +
+                '</soapenv:Body>' +
+            '</soapenv:Envelope>';
+
+
 
         try {
             // TODO 6:
@@ -399,17 +415,31 @@
             // Utilizar POST, indicar que se envía y se espera recibir XML
             // y enviar la cadena XML creada anteriormente en el body.
             // Recoger la respuesta recibida como texto.
+
             
             // const respuesta 
+            const respuesta = await fetch(URL_ENTRADAS, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/xml",
+                    "Accept": "text/xml"
+                },
+                body: xmlSoap
+            });
 
             // TODO 7:
             // Interpretar la respuesta SOAP.
             // Convertir el texto XML recibido en un documento XML.
             // Consultar el WSDL para recuperar los datos
             // del precio total y unitario (ESTAN ABAJO)
+
+            const textoRespuesta = await respuesta.text();
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(textoRespuesta, "application/xml");
             
             // const parser
             // const xml
+
 
             const nodoErrorXml =
                 xml.getElementsByTagName("parsererror")[0];
@@ -503,6 +533,13 @@
             // se espera recibir una respuesta JSON.
             
             // const respuesta
+                const respuesta = await fetch(URL_RESERVAS, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+                
 
             // TODO 12:
             // Recoger la respuesta JSON obtenida en la consulta.
