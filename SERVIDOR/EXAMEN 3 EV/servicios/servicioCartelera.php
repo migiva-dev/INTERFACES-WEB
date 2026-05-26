@@ -46,6 +46,19 @@ function mostrarCartelera()
     // por cada una, mostrando título ("h3"), género, duración y sala ("p").
     echo '<div class="cartelera">';
 
+    foreach ($peliculasFiltradas as $pelicula) {
+        echo '<article class="pelicula">';
+
+        echo '<h3 class="titulo">' . htmlspecialchars($pelicula["titulo"],) . '</h3>';
+
+        echo '<p class="genero">Género: ' . htmlspecialchars($pelicula["genero"],) . '</p>';
+
+        echo '<p class="duracion">Duración: ' . htmlspecialchars($pelicula["duracion"],) . '</p>';
+
+        echo '<p class="sala">Sala: ' . htmlspecialchars($pelicula["sala"],) . '</p>';
+
+        echo '</article>';
+    }
     
 
     echo '</div>';
