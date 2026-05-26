@@ -330,6 +330,10 @@
             // Construir la URL necesaria para consultar la cartelera.
             // Crear un objeto URLSearchParams e incluir el género seleccionado
             // en el formulario. Después, añadir esos parámetros a URL_CARTELERA.
+            const params = new URLSearchParams();
+            params.append("genero", selectGenero.value);
+            const urlCartelera = URL_CARTELERA + "?" + params.toString();
+                
 
 
             // TODO 4:
