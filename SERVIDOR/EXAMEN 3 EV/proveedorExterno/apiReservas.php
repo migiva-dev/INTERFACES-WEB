@@ -122,6 +122,8 @@ function crearReserva()
     // de una reserva llamando a la función responderJsonApi().
     // Consultar la especificación OpenAPI para identificar el código HTTP
     // que debe enviarse y la estructura JSON de la respuesta.
+    responderJsonApi($nuevaReserva, 201);
+    
     
 }
 

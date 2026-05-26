@@ -539,7 +539,7 @@
                         "Accept": "application/json"
                     }
                 });
-                
+
 
             // TODO 12:
             // Recoger la respuesta JSON obtenida en la consulta.
@@ -547,6 +547,15 @@
             // Si es correcta, mostrar las reservas recibidas utilizando mostrarReservas().
             
             //const datos = await leerRespuestaJson(respuesta);
+            const datos = await leerRespuestaJson(respuesta);
+            if (!respuesta.ok) {
+                throw new Error(
+                    "Error HTTP: " + respuesta.status + " " + respuesta.statusText +
+                    " | Detalles: " + (datos.mensaje || "No se han proporcionado detalles.")
+                );
+            }
+             
+
 
             mensajeReservas.className = "ok";
             mensajeReservas.textContent = mensajeFinal;
@@ -568,6 +577,13 @@
         // Los valores deben obtenerse de los campos del formulario.
         
         // const body
+        const body = {
+            cliente: document.getElementById("clienteReserva").value,
+            pelicula: document.getElementById("peliculaReserva").value,
+            entradas: parseInt(document.getElementById("entradasReserva").value)
+        };
+        
+
 
         mensajeReservas.className = "cargando";
         mensajeReservas.textContent = "Creando reserva...";
@@ -581,6 +597,23 @@
             
             // const respuesta
             // const datos
+            const respuesta = await fetch(URL_RESERVAS, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(body)
+            });
+            const datos = await leerRespuestaJson(respuesta);
+            if (!respuesta.ok) {
+                throw new Error(
+                    "Error HTTP: " + respuesta.status + " " + respuesta.statusText +
+                    " | Detalles: " + (datos.mensaje || "No se han proporcionado detalles.")
+                );
+            }
+
+
 
             formReserva.reset();
 
