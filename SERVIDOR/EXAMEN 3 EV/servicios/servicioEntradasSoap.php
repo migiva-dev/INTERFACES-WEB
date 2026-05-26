@@ -116,7 +116,7 @@ function procesarPeticionEntradasSoap()
         $precioTotal
     );
 
-    
+
 
 
     
@@ -161,6 +161,8 @@ function enviarRespuestaPrecioSoap(
     // TODO 10:
     // Construir y devolver la respuesta XML SOAP de la operación.
     // Consultar el WSDL para identificar los datos que debe contener la respuesta.
+
+
     $precioUnitarioFormateado = number_format(
         $precioUnitario,
         2,
@@ -182,6 +184,19 @@ function enviarRespuestaPrecioSoap(
     );
 
     // echo
+    echo '<?xml version="1.0" encoding="UTF-8"?>' .
+        '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">' .
+            '<soap:Body>' .
+                '<calcularPrecioEntradasResponse>' .
+                    '<cantidad>' . $cantidad . '</cantidad>' .
+                    '<tipo>' . $tipoSeguro . '</tipo>' .
+                    '<precioUnitario>' . $precioUnitarioFormateado . '</precioUnitario>' .
+                    '<precioTotal>' . $precioTotalFormateado . '</precioTotal>' .
+                '</calcularPrecioEntradasResponse>' .
+            '</soap:Body>' .
+        '</soap:Envelope>';
+
+        
 }
 
 function enviarFaultSoap($mensaje)
