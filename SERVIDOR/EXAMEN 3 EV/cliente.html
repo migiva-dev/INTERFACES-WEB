@@ -397,7 +397,7 @@
         const xmlSoap =
             '<?xml version="1.0" encoding="UTF-8"?>' +
             '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' +
-                'xmlns:ent="http://example.com/entradas">' +
+                'xmlns:ent="http://localhost/SERVIDOR/EXAMEN%203%20EV/servicios/servicioEntradasSoap.php">' +
                 '<soapenv:Header/>' +
                 '<soapenv:Body>' +
                     '<ent:calcularPrecio>' +
@@ -415,6 +415,7 @@
             // Utilizar POST, indicar que se envía y se espera recibir XML
             // y enviar la cadena XML creada anteriormente en el body.
             // Recoger la respuesta recibida como texto.
+
 
             
             // const respuesta 
@@ -582,7 +583,7 @@
             pelicula: document.getElementById("peliculaReserva").value,
             entradas: parseInt(document.getElementById("entradasReserva").value)
         };
-        
+
 
 
         mensajeReservas.className = "cargando";

@@ -56,6 +56,7 @@ function procesarPeticionEntradasSoap()
     // Consultar el WSDL para identificar los nombres de los datos recibidos.
     // Transformar la cantidad a un número entero y guardar el tipo como texto.
     
+    
     //$nodoCantidad
 
     // $nodoTipo
@@ -161,8 +162,6 @@ function enviarRespuestaPrecioSoap(
     // TODO 10:
     // Construir y devolver la respuesta XML SOAP de la operación.
     // Consultar el WSDL para identificar los datos que debe contener la respuesta.
-
-    
 
 
     $precioUnitarioFormateado = number_format(

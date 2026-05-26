@@ -158,7 +158,7 @@ function consumirApiReservasConCurl($metodo)
     // Configurar las opciones comunes de la petición cURL.
     // La respuesta de la API externa debe guardarse en una variable
     // y la petición debe indicar que espera recibir JSON.
-    
+
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, [
         "Accept: application/json"
@@ -167,6 +167,7 @@ function consumirApiReservasConCurl($metodo)
     // TODO 18:
     // Si el método recibido por el controlador es GET,
     // configurar cURL para realizar una petición GET al proveedor externo.
+    
     if ($metodo === "GET") {
         curl_setopt($curl, CURLOPT_HTTPGET, true);
     }
@@ -176,11 +177,24 @@ function consumirApiReservasConCurl($metodo)
         // Leer el cuerpo JSON que el cliente ha enviado al controlador.
         // Este mismo cuerpo deberá reenviarse después a la API externa.
         $cuerpoJson = file_get_contents("php://input");
+        if ($cuerpoJson === false || trim($cuerpoJson) === "") {
+            responderJson(
+                [
+                    "error" =>
+                        "El cuerpo de la petición POST no puede estar vacío."
+                ],
+                400
+            );
+
+            return;
+        }
 
         // TODO 20:
         // Configurar cURL para realizar una petición POST a la API externa.
         // Reenviar el cuerpo JSON recibido anteriormente e indicar mediante
         // cabeceras que se envía y se espera recibir información JSON.
+
+
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $cuerpoJson);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [
