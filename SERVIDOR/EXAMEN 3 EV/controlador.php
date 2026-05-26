@@ -18,16 +18,22 @@ $metodo = $_SERVER["REQUEST_METHOD"];
 // mediante require_once, ejecutar la función que devuelve la cartelera
 // en formato HTML y finalizar la ejecución del controlador.
 // La cartelera solamente debe aceptar peticiones GET.
-if () {
-    if () {
+if ($ruta === "cartelera") {
+    if ($metodo !== "GET") {
         http_response_code(405);
         header("Content-Type: text/html; charset=utf-8");
 
         echo '<p class="error">La cartelera solamente permite peticiones GET.</p>';
 
         exit;
+
     }
 
+    require_once __DIR__ . "/servicios/servicioCartelera.php";
+
+    header("Content-Type: text/html; charset=utf-8");
+
+    echo obtenerCarteleraHtml($_GET["genero"] ?? "");
 
     exit;
 }
