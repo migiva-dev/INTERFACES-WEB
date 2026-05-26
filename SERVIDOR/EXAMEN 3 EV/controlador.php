@@ -31,9 +31,7 @@ if ($ruta === "cartelera") {
 
     require_once __DIR__ . "/servicios/servicioCartelera.php";
 
-    header("Content-Type: text/html; charset=utf-8");
-
-    echo obtenerCarteleraHtml($_GET["genero"] ?? "");
+    mostrarCartelera();
 
     exit;
 }
