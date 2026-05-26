@@ -158,6 +158,7 @@ function consumirApiReservasConCurl($metodo)
     // Configurar las opciones comunes de la petición cURL.
     // La respuesta de la API externa debe guardarse en una variable
     // y la petición debe indicar que espera recibir JSON.
+    
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, [
         "Accept: application/json"
