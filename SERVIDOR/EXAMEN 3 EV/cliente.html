@@ -394,18 +394,18 @@
     
         // const xmlSoap 
          
-        const xmlSoap =
-            '<?xml version="1.0" encoding="UTF-8"?>' +
-            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" ' +
-                'xmlns:ent="http://localhost/SERVIDOR/EXAMEN%203%20EV/servicios/servicioEntradasSoap.php">' +
-                '<soapenv:Header/>' +
-                '<soapenv:Body>' +
-                    '<ent:calcularPrecio>' +
-                        '<ent:cantidad>' + cantidad + '</ent:cantidad>' +
-                        '<ent:tipo>' + tipo + '</ent:tipo>' +
-                    '</ent:calcularPrecio>' +
-                '</soapenv:Body>' +
-            '</soapenv:Envelope>';
+        // const xmlSoap
+            const xmlSoap =
+                '<?xml version="1.0" encoding="UTF-8"?>' +
+                '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://localhost/portal-cine/entradas">' +
+                    '<soapenv:Header/>' +
+                    '<soapenv:Body>' +
+                        '<tns:calcularPrecioEntradas>' +
+                            '<tns:cantidad>' + cantidad + '</tns:cantidad>' +
+                            '<tns:tipo>' + tipo + '</tns:tipo>' +
+                        '</tns:calcularPrecioEntradas>' +
+                    '</soapenv:Body>' +
+                '</soapenv:Envelope>';
 
 
 
@@ -419,28 +419,51 @@
 
             
             // const respuesta 
+           // const respuesta
+
+           // const respuesta
             const respuesta = await fetch(URL_ENTRADAS, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "text/xml",
-                    "Accept": "text/xml"
+                    "Content-Type": "text/xml; charset=utf-8",
+                    "Accept": "text/xml",
+                    "SOAPAction": "calcularPrecioEntradas"
                 },
                 body: xmlSoap
             });
 
+            const textoRespuesta = await respuesta.text();
+
+            if (!respuesta.ok) {
+                console.log(textoRespuesta);
+                throw new Error("Error HTTP: " + respuesta.status);
+            }
+           
             // TODO 7:
             // Interpretar la respuesta SOAP.
             // Convertir el texto XML recibido en un documento XML.
             // Consultar el WSDL para recuperar los datos
             // del precio total y unitario (ESTAN ABAJO)
 
-            const textoRespuesta = await respuesta.text();
+            // const parser
             const parser = new DOMParser();
-            const xml = parser.parseFromString(textoRespuesta, "application/xml");
+
+            // const xml
+            const xml = parser.parseFromString(textoRespuesta, "text/xml");
             
             // const parser
             // const xml
+            // const nodoPrecioTotal
+            const nodoPrecioTotal = obtenerPrimerNodo(
+                xml,
+                "precioTotal"
+            );
 
+            // const nodoPrecioUnitario
+            const nodoPrecioUnitario = obtenerPrimerNodo(
+                xml,
+                "precioUnitario"
+            );
 
             const nodoErrorXml =
                 xml.getElementsByTagName("parsererror")[0];
