@@ -94,6 +94,31 @@ function procesarPeticionEntradasSoap()
     */
     // Después, calcular el precio total en función de la cantidad recibida 
     // utilizando la función enviarRespuestaPrecioSoap().
+    $precioUnitario = 0;
+
+    if ($tipo === "normal") {
+        $precioUnitario = 8;
+    } else if ($tipo === "reducida") {
+        $precioUnitario = 5;
+    } else {
+        enviarFaultSoap(
+            "El tipo de entrada debe ser normal o reducida."
+        );
+
+        return;
+    }
+
+    $precioTotal = $cantidad * $precioUnitario;
+    enviarRespuestaPrecioSoap(
+        $cantidad,
+        $tipo,
+        $precioUnitario,
+        $precioTotal
+    );
+
+    
+
+
     
 }
 
