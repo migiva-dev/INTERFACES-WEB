@@ -330,12 +330,26 @@
             // Construir la URL necesaria para consultar la cartelera.
             // Crear un objeto URLSearchParams e incluir el género seleccionado
             // en el formulario. Después, añadir esos parámetros a URL_CARTELERA.
+            const parametros = new URLSearchParams();
 
+            parametros.append("genero" , selectGenero.value);
+
+            const url = URL_CARTELERA + "?" + parametros.toString();
 
             // TODO 4:
             // Realizar una petición GET al controlador para obtener la cartelera.
             // La respuesta recibida será un fragmento HTML, por lo que debe
             // leerse como texto e insertarse directamente dentro de zonaCartelera.
+            const respuesta = await fetch(url, {
+                method: "GET"
+            });
+
+            if (!respuesta.ok) {
+                throw new Error("Error HTTP: " + respuesta.status);
+            }
+
+            const html = await respuesta.text();
+            zonaCartelera.innerHTML = html;
 
 
         } catch (error) {
@@ -374,6 +388,8 @@
         // definida en el WSDL y los datos introducidos en el formulario.
         
         // const xmlSoap 
+
+    
 
         try {
             // TODO 6:
