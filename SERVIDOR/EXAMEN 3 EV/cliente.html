@@ -1,3 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal de Cine - Servicios Web</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #252525;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        .panel {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .descripcion {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select,
+        button {
+            padding: 9px;
+            font-size: 15px;
+        }
+
+        input,
+        select {
+            min-width: 190px;
+            border: 1px solid #aaa;
+        }
+
+        button {
+            border: 0;
+            background-color: #9e1b32;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #7e1528;
+        }
+
+        .resultado {
+            border-top: 1px solid #ddd;
+            padding-top: 18px;
+            min-height: 60px;
+        }
+
+        .cartelera {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 15px;
+        }
+
+        .pelicula,
+        .reserva {
+            border: 1px solid #d2d2d2;
+            padding: 15px;
+            background-color: #fafafa;
+        }
+
+        .pelicula h3,
+        .reserva h3 {
+            margin: 0 0 10px;
+            color: #9e1b32;
+        }
+
+        .pelicula p,
+        .reserva p {
+            margin: 6px 0;
+        }
+
+        .reservas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .mensaje {
+            padding: 12px;
+            background-color: #fff3cd;
+            border: 1px solid #ffe69c;
+        }
+
+        .ok {
+            padding: 12px;
+            background-color: #e5f6ea;
+            border: 1px solid #b7ddc3;
+            color: #0f5d2e;
+            font-weight: bold;
+        }
+
+        .error {
+            padding: 12px;
+            background-color: #f8dddd;
+            border: 1px solid #e8afaf;
+            color: darkred;
+            font-weight: bold;
+        }
+
+        .cargando {
+            padding: 12px;
+            background-color: #eeeeee;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .documentacion {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .documentacion a {
+            color: #9e1b32;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Portal de Cine</h1>
+</header>
+
+<main>
+
+    <!-- ===================================================== -->
+    <!-- SERVICIO 1: CARTELERA QUE DEVUELVE HTML               -->
+    <!-- ===================================================== -->
+    <section class="panel">
+        <h2>1. Cartelera</h2>
+
+        <p class="descripcion">
+            Consulta las películas disponibles según el género seleccionado.
+        </p>
+
+        <form id="formCartelera">
+            <div class="fila">
+                <div>
+                    <label for="genero">Género</label>
+                    <select id="genero">
+                        <option value="">Todos</option>
+                        <option value="Animación">Animación</option>
+                        <option value="Ciencia ficción">Ciencia ficción</option>
+                        <option value="Acción">Acción</option>
+                        <option value="Drama">Drama</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="submit">Cargar cartelera</button>
+                </div>
+            </div>
+        </form>
+
+        <div id="zonaCartelera" class="resultado">
+            <p class="mensaje">Selecciona un género y carga la cartelera.</p>
+        </div>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- SERVICIO 2: CÁLCULO DE ENTRADAS MEDIANTE SOAP        -->
+    <!-- ===================================================== -->
+    <section class="panel">
+        <h2>2. Precio de entradas</h2>
+
+        <p class="descripcion">
+            Calcula el precio total de las entradas según la cantidad y el tipo seleccionado.
+        </p>
+
+        <form id="formEntradas">
+            <div class="fila">
+                <div>
+                    <label for="cantidad">Cantidad de entradas</label>
+                    <input type="number" id="cantidad" min="1" value="2">
+                </div>
+
+                <div>
+                    <label for="tipoEntrada">Tipo de entrada</label>
+                    <select id="tipoEntrada">
+                        <option value="normal">Normal - 8 €</option>
+                        <option value="reducida">Reducida - 5 €</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="submit">Calcular precio</button>
+                </div>
+            </div>
+        </form>
+
+        <p id="resultadoEntradas" class="mensaje">
+            Todavía no se ha realizado ningún cálculo.
+        </p>
+
+        <p class="documentacion">
+            <a href="documentacion/entradas.wsdl" target="_blank">
+                Consultar WSDL del servicio
+            </a>
+        </p>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- SERVICIO 3: RESERVAS REST CONSUMIDAS MEDIANTE CURL   -->
+    <!-- ===================================================== -->
+    <section class="panel">
+        <h2>3. Reservas externas</h2>
+
+        <p class="descripcion">
+            Consulta las reservas registradas o crea una nueva reserva.
+        </p>
+
+        <button id="btnCargarReservas" type="button">Consultar reservas</button>
+
+        <h3>Crear nueva reserva</h3>
+
+        <form id="formReserva">
+            <div class="fila">
+                <div>
+                    <label for="clienteReserva">Cliente</label>
+                    <input type="text" id="clienteReserva" value="Ana">
+                </div>
+
+                <div>
+                    <label for="peliculaReserva">Película</label>
+                    <input type="text" id="peliculaReserva" value="Robot Dreams">
+                </div>
+
+                <div>
+                    <label for="entradasReserva">Entradas</label>
+                    <input type="number" id="entradasReserva" min="1" value="2">
+                </div>
+
+                <div>
+                    <button type="submit">Crear reserva</button>
+                </div>
+            </div>
+        </form>
+
+        <p id="mensajeReservas" class="mensaje">
+            Pulsa “Consultar reservas” para cargar los datos.
+        </p>
+
+        <div id="zonaReservas" class="reservas"></div>
+
+        <p class="documentacion">
+            <a href="documentacion/openApiReservas.yaml" target="_blank">
+                Consultar especificación OpenAPI
+            </a>
+        </p>
+    </section>
+
+</main>
+
 <script>
     // =====================================================
     // DIRECCIONES DEL CONTROLADOR
@@ -28,26 +330,13 @@
             // Construir la URL necesaria para consultar la cartelera.
             // Crear un objeto URLSearchParams e incluir el género seleccionado
             // en el formulario. Después, añadir esos parámetros a URL_CARTELERA.
-            const parametros = new URLSearchParams();
-            parametros.append("genero", selectGenero.value);
 
-            const url = URL_CARTELERA + "?" + parametros.toString();
 
             // TODO 4:
             // Realizar una petición GET al controlador para obtener la cartelera.
             // La respuesta recibida será un fragmento HTML, por lo que debe
             // leerse como texto e insertarse directamente dentro de zonaCartelera.
-            const respuesta = await fetch(url, {
-                method: "GET"
-            });
 
-            const html = await respuesta.text();
-
-            if (!respuesta.ok) {
-                throw new Error("Error HTTP: " + respuesta.status);
-            }
-
-            zonaCartelera.innerHTML = html;
 
         } catch (error) {
             zonaCartelera.innerHTML =
@@ -85,16 +374,6 @@
         // definida en el WSDL y los datos introducidos en el formulario.
         
         // const xmlSoap 
-        const xmlSoap = `<?xml version="1.0" encoding="UTF-8"?>
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cin="http://localhost/SERVIDOR/EXAMEN%203%20EV/servicio_entradas.php">
-            <soapenv:Header/>
-            <soapenv:Body>
-                <cin:calcularPrecioEntradas>
-                    <cin:cantidad>${cantidad}</cin:cantidad>
-                    <cin:tipo>${tipo}</cin:tipo>
-                </cin:calcularPrecioEntradas>
-            </soapenv:Body>
-        </soapenv:Envelope>`;
 
         try {
             // TODO 6:
@@ -104,20 +383,6 @@
             // Recoger la respuesta recibida como texto.
             
             // const respuesta 
-            const respuesta = await fetch(URL_ENTRADAS, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/xml; charset=utf-8",
-                    "Accept": "text/xml"
-                },
-                body: xmlSoap
-            });
-
-            const respuestaXml = await respuesta.text();
-
-            if (!respuesta.ok) {
-                throw new Error("Error HTTP: " + respuesta.status);
-            }
 
             // TODO 7:
             // Interpretar la respuesta SOAP.
@@ -127,8 +392,6 @@
             
             // const parser
             // const xml
-            const parser = new DOMParser();
-            const xml = parser.parseFromString(respuestaXml, "text/xml");
 
             const nodoErrorXml =
                 xml.getElementsByTagName("parsererror")[0];
@@ -153,16 +416,8 @@
             }
 
             // const nodoPrecioTotal
-            const nodoPrecioTotal = obtenerPrimerNodo(
-                xml,
-                "precioTotal"
-            );
 
             // const nodoPrecioUnitario
-            const nodoPrecioUnitario = obtenerPrimerNodo(
-                xml,
-                "precioUnitario"
-            );
 
             if (!nodoPrecioTotal || !nodoPrecioUnitario) {
                 throw new Error(
@@ -230,12 +485,6 @@
             // se espera recibir una respuesta JSON.
             
             // const respuesta
-            const respuesta = await fetch(URL_RESERVAS, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json"
-                }
-            });
 
             // TODO 12:
             // Recoger la respuesta JSON obtenida en la consulta.
@@ -243,21 +492,6 @@
             // Si es correcta, mostrar las reservas recibidas utilizando mostrarReservas().
             
             //const datos = await leerRespuestaJson(respuesta);
-            const datos = await leerRespuestaJson(respuesta);
-
-            if (!respuesta.ok) {
-                throw new Error(datos.error || "Error HTTP: " + respuesta.status);
-            }
-
-            if (Array.isArray(datos)) {
-                mostrarReservas(datos);
-
-            } else if (Array.isArray(datos.reservas)) {
-                mostrarReservas(datos.reservas);
-
-            } else {
-                throw new Error("La respuesta no contiene una lista de reservas.");
-            }
 
             mensajeReservas.className = "ok";
             mensajeReservas.textContent = mensajeFinal;
@@ -279,19 +513,6 @@
         // Los valores deben obtenerse de los campos del formulario.
         
         // const body
-        const body = {
-            cliente: document.getElementById("clienteReserva").value.trim(),
-            pelicula: document.getElementById("peliculaReserva").value.trim(),
-            entradas: Number(document.getElementById("entradasReserva").value)
-        };
-
-        if (body.cliente === "" || body.pelicula === "" || body.entradas < 1) {
-            mensajeReservas.className = "error";
-            mensajeReservas.textContent =
-                "Debes introducir cliente, película y al menos una entrada.";
-
-            return;
-        }
 
         mensajeReservas.className = "cargando";
         mensajeReservas.textContent = "Creando reserva...";
@@ -304,27 +525,13 @@
             // cabeceras necesarias. Recoger la respuesta JSON y comprobar si la operación es correcta.
             
             // const respuesta
-            const respuesta = await fetch(URL_RESERVAS, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json; charset=utf-8",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify(body)
-            });
-
             // const datos
-            const datos = await leerRespuestaJson(respuesta);
-
-            if (!respuesta.ok) {
-                throw new Error(datos.error || "Error HTTP: " + respuesta.status);
-            }
 
             formReserva.reset();
 
             document.getElementById("entradasReserva").value = 1;
 
-            await cargarReservas(datos.mensaje || "Reserva creada correctamente.");
+            await cargarReservas(datos.mensaje);
 
         } catch (error) {
             mensajeReservas.className = "error";
@@ -384,3 +591,6 @@
         });
     }
 </script>
+
+</body>
+</html>
