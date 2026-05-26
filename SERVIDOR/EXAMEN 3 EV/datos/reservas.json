@@ -100,5 +100,11 @@
         "cliente": "Ana",
         "pelicula": "Robot Dreams",
         "entradas": 1
+    },
+    {
+        "id": 18,
+        "cliente": "Ana",
+        "pelicula": "Robot Dreams",
+        "entradas": 2
     }
 ]

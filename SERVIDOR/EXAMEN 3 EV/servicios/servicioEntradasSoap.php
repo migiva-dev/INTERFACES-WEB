@@ -51,19 +51,24 @@ function procesarPeticionEntradasSoap()
 
         return;
     }
-      // TODO 8:
+
+    // TODO 8:
     // Recuperar de la operación SOAP los parámetros enviados por el cliente.
     // Consultar el WSDL para identificar los nombres de los datos recibidos.
     // Transformar la cantidad a un número entero y guardar el tipo como texto.
     
     
     //$nodoCantidad
+    $nodoCantidad = obtenerNodoPorNombreLocal(
+        $operacion,
+        "cantidad"
+    );
 
     // $nodoTipo
-
-
-    $nodoCantidad = obtenerNodoPorNombreLocal($operacion, "cantidad");
-    $nodoTipo = obtenerNodoPorNombreLocal($operacion, "tipo");
+    $nodoTipo = obtenerNodoPorNombreLocal(
+        $operacion,
+        "tipo"
+    );
 
     if ($nodoCantidad === null || $nodoTipo === null) {
         enviarFaultSoap(
@@ -99,8 +104,10 @@ function procesarPeticionEntradasSoap()
 
     if ($tipo === "normal") {
         $precioUnitario = 8;
-    } else if ($tipo === "reducida") {
+
+    } elseif ($tipo === "reducida") {
         $precioUnitario = 5;
+
     } else {
         enviarFaultSoap(
             "El tipo de entrada debe ser normal o reducida."
@@ -110,17 +117,13 @@ function procesarPeticionEntradasSoap()
     }
 
     $precioTotal = $cantidad * $precioUnitario;
+
     enviarRespuestaPrecioSoap(
         $cantidad,
         $tipo,
         $precioUnitario,
         $precioTotal
     );
-
-
-
-
-    
 }
 
 function obtenerPrimerElementoHijo($nodoPadre)
@@ -162,8 +165,6 @@ function enviarRespuestaPrecioSoap(
     // TODO 10:
     // Construir y devolver la respuesta XML SOAP de la operación.
     // Consultar el WSDL para identificar los datos que debe contener la respuesta.
-
-
     $precioUnitarioFormateado = number_format(
         $precioUnitario,
         2,
@@ -196,8 +197,6 @@ function enviarRespuestaPrecioSoap(
                 '</calcularPrecioEntradasResponse>' .
             '</soap:Body>' .
         '</soap:Envelope>';
-
-
 }
 
 function enviarFaultSoap($mensaje)
