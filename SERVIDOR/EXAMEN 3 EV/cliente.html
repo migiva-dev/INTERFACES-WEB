@@ -330,31 +330,26 @@
             // Construir la URL necesaria para consultar la cartelera.
             // Crear un objeto URLSearchParams e incluir el género seleccionado
             // en el formulario. Después, añadir esos parámetros a URL_CARTELERA.
-            const params = new URLSearchParams();
-            params.append("genero", selectGenero.value);
-            const urlCartelera = URL_CARTELERA + "?" + params.toString();
+            const parametros = new URLSearchParams();
+            parametros.append("genero", selectGenero.value);
 
-
+            const url = URL_CARTELERA + "?" + parametros.toString();
 
             // TODO 4:
             // Realizar una petición GET al controlador para obtener la cartelera.
             // La respuesta recibida será un fragmento HTML, por lo que debe
             // leerse como texto e insertarse directamente dentro de zonaCartelera.
-            const respuesta = await fetch(urlCartelera, {
-                method: "GET",
-                headers: {
-                    "Accept": "text/html"
-                }
+            const respuesta = await fetch(url, {
+                method: "GET"
             });
-            if (!respuesta.ok) {
-                throw new Error(
-                    "Error HTTP: " + respuesta.status + " " + respuesta.statusText
-                );
-            }
-            const html = await respuesta.text();
-            zonaCartelera.innerHTML = html;
-            
 
+            const html = await respuesta.text();
+
+            if (!respuesta.ok) {
+                throw new Error("Error HTTP: " + respuesta.status);
+            }
+
+            zonaCartelera.innerHTML = html;
 
         } catch (error) {
             zonaCartelera.innerHTML =
@@ -390,24 +385,19 @@
         // y construir la petición XML SOAP correspondiente.
         // La petición debe contener el Envelope, el Body, la operación
         // definida en el WSDL y los datos introducidos en el formulario.
-
-    
+        
         // const xmlSoap 
-         
-        // const xmlSoap
-            const xmlSoap =
-                '<?xml version="1.0" encoding="UTF-8"?>' +
-                '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://localhost/portal-cine/entradas">' +
-                    '<soapenv:Header/>' +
-                    '<soapenv:Body>' +
-                        '<tns:calcularPrecioEntradas>' +
-                            '<tns:cantidad>' + cantidad + '</tns:cantidad>' +
-                            '<tns:tipo>' + tipo + '</tns:tipo>' +
-                        '</tns:calcularPrecioEntradas>' +
-                    '</soapenv:Body>' +
-                '</soapenv:Envelope>';
-
-
+        const xmlSoap =
+            '<?xml version="1.0" encoding="UTF-8"?>' +
+            '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://localhost/portal-cine/entradas">' +
+                '<soapenv:Header/>' +
+                '<soapenv:Body>' +
+                    '<tns:calcularPrecioEntradas>' +
+                        '<tns:cantidad>' + cantidad + '</tns:cantidad>' +
+                        '<tns:tipo>' + tipo + '</tns:tipo>' +
+                    '</tns:calcularPrecioEntradas>' +
+                '</soapenv:Body>' +
+            '</soapenv:Envelope>';
 
         try {
             // TODO 6:
@@ -415,13 +405,8 @@
             // Utilizar POST, indicar que se envía y se espera recibir XML
             // y enviar la cadena XML creada anteriormente en el body.
             // Recoger la respuesta recibida como texto.
-
-
             
             // const respuesta 
-           // const respuesta
-
-           // const respuesta
             const respuesta = await fetch(URL_ENTRADAS, {
                 method: "POST",
                 headers: {
@@ -438,32 +423,18 @@
                 console.log(textoRespuesta);
                 throw new Error("Error HTTP: " + respuesta.status);
             }
-           
+
             // TODO 7:
             // Interpretar la respuesta SOAP.
             // Convertir el texto XML recibido en un documento XML.
             // Consultar el WSDL para recuperar los datos
             // del precio total y unitario (ESTAN ABAJO)
-
+            
             // const parser
             const parser = new DOMParser();
 
             // const xml
             const xml = parser.parseFromString(textoRespuesta, "text/xml");
-            
-            // const parser
-            // const xml
-            // const nodoPrecioTotal
-            const nodoPrecioTotal = obtenerPrimerNodo(
-                xml,
-                "precioTotal"
-            );
-
-            // const nodoPrecioUnitario
-            const nodoPrecioUnitario = obtenerPrimerNodo(
-                xml,
-                "precioUnitario"
-            );
 
             const nodoErrorXml =
                 xml.getElementsByTagName("parsererror")[0];
@@ -488,8 +459,16 @@
             }
 
             // const nodoPrecioTotal
+            const nodoPrecioTotal = obtenerPrimerNodo(
+                xml,
+                "precioTotal"
+            );
 
             // const nodoPrecioUnitario
+            const nodoPrecioUnitario = obtenerPrimerNodo(
+                xml,
+                "precioUnitario"
+            );
 
             if (!nodoPrecioTotal || !nodoPrecioUnitario) {
                 throw new Error(
@@ -557,13 +536,12 @@
             // se espera recibir una respuesta JSON.
             
             // const respuesta
-                const respuesta = await fetch(URL_RESERVAS, {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json"
-                    }
-                });
-
+            const respuesta = await fetch(URL_RESERVAS, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
 
             // TODO 12:
             // Recoger la respuesta JSON obtenida en la consulta.
@@ -572,14 +550,29 @@
             
             //const datos = await leerRespuestaJson(respuesta);
             const datos = await leerRespuestaJson(respuesta);
+
             if (!respuesta.ok) {
                 throw new Error(
-                    "Error HTTP: " + respuesta.status + " " + respuesta.statusText +
-                    " | Detalles: " + (datos.mensaje || "No se han proporcionado detalles.")
+                    datos.error || datos.mensaje || "Error HTTP: " + respuesta.status
                 );
             }
-             
 
+            console.log(datos);
+
+            if (Array.isArray(datos)) {
+                mostrarReservas(datos);
+
+            } else if (Array.isArray(datos.reservas)) {
+                mostrarReservas(datos.reservas);
+
+            } else if (datos.reserva) {
+                mostrarReservas([datos.reserva]);
+
+            } else {
+                throw new Error(
+                    "La respuesta JSON no contiene una lista de reservas."
+                );
+            }
 
             mensajeReservas.className = "ok";
             mensajeReservas.textContent = mensajeFinal;
@@ -602,12 +595,18 @@
         
         // const body
         const body = {
-            cliente: document.getElementById("clienteReserva").value,
-            pelicula: document.getElementById("peliculaReserva").value,
-            entradas: parseInt(document.getElementById("entradasReserva").value)
+            cliente: document.getElementById("clienteReserva").value.trim(),
+            pelicula: document.getElementById("peliculaReserva").value.trim(),
+            entradas: Number(document.getElementById("entradasReserva").value)
         };
 
+        if (body.cliente === "" || body.pelicula === "" || body.entradas < 1) {
+            mensajeReservas.className = "error";
+            mensajeReservas.textContent =
+                "Debes introducir cliente, película y al menos una entrada.";
 
+            return;
+        }
 
         mensajeReservas.className = "cargando";
         mensajeReservas.textContent = "Creando reserva...";
@@ -620,30 +619,29 @@
             // cabeceras necesarias. Recoger la respuesta JSON y comprobar si la operación es correcta.
             
             // const respuesta
-            // const datos
             const respuesta = await fetch(URL_RESERVAS, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json; charset=utf-8",
                     "Accept": "application/json"
                 },
                 body: JSON.stringify(body)
             });
+
+            // const datos
             const datos = await leerRespuestaJson(respuesta);
+
             if (!respuesta.ok) {
                 throw new Error(
-                    "Error HTTP: " + respuesta.status + " " + respuesta.statusText +
-                    " | Detalles: " + (datos.mensaje || "No se han proporcionado detalles.")
+                    datos.error || datos.mensaje || "Error HTTP: " + respuesta.status
                 );
             }
-
-
 
             formReserva.reset();
 
             document.getElementById("entradasReserva").value = 1;
 
-            await cargarReservas(datos.mensaje);
+            await cargarReservas(datos.mensaje || "Reserva creada correctamente.");
 
         } catch (error) {
             mensajeReservas.className = "error";
