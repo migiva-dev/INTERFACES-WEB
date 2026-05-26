@@ -388,8 +388,18 @@
         // definida en el WSDL y los datos introducidos en el formulario.
         
         // const xmlSoap 
+        const xmlSoap = `<?xml version="1.0" encoding="UTF-8"?>
+            <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/en
+            velope/" xmlns:ent="http://localhost/servicios/entradas">
 
-    
+            <soapenv:Header/>    
+                <soapenv:Body>
+                    <calcularPrecioEntradas>
+                        <cantidad>${cantidad}</cin:cantidad>
+                        <tipo>${tipo}</cin:tipo>
+                    <calcularPrecioEntradas>
+                </soapenv:Body>
+            </soapenv:Envelope>`;
 
         try {
             // TODO 6:
@@ -399,6 +409,8 @@
             // Recoger la respuesta recibida como texto.
             
             // const respuesta 
+
+            
 
             // TODO 7:
             // Interpretar la respuesta SOAP.
