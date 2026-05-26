@@ -167,7 +167,7 @@ function consumirApiReservasConCurl($metodo)
     // TODO 18:
     // Si el método recibido por el controlador es GET,
     // configurar cURL para realizar una petición GET al proveedor externo.
-    
+
     if ($metodo === "GET") {
         curl_setopt($curl, CURLOPT_HTTPGET, true);
     }
