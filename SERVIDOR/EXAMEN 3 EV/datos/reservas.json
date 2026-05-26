@@ -70,5 +70,35 @@
         "cliente": "PEpe",
         "pelicula": "Robot Dreams",
         "entradas": 2
+    },
+    {
+        "id": 13,
+        "cliente": "Ana",
+        "pelicula": "Robot Dreams",
+        "entradas": 2
+    },
+    {
+        "id": 14,
+        "cliente": "Ana",
+        "pelicula": "Robot Dreams",
+        "entradas": 1
+    },
+    {
+        "id": 15,
+        "cliente": "dad",
+        "pelicula": "Robot Dreams",
+        "entradas": 1
+    },
+    {
+        "id": 16,
+        "cliente": "Ana",
+        "pelicula": "Robot Dreams",
+        "entradas": 2
+    },
+    {
+        "id": 17,
+        "cliente": "Ana",
+        "pelicula": "Robot Dreams",
+        "entradas": 1
     }
 ]
