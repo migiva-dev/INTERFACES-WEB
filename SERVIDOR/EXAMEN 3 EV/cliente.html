@@ -86,15 +86,15 @@
         
         // const xmlSoap 
         const xmlSoap = `<?xml version="1.0" encoding="UTF-8"?>
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cin="http://localhost/servicios/entradas">
-    <soapenv:Header/>
-    <soapenv:Body>
-        <cin:calcularPrecioEntradas>
-            <cin:cantidad>${cantidad}</cin:cantidad>
-            <cin:tipo>${tipo}</cin:tipo>
-        </cin:calcularPrecioEntradas>
-    </soapenv:Body>
-</soapenv:Envelope>`;
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cin="http://localhost/servicios/entradas">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <cin:calcularPrecioEntradas>
+                    <cin:cantidad>${cantidad}</cin:cantidad>
+                    <cin:tipo>${tipo}</cin:tipo>
+                </cin:calcularPrecioEntradas>
+            </soapenv:Body>
+        </soapenv:Envelope>`;
 
         try {
             // TODO 6:
