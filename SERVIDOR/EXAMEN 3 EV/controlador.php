@@ -18,6 +18,7 @@ $metodo = $_SERVER["REQUEST_METHOD"];
 // mediante require_once, ejecutar la función que devuelve la cartelera
 // en formato HTML y finalizar la ejecución del controlador.
 // La cartelera solamente debe aceptar peticiones GET.
+
 if ($ruta === "cartelera") {
     if ($metodo !== "GET") {
         http_response_code(405);
@@ -26,7 +27,6 @@ if ($ruta === "cartelera") {
         echo '<p class="error">La cartelera solamente permite peticiones GET.</p>';
 
         exit;
-
     }
 
     require_once __DIR__ . "/servicios/servicioCartelera.php";
@@ -140,6 +140,7 @@ function consumirApiReservasConCurl($metodo)
     // de reservas utilizando la URL almacenada en $urlProveedor.
     
     //$curl
+    $curl = curl_init($urlProveedor);
 
     if ($curl === false) {
         responderJson(
@@ -157,24 +158,34 @@ function consumirApiReservasConCurl($metodo)
     // Configurar las opciones comunes de la petición cURL.
     // La respuesta de la API externa debe guardarse en una variable
     // y la petición debe indicar que espera recibir JSON.
-    
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, [
+        "Accept: application/json"
+    ]);
 
     // TODO 18:
     // Si el método recibido por el controlador es GET,
     // configurar cURL para realizar una petición GET al proveedor externo.
-    
+    if ($metodo === "GET") {
+        curl_setopt($curl, CURLOPT_HTTPGET, true);
+    }
 
     if ($metodo === "POST") {
         // TODO 19:
         // Leer el cuerpo JSON que el cliente ha enviado al controlador.
         // Este mismo cuerpo deberá reenviarse después a la API externa.
-        
+        $cuerpoJson = file_get_contents("php://input");
 
         // TODO 20:
         // Configurar cURL para realizar una petición POST a la API externa.
         // Reenviar el cuerpo JSON recibido anteriormente e indicar mediante
         // cabeceras que se envía y se espera recibir información JSON.
-        
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $cuerpoJson);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
+            "Content-Type: application/json; charset=utf-8",
+            "Accept: application/json"
+        ]);
     }
 
     // TODO 21:
@@ -183,9 +194,12 @@ function consumirApiReservasConCurl($metodo)
     // externa y reenviar al cliente dicho código junto con el cuerpo JSON recibido (ABAJO).
     
     // $respuestaProveedor
+    $respuestaProveedor = curl_exec($curl);
 
     if ($respuestaProveedor === false) {
         $errorCurl = curl_error($curl);
+
+        curl_close($curl);
 
         responderJson(
             [
@@ -200,6 +214,9 @@ function consumirApiReservasConCurl($metodo)
     }
 
     // $codigoHttp
+    $codigoHttp = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+    curl_close($curl);
 
     if ($codigoHttp === 0) {
         responderJson(
@@ -214,6 +231,10 @@ function consumirApiReservasConCurl($metodo)
     }
 
     // RESPUESTA
+    http_response_code($codigoHttp);
+    header("Content-Type: application/json; charset=utf-8");
+
+    echo $respuestaProveedor;
 }
 
 // =====================================================
