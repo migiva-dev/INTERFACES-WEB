@@ -51,8 +51,7 @@ function procesarPeticionEntradasSoap()
 
         return;
     }
-
-    // TODO 8:
+      // TODO 8:
     // Recuperar de la operación SOAP los parámetros enviados por el cliente.
     // Consultar el WSDL para identificar los nombres de los datos recibidos.
     // Transformar la cantidad a un número entero y guardar el tipo como texto.
@@ -60,6 +59,10 @@ function procesarPeticionEntradasSoap()
     //$nodoCantidad
 
     // $nodoTipo
+
+
+    $nodoCantidad = obtenerNodoPorNombreLocal($operacion, "cantidad");
+    $nodoTipo = obtenerNodoPorNombreLocal($operacion, "tipo");
 
     if ($nodoCantidad === null || $nodoTipo === null) {
         enviarFaultSoap(
@@ -69,8 +72,8 @@ function procesarPeticionEntradasSoap()
         return;
     }
 
-    // $cantidad
-    // $tipo
+    $cantidad = (int) $nodoCantidad->textContent;
+    $tipo = trim($nodoTipo->textContent);
 
     if ($cantidad <= 0) {
         enviarFaultSoap(
