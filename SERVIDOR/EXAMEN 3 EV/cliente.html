@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal de Cine - Servicios Web</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #252525;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+
+        .panel {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .descripcion {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select,
+        button {
+            padding: 9px;
+            font-size: 15px;
+        }
+
+        input,
+        select {
+            min-width: 190px;
+            border: 1px solid #aaa;
+        }
+
+        button {
+            border: 0;
+            background-color: #9e1b32;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #7e1528;
+        }
+
+        .resultado {
+            border-top: 1px solid #ddd;
+            padding-top: 18px;
+            min-height: 60px;
+        }
+
+        .cartelera {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 15px;
+        }
+
+        .pelicula,
+        .reserva {
+            border: 1px solid #d2d2d2;
+            padding: 15px;
+            background-color: #fafafa;
+        }
+
+        .pelicula h3,
+        .reserva h3 {
+            margin: 0 0 10px;
+            color: #9e1b32;
+        }
+
+        .pelicula p,
+        .reserva p {
+            margin: 6px 0;
+        }
+
+        .reservas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .mensaje {
+            padding: 12px;
+            background-color: #fff3cd;
+            border: 1px solid #ffe69c;
+        }
+
+        .ok {
+            padding: 12px;
+            background-color: #e5f6ea;
+            border: 1px solid #b7ddc3;
+            color: #0f5d2e;
+            font-weight: bold;
+        }
+
+        .error {
+            padding: 12px;
+            background-color: #f8dddd;
+            border: 1px solid #e8afaf;
+            color: darkred;
+            font-weight: bold;
+        }
+
+        .cargando {
+            padding: 12px;
+            background-color: #eeeeee;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .documentacion {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .documentacion a {
+            color: #9e1b32;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Portal de Cine</h1>
+</header>
+
+<main>
+
+    <!-- ===================================================== -->
+    <!-- SERVICIO 1: CARTELERA QUE DEVUELVE HTML               -->
+    <!-- ===================================================== -->
+    <section class="panel">
+        <h2>1. Cartelera</h2>
+
+        <p class="descripcion">
+            Consulta las películas disponibles según el género seleccionado.
+        </p>
+
+        <form id="formCartelera">
+            <div class="fila">
+                <div>
+                    <label for="genero">Género</label>
+                    <select id="genero">
+                        <option value="">Todos</option>
+                        <option value="Animación">Animación</option>
+                        <option value="Ciencia ficción">Ciencia ficción</option>
+                        <option value="Acción">Acción</option>
+                        <option value="Drama">Drama</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="submit">Cargar cartelera</button>
+                </div>
+            </div>
+        </form>
+
+        <div id="zonaCartelera" class="resultado">
+            <p class="mensaje">Selecciona un género y carga la cartelera.</p>
+        </div>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- SERVICIO 2: CÁLCULO DE ENTRADAS MEDIANTE SOAP        -->
+    <!-- ===================================================== -->
+    <section class="panel">
+        <h2>2. Precio de entradas</h2>
+
+        <p class="descripcion">
+            Calcula el precio total de las entradas según la cantidad y el tipo seleccionado.
+        </p>
+
+        <form id="formEntradas">
+            <div class="fila">
+                <div>
+                    <label for="cantidad">Cantidad de entradas</label>
+                    <input type="number" id="cantidad" min="1" value="2">
+                </div>
+
+                <div>
+                    <label for="tipoEntrada">Tipo de entrada</label>
+                    <select id="tipoEntrada">
+                        <option value="normal">Normal - 8 €</option>
+                        <option value="reducida">Reducida - 5 €</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="submit">Calcular precio</button>
+                </div>
+            </div>
+        </form>
+
+        <p id="resultadoEntradas" class="mensaje">
+            Todavía no se ha realizado ningún cálculo.
+        </p>
+
+        <p class="documentacion">
+            <a href="documentacion/entradas.wsdl" target="_blank">
+                Consultar WSDL del servicio
+            </a>
+        </p>
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- SERVICIO 3: RESERVAS REST CONSUMIDAS MEDIANTE CURL   -->
+    <!-- ===================================================== -->
+    <section class="panel">
+        <h2>3. Reservas externas</h2>
+
+        <p class="descripcion">
+            Consulta las reservas registradas o crea una nueva reserva.
+        </p>
+
+        <button id="btnCargarReservas" type="button">Consultar reservas</button>
+
+        <h3>Crear nueva reserva</h3>
+
+        <form id="formReserva">
+            <div class="fila">
+                <div>
+                    <label for="clienteReserva">Cliente</label>
+                    <input type="text" id="clienteReserva" value="Ana">
+                </div>
+
+                <div>
+                    <label for="peliculaReserva">Película</label>
+                    <input type="text" id="peliculaReserva" value="Robot Dreams">
+                </div>
+
+                <div>
+                    <label for="entradasReserva">Entradas</label>
+                    <input type="number" id="entradasReserva" min="1" value="2">
+                </div>
+
+                <div>
+                    <button type="submit">Crear reserva</button>
+                </div>
+            </div>
+        </form>
+
+        <p id="mensajeReservas" class="mensaje">
+            Pulsa “Consultar reservas” para cargar los datos.
+        </p>
+
+        <div id="zonaReservas" class="reservas"></div>
+
+        <p class="documentacion">
+            <a href="documentacion/openApiReservas.yaml" target="_blank">
+                Consultar especificación OpenAPI
+            </a>
+        </p>
+    </section>
+
+</main>
+
+<script>
+    // =====================================================
+    // DIRECCIONES DEL CONTROLADOR
+    // =====================================================
+    const URL_CARTELERA = "controlador.php/cartelera";
+    const URL_ENTRADAS = "controlador.php/entradas";
+    const URL_RESERVAS = "controlador.php/reservas";
+
+    // =====================================================
+    // SERVICIO 1: CARTELERA HTML
+    // =====================================================
+    const formCartelera = document.getElementById("formCartelera");
+    const selectGenero = document.getElementById("genero");
+    const zonaCartelera = document.getElementById("zonaCartelera");
+
+    formCartelera.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        await cargarCartelera();
+    });
+
+    async function cargarCartelera() {
+        zonaCartelera.innerHTML =
+            '<p class="cargando">Cargando cartelera...</p>';
+
+        try {
+            // TODO 3:
+            // Construir la URL necesaria para consultar la cartelera.
+            // Crear un objeto URLSearchParams e incluir el género seleccionado
+            // en el formulario. Después, añadir esos parámetros a URL_CARTELERA.
+
+
+            // TODO 4:
+            // Realizar una petición GET al controlador para obtener la cartelera.
+            // La respuesta recibida será un fragmento HTML, por lo que debe
+            // leerse como texto e insertarse directamente dentro de zonaCartelera.
+
+
+        } catch (error) {
+            zonaCartelera.innerHTML =
+                '<p class="error">Error al cargar la cartelera.</p>';
+
+            console.log(error);
+        }
+    }
+
+    // =====================================================
+    // SERVICIO 2: SOAP
+    // =====================================================
+    const formEntradas = document.getElementById("formEntradas");
+    const inputCantidad = document.getElementById("cantidad");
+    const selectTipoEntrada = document.getElementById("tipoEntrada");
+    const resultadoEntradas = document.getElementById("resultadoEntradas");
+
+    formEntradas.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        await calcularPrecioEntradas();
+    });
+
+    async function calcularPrecioEntradas() {
+        const cantidad = inputCantidad.value;
+        const tipo = selectTipoEntrada.value;
+
+        resultadoEntradas.className = "cargando";
+        resultadoEntradas.textContent = "Calculando precio...";
+
+        // TODO 5:
+        // Consultar el documento WSDL incluido en la carpeta documentacion
+        // y construir la petición XML SOAP correspondiente.
+        // La petición debe contener el Envelope, el Body, la operación
+        // definida en el WSDL y los datos introducidos en el formulario.
+        
+        // const xmlSoap 
+
+        try {
+            // TODO 6:
+            // Enviar la petición SOAP al controlador mediante fetch().
+            // Utilizar POST, indicar que se envía y se espera recibir XML
+            // y enviar la cadena XML creada anteriormente en el body.
+            // Recoger la respuesta recibida como texto.
+            
+            // const respuesta 
+
+            // TODO 7:
+            // Interpretar la respuesta SOAP.
+            // Convertir el texto XML recibido en un documento XML.
+            // Consultar el WSDL para recuperar los datos
+            // del precio total y unitario (ESTAN ABAJO)
+            
+            // const parser
+            // const xml
+
+            const nodoErrorXml =
+                xml.getElementsByTagName("parsererror")[0];
+
+            if (nodoErrorXml) {
+                throw new Error(
+                    "El servidor no ha devuelto un XML válido."
+                );
+            }
+
+            const nodoFault = obtenerPrimerNodo(
+                xml,
+                "faultstring"
+            );
+
+            if (nodoFault) {
+                resultadoEntradas.className = "error";
+                resultadoEntradas.textContent =
+                    "Error SOAP: " + nodoFault.textContent;
+
+                return;
+            }
+
+            // const nodoPrecioTotal
+
+            // const nodoPrecioUnitario
+
+            if (!nodoPrecioTotal || !nodoPrecioUnitario) {
+                throw new Error(
+                    "La respuesta SOAP no contiene el resultado esperado."
+                );
+            }
+
+            resultadoEntradas.className = "ok";
+
+            resultadoEntradas.textContent =
+                "Precio unitario: " + nodoPrecioUnitario.textContent +
+                " € | Precio total: " + nodoPrecioTotal.textContent + " €";
+
+        } catch (error) {
+            resultadoEntradas.className = "error";
+            resultadoEntradas.textContent =
+                "No se pudo calcular el precio de las entradas.";
+
+            console.log(error);
+        }
+    }
+
+    function obtenerPrimerNodo(xml, nombre) {
+        const nodosConNamespace =
+            xml.getElementsByTagNameNS("*", nombre);
+
+        if (nodosConNamespace.length > 0) {
+            return nodosConNamespace[0];
+        }
+
+        return xml.getElementsByTagName(nombre)[0];
+    }
+
+    // =====================================================
+    // SERVICIO 3: REST A TRAVÉS DE CURL
+    // =====================================================
+    const btnCargarReservas = document.getElementById("btnCargarReservas");
+    const formReserva = document.getElementById("formReserva");
+    const mensajeReservas = document.getElementById("mensajeReservas");
+    const zonaReservas = document.getElementById("zonaReservas");
+
+    btnCargarReservas.addEventListener("click", async function() {
+        await cargarReservas();
+    });
+
+    formReserva.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        await crearReserva();
+    });
+
+    async function cargarReservas(
+        mensajeFinal = "Reservas consultadas correctamente."
+    ) {
+        mensajeReservas.className = "cargando";
+        mensajeReservas.textContent = "Consultando reservas...";
+
+        zonaReservas.innerHTML = "";
+
+        try {
+            // TODO 11:
+            // Consultar las reservas utilizando la operación GET documentada
+            // en la especificación OpenAPI.
+            // La petición debe realizarse a URL_RESERVAS e indicar que
+            // se espera recibir una respuesta JSON.
+            
+            // const respuesta
+
+            // TODO 12:
+            // Recoger la respuesta JSON obtenida en la consulta.
+            // Si la respuesta HTTP no es correcta, lanzar un error (viene en el json).
+            // Si es correcta, mostrar las reservas recibidas utilizando mostrarReservas().
+            
+            //const datos = await leerRespuestaJson(respuesta);
+
+            mensajeReservas.className = "ok";
+            mensajeReservas.textContent = mensajeFinal;
+
+        } catch (error) {
+            mensajeReservas.className = "error";
+            mensajeReservas.textContent =
+                "No se pudieron consultar las reservas. " +
+                error.message;
+
+            console.log(error);
+        }
+    }
+
+    async function crearReserva() {
+        // TODO 13:
+        // Consultar la especificación OpenAPI y crear el objeto JavaScript
+        // correspondiente al cuerpo de una nueva reserva.
+        // Los valores deben obtenerse de los campos del formulario.
+        
+        // const body
+
+        mensajeReservas.className = "cargando";
+        mensajeReservas.textContent = "Creando reserva...";
+
+        try {
+            // TODO 14:
+            // Crear la nueva reserva utilizando la operación POST documentada
+            // en OpenAPI.
+            // Enviar el objeto anterior convertido a JSON, incluyendo las
+            // cabeceras necesarias. Recoger la respuesta JSON y comprobar si la operación es correcta.
+            
+            // const respuesta
+            // const datos
+
+            formReserva.reset();
+
+            document.getElementById("entradasReserva").value = 1;
+
+            await cargarReservas(datos.mensaje);
+
+        } catch (error) {
+            mensajeReservas.className = "error";
+            mensajeReservas.textContent =
+                "No se pudo crear la reserva. " +
+                error.message;
+
+            console.log(error);
+        }
+    }
+
+    async function leerRespuestaJson(respuesta) {
+        const texto = await respuesta.text();
+
+        try {
+            return JSON.parse(texto);
+
+        } catch (error) {
+            throw new Error(
+                "El servidor no ha devuelto una respuesta JSON válida."
+            );
+        }
+    }
+
+    function mostrarReservas(reservas) {
+        zonaReservas.innerHTML = "";
+
+        if (reservas.length === 0) {
+            zonaReservas.innerHTML =
+                '<p class="mensaje">No hay reservas registradas.</p>';
+
+            return;
+        }
+
+        reservas.forEach(function(reserva) {
+            const articulo = document.createElement("article");
+            articulo.className = "reserva";
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = "Reserva " + reserva.id;
+
+            const cliente = document.createElement("p");
+            cliente.textContent = "Cliente: " + reserva.cliente;
+
+            const pelicula = document.createElement("p");
+            pelicula.textContent = "Película: " + reserva.pelicula;
+
+            const entradas = document.createElement("p");
+            entradas.textContent = "Entradas: " + reserva.entradas;
+
+            articulo.appendChild(titulo);
+            articulo.appendChild(cliente);
+            articulo.appendChild(pelicula);
+            articulo.appendChild(entradas);
+
+            zonaReservas.appendChild(articulo);
+        });
+    }
+</script>
+
+</body>
+</html>

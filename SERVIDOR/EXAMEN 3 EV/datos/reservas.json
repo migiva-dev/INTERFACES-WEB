@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "cliente": "Luis",
+        "pelicula": "Interstellar",
+        "entradas": 2
+    },
+    {
+        "id": 2,
+        "cliente": "Marta",
+        "pelicula": "El viaje de Chihiro",
+        "entradas": 3
+    }
+]

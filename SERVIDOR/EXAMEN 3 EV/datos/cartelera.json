@@ -1,0 +1,44 @@
+[
+    {
+        "id": 1,
+        "titulo": "Robot Dreams",
+        "genero": "Animación",
+        "duracion": 102,
+        "sala": "Sala 1"
+    },
+    {
+        "id": 2,
+        "titulo": "Interstellar",
+        "genero": "Ciencia ficción",
+        "duracion": 169,
+        "sala": "Sala 2"
+    },
+    {
+        "id": 3,
+        "titulo": "Gladiator",
+        "genero": "Acción",
+        "duracion": 155,
+        "sala": "Sala 3"
+    },
+    {
+        "id": 4,
+        "titulo": "La llegada",
+        "genero": "Ciencia ficción",
+        "duracion": 116,
+        "sala": "Sala 2"
+    },
+    {
+        "id": 5,
+        "titulo": "El viaje de Chihiro",
+        "genero": "Animación",
+        "duracion": 125,
+        "sala": "Sala 1"
+    },
+    {
+        "id": 6,
+        "titulo": "La vida es bella",
+        "genero": "Drama",
+        "duracion": 116,
+        "sala": "Sala 4"
+    }
+]

@@ -1,0 +1,120 @@
+openapi: 3.0.3
+
+info:
+  title: API REST externa de reservas del Portal de Cine
+  version: 1.0.0
+  description: API externa simulada consumida por el controlador principal mediante cURL.
+
+servers:
+  - url: http://localhost/portal-cine/proveedorExterno/apiReservas.php
+    description: Servidor local XAMPP
+
+paths:
+  /reservas:
+    get:
+      summary: Consultar todas las reservas
+      operationId: obtenerReservas
+      responses:
+        '200':
+          description: Listado de reservas obtenido correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reserva'
+
+        '500':
+          description: Error al acceder a los datos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Crear una nueva reserva
+      operationId: crearReserva
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NuevaReserva'
+
+      responses:
+        '201':
+          description: Reserva creada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaCreacion'
+
+        '400':
+          description: Datos de la reserva incorrectos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Reserva:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        cliente:
+          type: string
+          example: Ana
+        pelicula:
+          type: string
+          example: Robot Dreams
+        entradas:
+          type: integer
+          example: 2
+      required:
+        - id
+        - cliente
+        - pelicula
+        - entradas
+
+    NuevaReserva:
+      type: object
+      properties:
+        cliente:
+          type: string
+          example: Ana
+        pelicula:
+          type: string
+          example: Robot Dreams
+        entradas:
+          type: integer
+          minimum: 1
+          example: 2
+      required:
+        - cliente
+        - pelicula
+        - entradas
+
+    RespuestaCreacion:
+      type: object
+      properties:
+        mensaje:
+          type: string
+          example: Reserva creada correctamente.
+        reserva:
+          $ref: '#/components/schemas/Reserva'
+      required:
+        - mensaje
+        - reserva
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: No se pudo procesar la petición.
+      required:
+        - error

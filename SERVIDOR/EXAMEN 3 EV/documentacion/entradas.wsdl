@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://localhost/portal-cine/entradas"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://localhost/portal-cine/entradas"
+    name="ServicioEntradas">
+
+    <types>
+        <xsd:schema
+            targetNamespace="http://localhost/portal-cine/entradas"
+            elementFormDefault="qualified">
+
+            <xsd:element name="calcularPrecioEntradas">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="cantidad" type="xsd:int"/>
+                        <xsd:element name="tipo" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="calcularPrecioEntradasResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="cantidad" type="xsd:int"/>
+                        <xsd:element name="tipo" type="xsd:string"/>
+                        <xsd:element name="precioUnitario" type="xsd:decimal"/>
+                        <xsd:element name="precioTotal" type="xsd:decimal"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+        </xsd:schema>
+    </types>
+
+    <message name="calcularPrecioEntradasRequest">
+        <part
+            name="parameters"
+            element="tns:calcularPrecioEntradas"/>
+    </message>
+
+    <message name="calcularPrecioEntradasResponse">
+        <part
+            name="parameters"
+            element="tns:calcularPrecioEntradasResponse"/>
+    </message>
+
+    <portType name="ServicioEntradasPortType">
+        <operation name="calcularPrecioEntradas">
+            <input message="tns:calcularPrecioEntradasRequest"/>
+            <output message="tns:calcularPrecioEntradasResponse"/>
+        </operation>
+    </portType>
+
+    <binding
+        name="ServicioEntradasBinding"
+        type="tns:ServicioEntradasPortType">
+
+        <soap:binding
+            style="document"
+            transport="http://schemas.xmlsoap.org/soap/http"/>
+
+        <operation name="calcularPrecioEntradas">
+            <soap:operation soapAction="calcularPrecioEntradas"/>
+
+            <input>
+                <soap:body use="literal"/>
+            </input>
+
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+
+    </binding>
+
+    <service name="ServicioEntradas">
+        <port
+            name="ServicioEntradasPort"
+            binding="tns:ServicioEntradasBinding">
+
+            <soap:address
+                location="http://localhost/portal-cine/controlador.php/entradas"/>
+
+        </port>
+    </service>
+
+</definitions>
