@@ -1,0 +1,18 @@
+{
+  "name": "biblioteca-videojuegos-examen",
+  "version": "1.0.0",
+  "description": "Gestor de biblioteca de videojuegos con DOM, JSDoc y pruebas Jest.",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "jest biblioteca.test.js",
+    "test:integracion": "jest biblioteca.bottomup.test.js",
+    "test:todo": "jest",
+    "generar-docs": "jsdoc -c jsdoc.json -P package.json"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "jsdoc": "^4.0.5"
+  }
+}

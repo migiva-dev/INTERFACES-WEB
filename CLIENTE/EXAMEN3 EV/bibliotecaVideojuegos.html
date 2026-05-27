@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de biblioteca de videojuegos</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="contenedor">
+    <header class="cabecera-principal">
+      <h1>Gestor de biblioteca de videojuegos</h1>
+      <p>
+        Añade juegos, controla su estado y organiza tu colección personal.
+      </p>
+    </header>
+
+    <div class="grid-principal">
+      <section class="panel">
+        <h2>Nuevo videojuego</h2>
+
+        <form id="formJuego" autocomplete="off">
+          <label>
+            Título
+            <input
+              id="inpTitulo"
+              type="text"
+              placeholder="Ej: Hollow Knight"
+              required
+            >
+          </label>
+
+          <label>
+            Estudio
+            <input
+              id="inpEstudio"
+              type="text"
+              placeholder="Ej: Team Cherry"
+              required
+            >
+          </label>
+
+          <label>
+            Plataforma
+            <select id="selPlataforma" required>
+              <option value="pc">PC</option>
+              <option value="playstation">PlayStation</option>
+              <option value="xbox">Xbox</option>
+              <option value="switch">Nintendo Switch</option>
+            </select>
+          </label>
+
+          <label>
+            PEGI
+            <select id="selPegi" required>
+              <option value="3">PEGI 3</option>
+              <option value="7">PEGI 7</option>
+              <option value="12" selected>PEGI 12</option>
+              <option value="16">PEGI 16</option>
+              <option value="18">PEGI 18</option>
+            </select>
+          </label>
+
+          <label>
+            Estado inicial
+            <select id="selEstado" required>
+              <option value="pendiente">Pendiente</option>
+              <option value="jugando" selected>Jugando</option>
+              <option value="completado">Completado</option>
+            </select>
+          </label>
+
+          <label>
+            Precio
+            <input
+              id="inpPrecio"
+              type="number"
+              min="0"
+              step="0.01"
+              value="39.99"
+              required
+            >
+          </label>
+
+          <button type="submit" class="btn-principal">
+            Añadir juego
+          </button>
+        </form>
+
+        <p id="mensaje" class="mensaje" aria-live="polite"></p>
+      </section>
+
+      <div>
+        <section class="panel">
+          <h2>Resumen de la biblioteca</h2>
+
+          <div class="resumen">
+            <div class="dato-resumen">
+              <strong id="totalJuegos">0</strong>
+              Juegos
+            </div>
+
+            <div class="dato-resumen">
+              <strong id="totalJugando">0</strong>
+              Jugando
+            </div>
+
+            <div class="dato-resumen">
+              <strong id="totalFavoritos">0</strong>
+              Favoritos
+            </div>
+
+            <div class="dato-resumen">
+              <strong id="valorBiblioteca">0.00 €</strong>
+              Valor total
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="cabecera-lista">
+            <div>
+              <h2>Mis videojuegos</h2>
+              <p class="texto-secundario">
+                Haz click en una tarjeta para seleccionarla.
+              </p>
+            </div>
+          </div>
+
+          <p id="mensajeVacio" class="mensaje-vacio">
+            Todavía no hay videojuegos en la biblioteca.
+          </p>
+
+          <div id="listaJuegos" class="lista-juegos"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/biblioteca.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
