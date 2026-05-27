@@ -4,6 +4,15 @@
 // @file
 // @author
 
+/**
+ * @file app.js
+ * @author Miguel
+ * @description
+ * Archivo encargado de la lógica de interfaz del gestor de biblioteca de videojuegos.
+ * Contiene la manipulación del DOM, creación dinámica de tarjetas, gestión de eventos,
+ * actualización visual de los videojuegos, procesamiento del formulario y actualización
+ * del resumen de la biblioteca.
+ */
 
 "use strict";
 
@@ -169,9 +178,39 @@ function crearTarjetaJuego(juego) {
   //
   // Añade los tres elementos <button> dentro del <div>.
 
+  const acciones = document.createElement("div");
+  acciones.classList.add("acciones");
+
+  const btnEstado = document.createElement("button");
+  btnEstado.type = "button";
+  btnEstado.classList.add("btn-estado");
+  btnEstado.setAttribute("data-accion", "estado");
+  btnEstado.title = "Cambiar el estado del videojuego";
+  btnEstado.textContent = "Cambiar estado";
+
+  const btnFavorito = document.createElement("button");
+  btnFavorito.type = "button";
+  btnFavorito.classList.add("btn-favorito");
+  btnFavorito.setAttribute("data-accion", "favorito");
+  btnFavorito.title = "Marcar o desmarcar como favorito";
+  btnFavorito.textContent = "Favorito";
+
+  const btnEliminar = document.createElement("button");
+  btnEliminar.type = "button";
+  btnEliminar.classList.add("btn-eliminar");
+  btnEliminar.setAttribute("data-accion", "eliminar");
+  btnEliminar.title = "Eliminar el videojuego de la biblioteca";
+  btnEliminar.textContent = "Eliminar";
+
+  acciones.appendChild(btnEstado);
+  acciones.appendChild(btnFavorito);
+  acciones.appendChild(btnEliminar);
+
   article.appendChild(cabecera);
   article.appendChild(datos);
   article.appendChild(acciones);
+
+  actualizarTarjeta(article);
 
   return article;
 }
@@ -200,7 +239,14 @@ function aplicarClasePlataforma(tarjeta) {
 // @param
 // @returns
 
-
+/**
+ * Actualiza el estado del botón de favorito de una tarjeta.
+ * Si el videojuego no puede marcarse como favorito, el botón queda deshabilitado
+ * y el atributo data-favorito de la tarjeta se establece en "false".
+ *
+ * @param {HTMLElement} tarjeta - Elemento article que representa un videojuego.
+ * @returns {void}
+ */
 function actualizarBotonFavorito(tarjeta) {
   const juego = obtenerJuegoDesdeTarjeta(tarjeta);
   const btnFavorito = tarjeta.querySelector("button[data-accion='favorito']");
@@ -277,7 +323,13 @@ function actualizarResumen() {
 //   elemento <article class="juego"> recibido.
 
 function seleccionarJuego(tarjeta) {
+  const tarjetas = listaJuegos.querySelectorAll("article.juego");
 
+  for (let i = 0; i < tarjetas.length; i++) {
+    tarjetas[i].classList.remove("seleccionado");
+  }
+
+  tarjeta.classList.add("seleccionado");
 }
 
 // =====================================================
@@ -317,7 +369,23 @@ mostrarMensaje(
 // mostrarMensaje("Se ha actualizado el estado de favorito.", "correcto");
 
 function alternarFavoritoJuego(tarjeta) {
+  const juego = obtenerJuegoDesdeTarjeta(tarjeta);
 
+  if (!biblioteca.puedeSerFavorito(juego)) {
+    mostrarMensaje(
+      "Un juego pendiente o PEGI 18 no puede marcarse como favorito.",
+      "error"
+    );
+    return;
+  }
+
+  const nuevoValor = juego.favorito ? "false" : "true";
+  tarjeta.setAttribute("data-favorito", nuevoValor);
+
+  actualizarTarjeta(tarjeta);
+  actualizarResumen();
+
+  mostrarMensaje("Se ha actualizado el estado de favorito.", "correcto");
 }
 
 // TODO 8:
@@ -330,7 +398,11 @@ function alternarFavoritoJuego(tarjeta) {
 // mostrarMensaje("El videojuego se ha eliminado de la biblioteca.", "correcto");
 
 function eliminarJuego(tarjeta) {
+  listaJuegos.removeChild(tarjeta);
 
+  actualizarResumen();
+
+  mostrarMensaje("El videojuego se ha eliminado de la biblioteca.", "correcto");
 }
 
 // =====================================================
@@ -361,11 +433,45 @@ function eliminarJuego(tarjeta) {
 // mostrarMensaje(error.message, "error");
 
 function procesarFormulario(evento) {
+  evento.preventDefault();
+  limpiarMensaje();
 
   try {
+    const titulo = inpTitulo.value;
+    const estudio = inpEstudio.value;
+    const plataforma = selPlataforma.value;
+    const pegi = selPegi.value;
+    const estado = selEstado.value;
+    const precio = inpPrecio.value;
 
+    const juego = biblioteca.crearJuego(
+      siguienteId,
+      titulo,
+      estudio,
+      plataforma,
+      pegi,
+      estado,
+      precio
+    );
+
+    const tarjeta = crearTarjetaJuego(juego);
+
+    listaJuegos.appendChild(tarjeta);
+
+    siguienteId++;
+
+    formJuego.reset();
+    selPegi.value = "12";
+    selEstado.value = "jugando";
+    inpPrecio.value = "39.99";
+
+    inpTitulo.focus();
+
+    actualizarResumen();
+
+    mostrarMensaje("Videojuego añadido correctamente.", "correcto");
   } catch (error) {
-    
+    mostrarMensaje(error.message, "error");
   }
 }
 
@@ -392,7 +498,32 @@ function procesarFormulario(evento) {
 // - Si no se ha pulsado un botón, selecciona la tarjeta con la función seleccionarJuego.
 
 function gestionarClickLista(evento) {
+  const elementoPulsado = evento.target;
+  const tarjeta = elementoPulsado.closest("article.juego");
 
+  if (!tarjeta) {
+    return;
+  }
+
+  const boton = elementoPulsado.closest("button[data-accion]");
+
+  if (boton) {
+    evento.stopPropagation();
+
+    const accion = boton.getAttribute("data-accion");
+
+    if (accion === "estado") {
+      cambiarEstadoJuego(tarjeta);
+    } else if (accion === "favorito") {
+      alternarFavoritoJuego(tarjeta);
+    } else if (accion === "eliminar") {
+      eliminarJuego(tarjeta);
+    }
+
+    return;
+  }
+
+  seleccionarJuego(tarjeta);
 }
 
 // =====================================================
