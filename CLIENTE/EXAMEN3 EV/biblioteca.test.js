@@ -22,18 +22,38 @@ const Biblioteca = require("./js/biblioteca");
 
 describe("Lógica principal de la biblioteca de videojuegos", () => {
   test("un juego que está jugando pasa a completado", () => {
-    
+    expect(Biblioteca.siguienteEstado("jugando")).toBe("completado");
   });
 
   test("un juego jugando y PEGI 12 puede ser favorito", () => {
+    const juego = {
+      estado: "jugando",
+      pegi: 12
+    };
 
+    expect(Biblioteca.puedeSerFavorito(juego)).toBe(true);
   });
 
   test("un juego pendiente no puede ser favorito", () => {
+    const juego = {
+      estado: "pendiente",
+      pegi: 7
+    };
 
+    expect(Biblioteca.puedeSerFavorito(juego)).toBe(false);
   });
 
   test("no se puede crear un videojuego con precio negativo", () => {
-
+    expect(() => {
+      Biblioteca.crearJuego(
+        1,
+        "The Legend of Zelda",
+        "Nintendo",
+        "switch",
+        12,
+        "jugando",
+        -10
+      );
+    }).toThrow("El precio debe ser un número mayor o igual que cero.");
   });
 });

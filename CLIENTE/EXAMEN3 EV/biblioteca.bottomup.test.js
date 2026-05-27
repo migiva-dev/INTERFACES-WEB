@@ -77,10 +77,42 @@ describe("Integración Bottom-Up del gestor de biblioteca", () => {
   });
 
   test("añadir un juego crea su tarjeta y actualiza el resumen", () => {
+    agregarJuego({
+      titulo: "Hollow Knight",
+      estudio: "Team Cherry",
+      plataforma: "pc",
+      pegi: 12,
+      estado: "jugando",
+      precio: 19.99
+    });
 
+    const tarjeta = document.querySelector("article.juego");
+
+    expect(tarjeta).not.toBeNull();
+    expect(tarjeta.getAttribute("data-titulo")).toBe("Hollow Knight");
+    expect(document.getElementById("totalJuegos").textContent).toBe("1");
+    expect(document.getElementById("valorBiblioteca").textContent).toBe("19.99 €");
   });
 
   test("pulsar el botón favorito modifica la tarjeta y el resumen", () => {
+    agregarJuego({
+      titulo: "Hollow Knight",
+      estudio: "Team Cherry",
+      plataforma: "pc",
+      pegi: 12,
+      estado: "jugando",
+      precio: 19.99
+    });
 
+    const tarjeta = document.querySelector("article.juego");
+    const botonFavorito = tarjeta.querySelector(
+      "button.btn-favorito[data-accion='favorito']"
+    );
+
+    botonFavorito.click();
+
+    expect(tarjeta.getAttribute("data-favorito")).toBe("true");
+    expect(tarjeta.classList.contains("favorito")).toBe(true);
+    expect(document.getElementById("totalFavoritos").textContent).toBe("1");
   });
 });
