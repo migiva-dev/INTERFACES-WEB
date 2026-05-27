@@ -5,8 +5,8 @@
 /**
 * @file biblioteca.js
 * @author Miguel Gavila ~ DAW
-* @description
 
+* @description
 * Archivo que contiene la lógica principal del gestor de biblioteca de videojuegos.
 * Incluye constantes con datos válidos, funciones de validación, creación de videojuegos,
 * gestión de estados, favoritos, resumen de la biblioteca y funciones auxiliares.
