@@ -4,7 +4,7 @@
 
 /**
 * @file biblioteca.js
-* @author Miguel
+* @author Miguel Gavila ~ DAW
 * @description
 
 * Archivo que contiene la lógica principal del gestor de biblioteca de videojuegos.

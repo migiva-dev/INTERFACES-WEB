@@ -5,8 +5,9 @@
 // @author
 
 /**
+ * 
  * @file app.js
- * @author Miguel
+ * @author Miguel Gavila ~ DAW
  * @description
  * Archivo encargado de la lógica de interfaz del gestor de biblioteca de videojuegos.
  * Contiene la manipulación del DOM, creación dinámica de tarjetas, gestión de eventos,
