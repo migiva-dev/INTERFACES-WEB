@@ -1,8 +1,17 @@
 // TODO 1:
 // Documenta la introducción general de este archivo utilizando JSDoc.
 // Debes explicar brevemente qué tipo de lógica contiene e incluir las etiquetas:
-// @file
-// @author
+
+/**
+* @file biblioteca.js
+* @author Miguel
+* @description
+
+* Archivo que contiene la lógica principal del gestor de biblioteca de videojuegos.
+* Incluye constantes con datos válidos, funciones de validación, creación de videojuegos,
+* gestión de estados, favoritos, resumen de la biblioteca y funciones auxiliares.
+
+*/
 
 (function (global) {
   "use strict";
@@ -102,9 +111,24 @@
   // Documenta la función puedeSerFavorito(juego) utilizando JSDoc.
   // Debes explicar cuándo un videojuego puede marcarse como favorito
   // e incluir las etiquetas:
-  // @param
-  // @returns
-  // @example
+
+  /**
+   * Comprueba si un videojuego puede marcarse como favorito.
+   * Un videojuego puede ser favorito cuando no está pendiente
+   * y su clasificación PEGI no es 18.
+   * 
+   * @param {object} juego - Videojuego que se quiere comprobar. 
+   * @param {string} - juego.estado - Estado actual del videojuego.
+   * @param {number} - juego.pegi - Clasificación PEGI del videojuego.
+   * @param {boolean} - 
+   * @returns 
+   * 
+   * 
+   */
+  
+
+
+
 
   function puedeSerFavorito(juego) {
     return juego.estado !== "pendiente" && Number(juego.pegi) !== 18;
