@@ -120,15 +120,14 @@
    * @param {object} juego - Videojuego que se quiere comprobar. 
    * @param {string} - juego.estado - Estado actual del videojuego.
    * @param {number} - juego.pegi - Clasificación PEGI del videojuego.
-   * @param {boolean} - 
-   * @returns 
+   * @returns {boolean} - Devuelve true si el videojuego puede marcarse como favorito, false en caso contrario.
    * 
+   * @example 
+   * const juego = {estado: "jugando", pegi: 16};
+   * puedeSerFavorito(juego); //true
    * 
    */
   
-
-
-
 
   function puedeSerFavorito(juego) {
     return juego.estado !== "pendiente" && Number(juego.pegi) !== 18;
